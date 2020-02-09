@@ -1,6 +1,6 @@
 import request from 'request'
 import logger from './logger'
-import url from 'url'
+// import url from 'url'
 
 export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
@@ -148,7 +148,8 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
 const createOption = (config_: any, accessToken: string, apiPath: string): any => {
   const servername = config_.serverinfo.servername
   const option = {
-    uri: url.resolve(servername, apiPath),
+    // uri: url.resolve(servername, apiPath),
+    uri: servername + apiPath,
     headers: headers(config_, accessToken),
     // proxy: 'http://xxx:8888',
     // strictSSL: false,

@@ -69,6 +69,7 @@ describe('OrchestratorApi のテスト', () => {
         testUser = await api.user.find(testUserId)
         expect(testUser.Name).toBe(expectedName)
       } catch (error) {
+        console.log('Community版の場合は失敗するかもしれない')
         fail(error)
       }
     })
