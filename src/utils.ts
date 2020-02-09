@@ -1,28 +1,41 @@
 import request from 'request'
 import logger from './logger'
+import url from 'url'
+
+export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
+  const option = createOption(config_, accessToken, apiPath)
+  return createStrPromise(Object.assign(option, { method: 'GET' }))
+}
 
 export const getArray = (
   config_: any,
   accessToken: string,
   apiPath: string,
+  queries?: any,
 ): Promise<Array<any>> => {
-  const servername = config_.serverinfo.servername
-  const options = {
-    method: 'GET',
-    uri: servername + apiPath,
-    headers: headers(config_, accessToken),
+  let optionTmp = createOption(config_, accessToken, apiPath)
+  optionTmp = Object.assign(optionTmp, { method: 'GET' })
+
+  let option = optionTmp
+  if (queries) {
+    option = Object.assign(optionTmp, { qs: queries })
   }
-  return createArrayPromise(options)
+  return createArrayPromise(option)
 }
 
-export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
-  const servername = config_.serverinfo.servername
-  const options = {
-    method: 'GET',
-    uri: servername + apiPath,
-    headers: headers(config_, accessToken),
-  }
-  return createPromise(options)
+export const postData = (
+  config_: any,
+  accessToken: string,
+  apiPath: string,
+  obj: any,
+): Promise<any> => {
+  const option = createOption(config_, accessToken, apiPath)
+  return createJSONPromise(
+    Object.assign(option, {
+      method: 'POST',
+      json: obj,
+    }),
+  )
 }
 
 export const putData = (
@@ -31,14 +44,22 @@ export const putData = (
   apiPath: string,
   obj: any,
 ): Promise<any> => {
-  const servername = config_.serverinfo.servername
-  const options = {
-    method: 'PUT',
-    uri: servername + apiPath,
-    headers: headers(config_, accessToken),
-    form: obj,
-  }
-  return createPromise(options)
+  const option = createOption(config_, accessToken, apiPath)
+  return createJSONPromise(
+    Object.assign(option, {
+      method: 'PUT',
+      json: obj,
+    }),
+  )
+}
+
+export const deleteData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
+  const option = createOption(config_, accessToken, apiPath)
+  return createJSONPromise(
+    Object.assign(option, {
+      method: 'DELETE',
+    }),
+  )
 }
 
 /**
@@ -65,13 +86,14 @@ const createArrayPromise = (options: any): Promise<Array<any>> => {
  * 「APIのReturn値をそのまま返すPromise」を返す
  * @param options
  */
-const createPromise = (options: any): Promise<Array<any>> => {
+const createStrPromise = (options: any): Promise<Array<any>> => {
   const promise: Promise<any> = new Promise((resolve, reject) => {
     request(options, function(err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
       }
+      logger.main.info(options.method)
       logger.main.info(body)
       if (body === null || body === '') {
         resolve()
@@ -79,7 +101,8 @@ const createPromise = (options: any): Promise<Array<any>> => {
       }
       const obj = JSON.parse(body)
       // エラーがあった場合
-      if (obj.errorCode) {
+      if (obj.errorCode || obj.errorCode === 0) {
+        //errorCodeが数値のゼロの時があった
         reject(obj)
         return
       }
@@ -88,6 +111,49 @@ const createPromise = (options: any): Promise<Array<any>> => {
     })
   })
   return promise
+}
+
+/**
+ * 「APIのReturn値をそのまま返すPromise」を返す
+ * @param options
+ */
+const createJSONPromise = (options: any): Promise<Array<any>> => {
+  const promise: Promise<any> = new Promise((resolve, reject) => {
+    request(options, function(err: any, response: any, body: any) {
+      if (err) {
+        reject(err)
+        return
+      }
+      logger.main.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      logger.main.info(body)
+
+      // PUTのばあい、StatusCodeが200で、Bodyが空のためundefinedになったが正常終了させる。
+      if (response.statusCode === 200 && !body) {
+        resolve()
+        return
+      }
+      if (body.errorCode || body.errorCode === 0) {
+        // エラーがあった場合
+        //errorCodeが数値のゼロの時があった
+        reject(body)
+        return
+      }
+      resolve(body)
+      return
+    })
+  })
+  return promise
+}
+
+const createOption = (config_: any, accessToken: string, apiPath: string): any => {
+  const servername = config_.serverinfo.servername
+  const option = {
+    uri: url.resolve(servername, apiPath),
+    headers: headers(config_, accessToken),
+    // proxy: 'http://xxx:8888',
+    // strictSSL: false,
+  }
+  return option
 }
 
 const headers = (config_: any, accessToken: string): any => {
