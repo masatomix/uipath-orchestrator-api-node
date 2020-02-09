@@ -228,44 +228,43 @@ if (!module.parent) {
     let instances: any[] = []
 
     // // ロボットを取得する
-    // instances = await api.robot.findAll()
-    // for (const instance of instances) {
-    //   console.log(instance)
-    //   // const robotId: number = instance.Id
-    //   // const robot = await api.robot.find(robotId)
-    //   // console.log(robot)
-    // }
+    instances = await api.robot.findAll()
+    for (const instance of instances) {
+      console.log(instance)
+      const robotId: number = instance.Id
+      const robot = await api.robot.find(robotId)
+      console.log(robot)
+    }
 
-    const robot = await api.robot.find(8)
-    robot.Description = 'test3'
+    // const robot = await api.robot.find(1)
+    // robot.Description = 'test3'
+    // await api.robot.update(robot)
 
-    await api.robot.update(robot)
+    // Userを取得する
+    instances = await api.user.findAll()
+    for (const instance of instances) {
+      const userId: number = instance.Id
+      const user = await api.user.find(userId)
+      console.log(user)
+    }
 
-    // // Userを取得する
-    // instances = await api.user.findAll()
-    // for (const instance of instances) {
-    //   const userId: number = instance.Id
-    //   const user = await api.user.find(userId)
-    //   console.log(user)
-    // }
+    // Machineを取得する
+    instances = await api.machine.findAll()
+    for (const instance of instances) {
+      console.log(instance)
+    }
 
-    // // Machineを取得する
-    // instances = await api.machine.findAll()
-    // for (const instance of instances) {
-    //   console.log(instance)
-    // }
+    // Processesを取得する
+    instances = await api.process.findAll()
+    for (const instance of instances) {
+      console.log(instance)
+    }
 
-    // // Processesを取得する
-    // instances = await api.process.findAll()
-    // for (const instance of instances) {
-    //   console.log(instance)
-    // }
-
-    // // Schedulesを取得する
-    // instances = await api.schedule.findAll()
-    // for (const instance of instances) {
-    //   console.log(instance)
-    // }
+    // Schedulesを取得する
+    instances = await api.schedule.findAll()
+    for (const instance of instances) {
+      console.log(instance)
+    }
   }
 
   main()

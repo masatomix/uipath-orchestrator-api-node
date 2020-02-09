@@ -78,6 +78,11 @@ const createPromise = (options: any): Promise<Array<any>> => {
         return
       }
       const obj = JSON.parse(body)
+      // エラーがあった場合
+      if (obj.errorCode) {
+        reject(obj)
+        return
+      }
       resolve(obj)
       return
     })
@@ -87,18 +92,17 @@ const createPromise = (options: any): Promise<Array<any>> => {
 
 const headers = (config_: any, accessToken: string): any => {
   const tenant_logical_name = config_.serverinfo.tenant_logical_name
-  if (tenant_logical_name) {
-    return {
-      Authorization: 'Bearer ' + accessToken,
-      'content-type': 'application/json',
-      // 'X-UIPATH-OrganizationUnitId': 1
-      'X-UiPath-TenantName': tenant_logical_name,
-    }
-  }
-  return {
+  const ret = {
     Authorization: 'Bearer ' + accessToken,
+    'content-type': 'application/json',
     // 'X-UIPATH-OrganizationUnitId': 1
   }
+  if (tenant_logical_name) {
+    return Object.assign(ret, {
+      'X-UiPath-TenantName': tenant_logical_name,
+    })
+  }
+  return ret
 }
 
 if (!module.parent) {
