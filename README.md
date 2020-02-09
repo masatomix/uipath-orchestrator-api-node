@@ -14,6 +14,33 @@ for (const robot of robots) {
 }
 ```
 
+実行結果
+
+```
+{
+  LicenseKey: null,
+  MachineName: 'PBPC0124',
+  MachineId: 4,
+  Name: 'PBPC0124_kino',
+  Username: 'xx\\kino',
+  ExternalName: null,
+  Description: null,
+  Version: '19.10.2.0',
+  Type: 'Development',
+  HostingType: 'Standard',
+  ProvisionType: 'Manual',
+  Password: null,
+  CredentialStoreId: null,
+  UserId: null,
+  CredentialType: null,
+  RobotEnvironments: 'Main',
+  IsExternalLicensed: false,
+  Id: 2,
+  ExecutionSettings: null }
+{
+  ...
+```
+
 こんな感じでOrchestrator上の情報をAPI経由で取得します。
 
 
@@ -89,7 +116,7 @@ $ cat package.json
   },
   "dependencies": {
     "config": "^3.2.5",
-    "uipath-orchestrator-api-node": "^0.2.0"
+    "uipath-orchestrator-api-node": "latest"
   }
 }
 ```
@@ -145,6 +172,76 @@ $
 $ npm i
 $ npx tsc
 $ node dist/index.js
+```
+
+
+
+
+
+
+## 利用方法(JavaScriptから)
+
+最終的に、ディレクトリ構成はこんな感じになります。
+
+```
+$ tree
+.
+├── config
+│   └── local.json
+├── index.js
+└── package.json
+
+$
+```
+
+それぞれのファイルは以下のようにします。
+
+```
+$ cat package.json 
+{
+  "name": "api_use",
+  "version": "1.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "uipath-orchestrator-api-node": "latest",
+    "config": "^3.2.5"
+  }
+}
+```
+
+
+
+```
+$ cat index.js 
+const config = require('config')
+const OrchestratorApi = require('uipath-orchestrator-api-node')
+
+const oc = new OrchestratorApi(config)
+
+const main = async () => {
+  const token = await oc.authenticate()
+  const robots = await oc.robot.findAll()
+  for (const robot of robots) {
+    console.log(robot)
+  }
+}
+
+if (!module.parent) {
+  main()
+$ 
+```
+
+実行してみます。
+
+```
+$ npm i
+$ node index.js
 ```
 
 
