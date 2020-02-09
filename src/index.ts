@@ -1,20 +1,26 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData } from './utils'
+import { getData, getArray, putData, postData, deleteData } from './utils'
 
 interface IOrchestratorApi {
   authenticate: () => Promise<any>
   license: ICrudService
   robot: ICrudService
-  user: ICrudService
+  user: UserCrudService
   machine: ICrudService
   process: ICrudService
   schedule: ICrudService
+  // 以下、汎用的なメソッド
+  getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
+  getData: (apiPath: string) => Promise<any>
+  postData: (apiPath: string, obj: any) => Promise<any>
+  putData: (apiPath: string, obj: any) => Promise<void>
+  deleteData: (apiPath: string) => Promise<any>
 }
 
 interface ICrudService {
   findAll: () => Promise<Array<any>>
-  find: (obj?: any) => Promise<any>
+  find: (obj?: any) => Promise<any> // licenseなどはパラメタ不要だったりするのでOption
   create: (obj: any) => Promise<any>
   update: (obj: any) => Promise<void>
   delete: (obj: any) => Promise<any>
@@ -41,6 +47,15 @@ class BaseCrudService implements ICrudService {
     throw Error('Not implemented yet.')
   }
   delete(obj: any): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class UserCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findByUserName(userName: String): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
 }
@@ -169,7 +184,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  user: ICrudService = new (class extends BaseCrudService {
+  user: UserCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
@@ -179,6 +194,24 @@ class OrchestratorApi implements IOrchestratorApi {
 
     find(id: number): Promise<any> {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
+    }
+
+    findByUserName(userName: String): Promise<any> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', {
+        $filter: `UserName eq '${userName}'`,
+      })
+    }
+
+    update(user: any): Promise<any> {
+      return putData(this.parent.config, this.parent.accessToken, `/odata/Users(${user.Id})`, user)
+    }
+
+    create(user: any): Promise<any> {
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Users', user)
+    }
+
+    delete(id: number): Promise<any> {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
     }
   })(this)
 
@@ -208,6 +241,26 @@ class OrchestratorApi implements IOrchestratorApi {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/ProcessSchedules')
     }
   })(this)
+
+  getArray = (apiPath: string, queries?: any): Promise<Array<any>> => {
+    return getArray(this.config, this.accessToken, apiPath, queries)
+  }
+
+  getData = (apiPath: string): Promise<any> => {
+    return getData(this.config, this.accessToken, apiPath)
+  }
+
+  postData = (apiPath: string, obj: any): Promise<any> => {
+    return postData(this.config, this.accessToken, apiPath, obj)
+  }
+
+  putData = (apiPath: string, obj: any): Promise<any> => {
+    return putData(this.config, this.accessToken, apiPath, obj)
+  }
+
+  deleteData = (apiPath: string): Promise<any> => {
+    return deleteData(this.config, this.accessToken, apiPath)
+  }
 }
 
 export = OrchestratorApi
@@ -218,52 +271,63 @@ import config from 'config'
 if (!module.parent) {
   async function main() {
     const api = new OrchestratorApi(config)
-    // まずは認証
-    await api.authenticate()
 
-    // ライセンスを取得する
-    const license: any = await api.license.find()
-    console.log(license)
+    try {
+      // まずは認証
+      await api.authenticate()
 
-    let instances: any[] = []
+      let instances: any[] = []
 
-    // // ロボットを取得する
-    instances = await api.robot.findAll()
-    for (const instance of instances) {
-      console.log(instance)
-      const robotId: number = instance.Id
-      const robot = await api.robot.find(robotId)
-      console.log(robot)
-    }
+      // ライセンスを取得する
+      const license: any = await api.license.find()
+      console.log(license)
 
-    // const robot = await api.robot.find(1)
-    // robot.Description = 'test3'
-    // await api.robot.update(robot)
+      // // ロボットを取得する
+      instances = await api.robot.findAll()
+      for (const instance of instances) {
+        console.log(instance)
+        const robotId: number = instance.Id
+        const robot = await api.robot.find(robotId)
+        console.log(robot)
+      }
 
-    // Userを取得する
-    instances = await api.user.findAll()
-    for (const instance of instances) {
-      const userId: number = instance.Id
-      const user = await api.user.find(userId)
-      console.log(user)
-    }
+      // Userを取得する
+      instances = await api.user.findAll()
+      for (const instance of instances) {
+        const userId: number = instance.Id
+        const user = await api.user.find(userId)
+        console.log(user)
+      }
 
-    // Machineを取得する
-    instances = await api.machine.findAll()
-    for (const instance of instances) {
-      console.log(instance)
-    }
+      // Machineを取得する
+      instances = await api.machine.findAll()
+      for (const instance of instances) {
+        console.log(instance)
+      }
 
-    // Processesを取得する
-    instances = await api.process.findAll()
-    for (const instance of instances) {
-      console.log(instance)
-    }
+      // Processesを取得する
+      instances = await api.process.findAll()
+      for (const instance of instances) {
+        console.log(instance)
+      }
 
-    // Schedulesを取得する
-    instances = await api.schedule.findAll()
-    for (const instance of instances) {
-      console.log(instance)
+      // Schedulesを取得する
+      instances = await api.schedule.findAll()
+      for (const instance of instances) {
+        console.log(instance)
+      }
+
+      instances = await api.getArray('/odata/Folders')
+      for (const instance of instances) {
+        console.log(instance)
+      }
+
+      instances = await api.getArray('/odata/Users')
+      for (const instance of instances) {
+        console.log(instance)
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 

@@ -21,4 +21,4 @@ $ npm publish ./
 - [初めてのnpm パッケージ公開](https://qiita.com/TsutomuNakamura/items/f943e0490d509f128ae2)
 - [package.json のチルダ(~) とキャレット(^)](https://qiita.com/sotarok/items/4ebd4cfedab186355867)
 - [npmでpackageのバージョンを調べる](https://blog.katsubemakito.net/nodejs/npm_info_version)
-
+- [[Typescript] Jest でユニットテスト環境を作る方法](https://webbibouroku.com/Blog/Article/typescript-jest)
