@@ -77,9 +77,6 @@ class OrchestratorApi implements IOrchestratorApi {
    */
   authenticate(): Promise<any> {
     const servername = this.config.serverinfo.servername
-    logger.main.info(this.config.userinfo.tenancyName)
-    logger.main.info(this.config.userinfo.usernameOrEmailAddress)
-    logger.main.info(this.config.userinfo.password)
     logger.main.info(servername)
 
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
@@ -87,6 +84,10 @@ class OrchestratorApi implements IOrchestratorApi {
 
     if (!this.config.serverinfo.client_id) {
       logger.main.info('Enterprise版として処理開始')
+      logger.main.info(this.config.userinfo.tenancyName)
+      logger.main.info(this.config.userinfo.usernameOrEmailAddress)
+      logger.main.info(this.config.userinfo.password)
+
       const auth_options = {
         uri: servername + '/api/Account/Authenticate',
         headers: {
