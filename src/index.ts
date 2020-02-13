@@ -16,6 +16,9 @@ interface IOrchestratorApi {
   postData: (apiPath: string, obj: any) => Promise<any>
   putData: (apiPath: string, obj: any) => Promise<void>
   deleteData: (apiPath: string) => Promise<any>
+
+  isEnterprise: boolean
+  isCommunity: boolean
 }
 
 interface ICrudService {
@@ -65,11 +68,19 @@ class UserCrudService extends BaseCrudService {
  * (Mainのクラスです)
  */
 class OrchestratorApi implements IOrchestratorApi {
+  isEnterprise: boolean = false
+  isCommunity: boolean = false
   private config: any
   private accessToken: string = ''
 
   constructor(config_: any) {
     this.config = config_
+    // Enterpriseだったら、trueにする
+    if (!this.config.serverinfo.client_id) {
+      this.isEnterprise = true
+    } else {
+    }
+    this.isCommunity = !this.isEnterprise // Enterpriseの逆にする。
   }
 
   /**
@@ -82,7 +93,7 @@ class OrchestratorApi implements IOrchestratorApi {
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
-    if (!this.config.serverinfo.client_id) {
+    if (this.isEnterprise) {
       logger.main.info('Enterprise版として処理開始')
       logger.main.info(this.config.userinfo.tenancyName)
       logger.main.info(this.config.userinfo.usernameOrEmailAddress)
@@ -138,6 +149,12 @@ class OrchestratorApi implements IOrchestratorApi {
             return
           }
           const obj = JSON.parse(body)
+
+          if (!obj.success) {
+            reject(obj)
+            return
+          }
+
           logger.main.info(obj)
 
           const access_token = obj.access_token
