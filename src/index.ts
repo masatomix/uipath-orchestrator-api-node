@@ -390,6 +390,13 @@ if (!module.parent) {
       const queueItemId = instances[0].Id
       const result = await api.queue.find(queueItemId)
       console.log(result)
+
+      const machinename = 'PBPC0124'
+      const userName = 'xx\\kino'
+      instances = await api.robot.findAll({
+        $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
+      })
+      console.log(instances)
     } catch (error) {
       console.log(error)
     }
