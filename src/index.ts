@@ -2,6 +2,10 @@ import request from 'request'
 import logger from './logger'
 import { getData, getArray, putData, postData, deleteData } from './utils'
 
+/**
+ * Orchestrator API Wrapper
+ * cf. https://docs.uipath.com/orchestrator/v2019/reference
+ */
 interface IOrchestratorApi {
   authenticate: () => Promise<any>
   license: ICrudService
@@ -10,6 +14,7 @@ interface IOrchestratorApi {
   machine: ICrudService
   process: ICrudService
   schedule: ICrudService
+  queue: ICrudService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
@@ -22,7 +27,7 @@ interface IOrchestratorApi {
 }
 
 interface ICrudService {
-  findAll: () => Promise<Array<any>>
+  findAll: (obj?: any) => Promise<Array<any>>
   find: (obj?: any) => Promise<any> // licenseなどはパラメタ不要だったりするのでOption
   create: (obj: any) => Promise<any>
   update: (obj: any) => Promise<void>
@@ -37,10 +42,10 @@ class BaseCrudService implements ICrudService {
   constructor(parent_: OrchestratorApi) {
     this.parent = parent_
   }
-  findAll(): Promise<Array<any>> {
+  findAll(obj?: any): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
-  find(id: number): Promise<any> {
+  find(obj?: any): Promise<any> {
     throw Error('Not implemented yet.')
   }
   create(obj: any): Promise<any> {
@@ -150,7 +155,7 @@ class OrchestratorApi implements IOrchestratorApi {
           }
           const obj = JSON.parse(body)
 
-          if (!obj.success) {
+          if (!obj.access_token) {
             reject(obj)
             return
           }
@@ -184,8 +189,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots')
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', queries)
     }
 
     find(id: number): Promise<any> {
@@ -206,8 +211,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users')
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries)
     }
 
     find(id: number): Promise<any> {
@@ -237,8 +242,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines')
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries)
     }
   })(this)
 
@@ -246,8 +251,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases')
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries)
     }
   })(this)
 
@@ -255,10 +260,41 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/ProcessSchedules')
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(
+        this.parent.config,
+        this.parent.accessToken,
+        '/odata/ProcessSchedules',
+        queries,
+      )
     }
   })(this)
+
+  queue: ICrudService = new (class extends BaseCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries)
+    }
+    find(queueItemId: number): Promise<Array<any>> {
+      return getData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/QueueItems(${queueItemId})`,
+      )
+    }
+  })(this)
+
+  // ロボットグループ
+  // パッケージ
+  // ジョブ
+  // ロール
+  // キュー
+  // アセット
+  // タスク(Enterpriseには、ない)
+  // フォルダー(OU)
+  // Webhook
 
   getArray = (apiPath: string, queries?: any): Promise<Array<any>> => {
     return getArray(this.config, this.accessToken, apiPath, queries)
@@ -344,6 +380,23 @@ if (!module.parent) {
       for (const instance of instances) {
         console.log(instance)
       }
+
+      instances = await api.queue.findAll()
+      for (const instance of instances) {
+        console.log(instance)
+      }
+      console.log(instances.length)
+
+      const queueItemId = instances[0].Id
+      const result = await api.queue.find(queueItemId)
+      console.log(result)
+
+      const machinename = 'PBPC0124'
+      const userName = 'xx\\kino'
+      instances = await api.robot.findAll({
+        $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
+      })
+      console.log(instances)
     } catch (error) {
       console.log(error)
     }
