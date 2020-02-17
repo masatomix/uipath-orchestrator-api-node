@@ -38,7 +38,23 @@ describe('OrchestratorApi のテスト', () => {
         expect(robot.Id).toBe(robotId)
       }
     })
+    it('Robot のテスト', async () => {
+      // // ロボットを取得する
+      const machinename = 'PBPC0124'
+      const username = 'pb\\pbkino'
+      const instances: any[] = await api.robot.findAll({
+        '$filter': `MachineName eq '${machinename}' and Username eq '${username}'`
+      })
+      expect(instances.length).toBeGreaterThanOrEqual(1)
 
+      for (const instance of instances) {
+        console.log(instance)
+        const robotId: number = instance.Id
+        const robot = await api.robot.find(robotId)
+        // console.log('RobotId:', robot.Id)
+        expect(robot.Id).toBe(robotId)
+      }
+    })
     describe('User登録テスト', () => {
       const user = {
         Name: 'user002',
@@ -123,19 +139,19 @@ describe('OrchestratorApi のテスト', () => {
       }
     })
 
-    it('Queue のテスト', async () => {
-      const instances = await api.queue.findAll()
-      expect(instances.length).toBeGreaterThanOrEqual(0)
+    // it('Queue のテスト', async () => {
+    //   const instances = await api.queue.findAll()
+    //   expect(instances.length).toBeGreaterThanOrEqual(0)
 
-      for (const instance of instances) {
-        // console.log(instance)
-        expect(instance.Id).not.toBeUndefined()
-      }
-      const queueItemId = instances[0].Id
-      const result = await api.queue.find(queueItemId)
-      console.log(result)
-      expect(result.Id).toBe(queueItemId)
-    })
+    //   for (const instance of instances) {
+    //     // console.log(instance)
+    //     expect(instance.Id).not.toBeUndefined()
+    //   }
+    //   const queueItemId = instances[0].Id
+    //   const result = await api.queue.find(queueItemId)
+    //   console.log(result)
+    //   expect(result.Id).toBe(queueItemId)
+    // })
 
     it('汎用メソッド のテスト', async () => {
       const instances = await api.getArray('/odata/Folders')
