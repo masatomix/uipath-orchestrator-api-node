@@ -71,13 +71,11 @@ class UserCrudService extends BaseCrudService {
   }
 }
 
-
-
 class QueueDefinitionCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByName(name: String): Promise<Array<any>> {
+  findByName(name: String): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -86,11 +84,10 @@ class QueueCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-
-  getQueueAndStartTransaction(): Promise<any> {
+  getQueueAndStartTransaction(queueName: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
-  setTransactionResult(): Promise<void> {
+  setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
     throw Error('Not implemented yet.')
   }
 }
@@ -361,10 +358,15 @@ class OrchestratorApi implements IOrchestratorApi {
       )
     }
 
-    findByName(name: String): Promise<Array<any>> {
+    _findByName(name: String): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', {
         $filter: `Name eq '${name}'`,
       })
+    }
+
+    async findByName(name: String): Promise<any> {
+      const defs: any[] = await this._findByName(name)
+      return defs[0]
     }
 
     create(queueDefinition: any): Promise<any> {
@@ -430,11 +432,26 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    getQueueAndStartTransaction(): Promise<any> {
-      throw Error('Not implemented yet.')
+    getQueueAndStartTransaction(queueName: string): Promise<any> {
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        '/odata/Queues/UiPathODataSvc.StartTransaction',
+        {
+          'transactionData': {
+            'Name': queueName,
+            'RobotIdentifier': this.parent.accessToken
+          }
+        },
+      )
     }
-    setTransactionResult(): Promise<void> {
-      throw Error('Not implemented yet.')
+    setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Queues(${queueItemId})/UiPathODataSvc.SetTransactionResult`,
+        statusObj,
+      )
     }
   })(this)
 
@@ -565,13 +582,13 @@ if (!module.parent) {
       instances = await api.robot.findAll({
         $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
       })
-      console.log(instances)
+      // console.log(instances)
 
-      instances = await api.queueDefinition.findByName('QueueTest')
-      console.table(instances)
+      let queueDef = await api.queueDefinition.findByName('QueueTest')
+      // console.table(queueDef)
 
-      const queueDef = await api.queueDefinition.find(1)
-      console.table(queueDef)
+      queueDef = await api.queueDefinition.find(1)
+      // console.table(queueDef)
 
     } catch (error) {
       console.log(error)
