@@ -1,11 +1,30 @@
+[![npm version](https://badge.fury.io/js/uipath-orchestrator-api-node.svg)](https://badge.fury.io/js/uipath-orchestrator-api-node)
+
 # uipath-orchestrator-api-node
 
 [UiPath Orchestrator のAPI](https://docs.uipath.com/orchestrator/lang-ja/reference#about-odata-and-references) を、Node.jsから呼び出すライブラリです。
 
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Examples](#quick-examples)
+    - [Robot一覧を取得する](#robot一覧を取得する)
+    - [条件を指定してみる](#条件を指定してみる)
+- [使用するための前準備](#使用するための前準備)
+- [利用方法(TypeScriptから)](#利用方法typescriptから)
+- [利用方法(JavaScriptから)](#利用方法javascriptから)
+- [API対応状況(2020/02/19時点)](#対応状況20200219時点)
+- [設定ファイル書き方いろいろ](#設定ファイル書き方いろいろ)
+- [ソースコードなどリポジトリ](#ソースコードなどリポジトリ)
+- [改訂履歴](#改訂履歴)
+
+
+
+
 ## Installation
 
-```
+```console
 $ npm install uipath-orchestrator-api-node
 ```
 
@@ -13,7 +32,7 @@ $ npm install uipath-orchestrator-api-node
 
 ### Robot一覧を取得する
 
-```
+```typescript
 const api = new OrchestratorApi(config)
 // まずは認証
 await api.authenticate()
@@ -27,7 +46,7 @@ for (const robot of robots) {
 
 実行結果
 
-```
+```typescript
 {
   LicenseKey: null,
   MachineName: 'PBPC0124',
@@ -60,7 +79,7 @@ for (const robot of robots) {
 検索条件を指定することで、条件に合致するリソースを検索することもできます。
 
 
-```
+```typescript
 const api = new OrchestratorApi(config)
 await api.authenticate()
 
@@ -75,7 +94,7 @@ console.log(robots)
 
 実行結果
 
-```
+```typescript
 {
   LicenseKey: null,
   MachineName: 'PBPC0124',
@@ -111,7 +130,7 @@ console.log(robots)
 
 UiPath Orchestrator がEnterprise版の場合:
 
-```
+```json
 $ cat config/local.json
 {
   "userinfo": {
@@ -127,7 +146,7 @@ $ cat config/local.json
 
 UiPath Orchestrator がCommunity版の場合:
 
-```
+```json
 $ cat config/local.json
 {
   "serverinfo": {
@@ -145,7 +164,7 @@ $ cat config/local.json
 
 最終的に、ディレクトリ構成はこんな感じになります。
 
-```
+```console
 $ tree
 .
 ├── src
@@ -159,8 +178,9 @@ $
 
 それぞれのファイルはたとえば以下のようにします。
 
-```
-$ cat src/index.ts 
+```typescript
+$ cat src/index.ts
+
 import config from 'config'
 import OrchestratorApi from 'uipath-orchestrator-api-node'
 
@@ -183,11 +203,10 @@ async function main() {
 if (!module.parent) {
     main()
 }
-$ 
 ```
 
-```
-$ cat package.json 
+```json
+$ cat package.json
 {
   "name": "api_use_ts",
   "version": "1.0.0",
@@ -211,8 +230,9 @@ $ cat package.json
 }
 ```
 
-```
-$ cat tsconfig.json 
+
+```json
+$ cat tsconfig.json
 {
     "compilerOptions": {
       "target": "ES2019", 
@@ -227,13 +247,11 @@ $ cat tsconfig.json
       "src/**/*"
     ],
 }
-$
 ```
-
-
 
 実行してみます。
-```
+
+```console
 $ npm i
 $ npx tsc
 $ node dist/index.js
@@ -245,7 +263,7 @@ $ node dist/index.js
 
 最終的に、ディレクトリ構成はこんな感じになります。
 
-```
+```console
 $ tree
 .
 ├── config
@@ -259,8 +277,9 @@ $
 それぞれのファイルは以下のようにします。
 
 
-```
+```typescript
 $ cat index.js 
+
 const config = require('config')
 const OrchestratorApi = require('uipath-orchestrator-api-node')
 
@@ -276,11 +295,11 @@ const main = async () => {
 
 if (!module.parent) {
   main()
-$ 
+}
 ```
 
 
-```
+```json
 $ cat package.json 
 {
   "name": "api_use",
@@ -301,16 +320,37 @@ $ cat package.json
 
 実行してみます。
 
-```
+```console
 $ npm i
 $ node index.js
 ```
+
+## 対応状況(2020/02/19時点)
+
+各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
+専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
+
+
+| No. | リソース        | 検索 | PK検索 | 作成 | 更新 | 削除 | その他                                                                | 備考           |
+|:---:|-----------------|:----:|:------:|:----:|:----:|:----:|-----------------------------------------------------------------------|----------------|
+|  1  | license         |  〇  |        |      |      |      |                                                                       |                |
+|  2  | robot           |  〇  |   〇   |      |  〇  |      |                                                                       |                |
+|  3  | user            |  〇  |   〇   |  〇  |  〇  |  〇  | 名前で検索                                                            |                |
+|  4  | machine         |  〇  |        |      |      |      |                                                                       |                |
+|  5  | process         |  〇  |        |      |      |      |                                                                       |                |
+|  6  | schedule        |  〇  |        |      |      |      |                                                                       |                |
+|  7  | queueDefinition |  〇  |   〇   |  〇  |  〇  |  〇  | 名前で検索                                                            |                |
+|  8  | queueItem       |  〇  |   〇   |  〇  |      |  〇  |                                                                       | 削除は論理削除 |
+|  9  | queueOperation  |      |        |      |      |      | TransactionのスタートでqueueItemを取得<br>Transactionのステータス変更 |                |
+|  10 | 汎用            |  〇  |   〇   |  〇  |  〇  |  〇  |                                                                       |                |
+
+
 
 ## 設定ファイル書き方いろいろ
 
 ちなみに設定ファイルは Own Coding で、
 
-```
+```typescript
 const api2 = new OrchestratorApi({
   userinfo: {
     tenancyName: 'default',
