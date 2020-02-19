@@ -22,4 +22,12 @@ describe('OrchestratorApi_general', () => {
       }
     })
   })
+
+  it('汎用メソッド のテスト', async () => {
+    const isOData = false
+    const instances = await api.getArray('/api/Stats/GetLicenseStats',
+      { 'tenantId': 1, days: 100 }, isOData)
+    console.table(instances)
+  })
+
 })
