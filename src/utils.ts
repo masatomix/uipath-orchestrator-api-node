@@ -12,6 +12,7 @@ export const getArray = (
   accessToken: string,
   apiPath: string,
   queries?: any,
+  isOdata: boolean = true
 ): Promise<Array<any>> => {
   let optionTmp = createOption(config_, accessToken, apiPath)
   optionTmp = Object.assign(optionTmp, { method: 'GET' })
@@ -20,7 +21,7 @@ export const getArray = (
   if (queries) {
     option = Object.assign(optionTmp, { qs: queries })
   }
-  return createArrayPromise(option)
+  return createArrayPromise(option, isOdata)
 }
 
 export const postData = (
@@ -65,11 +66,12 @@ export const deleteData = (config_: any, accessToken: string, apiPath: string): 
 /**
  * 「APIのReturn値のvalueが配列であると見なしてvalueを配列で返すPromise」を返す
  * @param options
+ * @param isOdata  stat系APIは、OData形式ではなく、どうもただの配列で返ってくるので、valueプロパティを返すかそのまま返すかの判定フラグに使う
  */
-const createArrayPromise = (options: any): Promise<Array<any>> => {
+const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>> => {
   // promiseを返す処理は毎回おなじ。Request処理して、コールバックで値を設定するPromiseを作って返すところを共通化
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(options, function(err: any, response: any, body: string) {
+    request(options, function (err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
@@ -80,7 +82,11 @@ const createArrayPromise = (options: any): Promise<Array<any>> => {
       }
       logger.main.info(body)
       const obj = JSON.parse(body)
-      resolve(obj.value) // valueプロパティが配列である想定。
+      if (isOdata) {
+        resolve(obj.value) // valueプロパティが配列である場合。
+      } else {
+        resolve(obj) // objがそのまま配列であるばあい。
+      }
     })
   })
   return promise

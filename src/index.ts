@@ -465,8 +465,8 @@ class OrchestratorApi implements IOrchestratorApi {
   // フォルダー(OU)
   // Webhook
 
-  getArray = (apiPath: string, queries?: any): Promise<Array<any>> => {
-    return getArray(this.config, this.accessToken, apiPath, queries)
+  getArray = (apiPath: string, queries?: any, isOdata: boolean = true): Promise<Array<any>> => {
+    return getArray(this.config, this.accessToken, apiPath, queries, isOdata)
   }
 
   getData = (apiPath: string): Promise<any> => {
