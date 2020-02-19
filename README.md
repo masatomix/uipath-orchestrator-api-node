@@ -339,6 +339,7 @@ const api2 = new OrchestratorApi({
 
 ## 改訂履歴
 
+- 0.3.0 QueueItemのCRUDを追加(もともとqueueって名前だったけどqueueItemに変更しました)。QueueDefinitionのCRUDを追加
 - 0.2.5 findAllもOptionalな引数を追加(GETのパラメタとして)。ActionsでUTするように整理
 - 0.2.3 user はCRUD作成完了、UnitTest追加( jest )、API に、汎用的なメソッドを追加。requestライブラリはformでなげると application/x-www-form-urlencoded になるのでjsonに変更
 - 0.2.0 Id指定でのロボットの取得、プロセス一覧の取得、対象オブジェクトごとにメソッドを整理、Enterprise/Community版 両対応
