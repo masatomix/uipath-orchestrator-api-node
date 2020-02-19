@@ -9,14 +9,14 @@ import config from 'config'
 //   await api.robot.update(robot)
 // }
 
-describe('OrchestratorApi のテスト', () => {
+describe('OrchestratorApi', () => {
   const api = new OrchestratorApi(config)
 
   beforeEach(async () => {
     await api.authenticate()
   })
 
-  describe('OrchestratorApi のテスト', () => {
+  describe('license/Robot/User/Machine/Process/Schedules... のテスト', () => {
     it('license のテスト', async () => {
       // ライセンスを取得する
       const license: any = await api.license.find()
@@ -43,12 +43,12 @@ describe('OrchestratorApi のテスト', () => {
       const machinename = 'PBPC0124'
       const username = 'pb\\pbkino'
       const instances: any[] = await api.robot.findAll({
-        '$filter': `MachineName eq '${machinename}' and Username eq '${username}'`
+        $filter: `MachineName eq '${machinename}' and Username eq '${username}'`,
       })
       expect(instances.length).toBeGreaterThanOrEqual(1)
 
       for (const instance of instances) {
-        console.log(instance)
+        // console.log(instance)
         const robotId: number = instance.Id
         const robot = await api.robot.find(robotId)
         // console.log('RobotId:', robot.Id)
@@ -139,29 +139,6 @@ describe('OrchestratorApi のテスト', () => {
       }
     })
 
-    // it('Queue のテスト', async () => {
-    //   const instances = await api.queue.findAll()
-    //   expect(instances.length).toBeGreaterThanOrEqual(0)
-
-    //   for (const instance of instances) {
-    //     // console.log(instance)
-    //     expect(instance.Id).not.toBeUndefined()
-    //   }
-    //   const queueItemId = instances[0].Id
-    //   const result = await api.queue.find(queueItemId)
-    //   console.log(result)
-    //   expect(result.Id).toBe(queueItemId)
-    // })
-
-    it('汎用メソッド のテスト', async () => {
-      const instances = await api.getArray('/odata/Folders')
-      expect(instances.length).toBeGreaterThanOrEqual(0)
-
-      for (const instance of instances) {
-        // console.log(instance)
-        expect(instance.DisplayName).not.toBeUndefined()
-      }
-    })
   })
 
   describe('Enterprise判別テスト。と認証エラー系', () => {
@@ -215,6 +192,52 @@ describe('OrchestratorApi のテスト', () => {
         expect(error.error).toBe('access_denied')
         expect(error.error_description).toBe('Unauthorized')
       }
+    })
+  })
+
+  describe('Robot判別テスト1。', () => {
+    const api2 = new OrchestratorApi({
+      robotInfo: {
+        machineKey: 'xx',
+        machineName: 'bbbb',
+        userName: 'xxx',
+      },
+      userinfo: {
+        tenancyName: 'default',
+        usernameOrEmailAddress: 'aaa',
+        password: 'bbb',
+      },
+      serverinfo: {
+        servername: 'https://platform.uipath.com/', // ホントはEnterprise サーバでやるべきだけど気にしない
+      },
+    })
+
+    it('Robot判別テスト。', async () => {
+      expect(api2.isEnterprise).toBe(true)
+      expect(api2.isCommunity).toBe(false)
+      expect(api2.isRobot).toBe(true)
+    })
+  })
+
+  describe('Robot判別テスト2.', () => {
+    const api2 = new OrchestratorApi({
+      robotInfo: {
+        machineKey: 'xx',
+        machineName: 'bbbb',
+        userName: 'xxx',
+      },
+      serverinfo: {
+        servername: 'https://platform.uipath.com/kinooqmollho/kinoorgDefault',
+        refresh_token: 'xxx', // User Key
+        tenant_logical_name: 'kinoorgxx',
+        client_id: 'xxxx',
+      },
+    })
+
+    it('Robot判別テスト2', async () => {
+      expect(api2.isCommunity).toBe(true)
+      expect(api2.isEnterprise).toBe(false)
+      expect(api2.isRobot).toBe(true)
     })
   })
 })

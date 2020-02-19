@@ -99,13 +99,14 @@ console.log(robots)
 }
 ```
 
-プロパティ名と値を指定することで、条件に一致するRobotを検索することができました。
-条件指定は ``$filter`` 以外にもいくつかありますが、その仕様は [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) ココに詳しく書いてあります。
+``「`MachineName eq '${machinename}' and Username eq '${userName}'`」``などとRobotの
+プロパティ名とその値を指定することで、条件に一致するRobotを検索することができました。
+条件指定は ``$filter`` 以外にも ``$top`` や ``$select`` などいくつかありますが、その仕様は [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) のサイトに詳しく書いてあります。
 
 
 ## 使用するための前準備
 
-さて、本来ブラリを使用するには、接続するUiPath Orchestratorの接続上などの環境設定が必要です。
+さて、本ライブラリを使用するには、接続するUiPath Orchestratorの情報など環境設定が必要です。
 
 
 UiPath Orchestrator がEnterprise版の場合:
@@ -156,7 +157,7 @@ $ tree
 $
 ```
 
-それぞれのファイルは以下のようにします。
+それぞれのファイルはたとえば以下のようにします。
 
 ```
 $ cat src/index.ts 

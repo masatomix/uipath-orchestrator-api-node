@@ -74,6 +74,10 @@ const createArrayPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
+      if (response.statusCode >= 400) {
+        logger.main.error(body)
+        reject(body)
+      }
       logger.main.info(body)
       const obj = JSON.parse(body)
       resolve(obj.value) // valueプロパティが配列である想定。
@@ -95,6 +99,10 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
       }
       logger.main.info(options.method)
       logger.main.info(body)
+      if (response.statusCode >= 400) {
+        logger.main.error(body)
+        reject(body)
+      }
       if (body === null || body === '') {
         resolve()
         return
@@ -126,6 +134,10 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
       }
       logger.main.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.main.info(body)
+      if (response.statusCode >= 400) {
+        logger.main.error(body)
+        reject(body)
+      }
 
       // PUTのばあい、StatusCodeが200で、Bodyが空のためundefinedになったが正常終了させる。
       if (response.statusCode === 200 && !body) {
@@ -159,10 +171,19 @@ const createOption = (config_: any, accessToken: string, apiPath: string): any =
 
 const headers = (config_: any, accessToken: string): any => {
   const tenant_logical_name = config_.serverinfo.tenant_logical_name
-  const ret = {
-    Authorization: 'Bearer ' + accessToken,
-    'content-type': 'application/json',
-    // 'X-UIPATH-OrganizationUnitId': 1
+  let ret = {}
+  if (config_.robotInfo) {
+    ret = {
+      Authorization: 'UiRobot ' + accessToken,
+      'content-type': 'application/json',
+      // 'X-UIPATH-OrganizationUnitId': 1
+    }
+  } else {
+    ret = {
+      Authorization: 'Bearer ' + accessToken,
+      'content-type': 'application/json',
+      // 'X-UIPATH-OrganizationUnitId': 1
+    }
   }
   if (tenant_logical_name) {
     return Object.assign(ret, {
