@@ -14,7 +14,9 @@ interface IOrchestratorApi {
   machine: ICrudService
   process: ICrudService
   schedule: ICrudService
-  queue: ICrudService
+  queueDefinition: ICrudService
+  queueItem: ICrudService
+  queueOperation: QueueCrudService // Queueの処理をするのに、Robotの情報が必要かもしれないので、これはisRobotのときのみ動くようにする？
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
@@ -24,6 +26,7 @@ interface IOrchestratorApi {
 
   isEnterprise: boolean
   isCommunity: boolean
+  isRobot: boolean
 }
 
 interface ICrudService {
@@ -68,6 +71,30 @@ class UserCrudService extends BaseCrudService {
   }
 }
 
+
+
+class QueueDefinitionCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findByName(name: String): Promise<Array<any>> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class QueueCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+
+  getQueueAndStartTransaction(): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+  setTransactionResult(): Promise<void> {
+    throw Error('Not implemented yet.')
+  }
+}
+
 /**
  * OrchestratorのAPIのWrapperクラス
  * (Mainのクラスです)
@@ -75,17 +102,25 @@ class UserCrudService extends BaseCrudService {
 class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
+  isRobot: boolean = false
   private config: any
   private accessToken: string = ''
 
   constructor(config_: any) {
     this.config = config_
     // Enterpriseだったら、trueにする
-    if (!this.config.serverinfo.client_id) {
+    if (!this.config.serverinfo.client_id) { // serverinfo.client_idプロパティがなければEnterprise
       this.isEnterprise = true
     } else {
     }
     this.isCommunity = !this.isEnterprise // Enterpriseの逆にする。
+
+    // Enterprise/Community判定は client_id があるなしだけの判定なので、
+    // client_idナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
+    if (this.config.robotInfo) {
+      this.isRobot = true
+    } else {
+    }
   }
 
   /**
@@ -98,7 +133,46 @@ class OrchestratorApi implements IOrchestratorApi {
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
-    if (this.isEnterprise) {
+    if (this.isRobot) {
+      logger.main.info('Robotモードとして処理開始')
+      logger.main.info(this.config.robotInfo.machineKey)
+      logger.main.info(this.config.robotInfo.machineName)
+      logger.main.info(this.config.robotInfo.userName)
+
+      const auth_options = {
+        uri: servername + '/api/robotsservice/BeginSession',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'X-ROBOT-LICENSE': this.config.robotInfo.machineKey,
+          'X-ROBOT-MACHINE-ENCODED': Buffer.from(this.config.robotInfo.machineName).toString(
+            'base64',
+          ),
+          Accept: 'application/json',
+        },
+        json: { UserName: this.config.robotInfo.userName },
+        // proxy: 'http://xxxxx:8888',
+        // strictSSL: false,
+      }
+
+      const me = this
+      promise = new Promise((resolve, reject) => {
+        request.post(auth_options, function (err, response, body) {
+          if (err) {
+            reject(err)
+            return
+          }
+          const obj = body
+          if (!obj.robotKey) {
+            reject(obj)
+            return
+          }
+          const access_token = obj.robotKey
+          me.accessToken = access_token
+          logger.main.info(access_token)
+          resolve(obj)
+        })
+      })
+    } else if (this.isEnterprise) {
       logger.main.info('Enterprise版として処理開始')
       logger.main.info(this.config.userinfo.tenancyName)
       logger.main.info(this.config.userinfo.usernameOrEmailAddress)
@@ -270,19 +344,97 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  queue: ICrudService = new (class extends BaseCrudService {
+  queueDefinition: QueueDefinitionCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
+
+    findAll(queries?: any): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries)
+    }
+
+    find(id: number): Promise<Array<any>> {
+      return getData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/QueueDefinitions(${id})`,
+      )
+    }
+
+    findByName(name: String): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', {
+        $filter: `Name eq '${name}'`,
+      })
+    }
+
+    create(queueDefinition: any): Promise<any> {
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        '/odata/QueueDefinitions',
+        queueDefinition,
+      )
+    }
+
+    update(queueDefinition: any): Promise<any> {
+      return putData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${queueDefinition.Id})`, queueDefinition)
+    }
+
+    delete(id: number): Promise<any> {
+      return deleteData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/QueueDefinitions(${id})`,
+      )
+    }
+  })(this)
+
+  queueItem: ICrudService = new (class extends BaseCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+    // QueueItemを一覧する
     findAll(queries?: any): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries)
     }
+
+    // PK指定で取得する
     find(queueItemId: number): Promise<Array<any>> {
       return getData(
         this.parent.config,
         this.parent.accessToken,
         `/odata/QueueItems(${queueItemId})`,
       )
+    }
+
+    create(queue: any): Promise<any> {
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        '/odata/Queues/UiPathODataSvc.AddQueueItem',
+        queue,
+      )
+    }
+
+    // PK指定で、削除済みにする。
+    delete(queueItemId: number): Promise<any> {
+      return deleteData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/QueueItems(${queueItemId})`,
+      )
+    }
+  })(this)
+
+  queueOperation: QueueCrudService = new (class extends QueueCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+    getQueueAndStartTransaction(): Promise<any> {
+      throw Error('Not implemented yet.')
+    }
+    setTransactionResult(): Promise<void> {
+      throw Error('Not implemented yet.')
     }
   })(this)
 
@@ -322,9 +474,26 @@ export = OrchestratorApi
 // 以下、確認のためのドライバ
 import config from 'config'
 
+const getConfig = () => {
+  // 設定ファイルから読むパタン
+  return config
+
+  // Own Codingするパタン
+  // return {
+  //   userinfo: {
+  //     tenancyName: 'default',
+  //     usernameOrEmailAddress: 'aaa',
+  //     password: 'bbb',
+  //   },
+  //   serverinfo: {
+  //     servername: 'https://platform.uipath.com/',
+  //   },
+  // }
+}
+
 if (!module.parent) {
   async function main() {
-    const api = new OrchestratorApi(config)
+    const api = new OrchestratorApi(getConfig())
 
     try {
       // まずは認証
@@ -381,14 +550,14 @@ if (!module.parent) {
         console.log(instance)
       }
 
-      instances = await api.queue.findAll()
+      instances = await api.queueItem.findAll()
       for (const instance of instances) {
         console.log(instance)
       }
       console.log(instances.length)
 
       const queueItemId = instances[0].Id
-      const result = await api.queue.find(queueItemId)
+      const result = await api.queueItem.find(queueItemId)
       console.log(result)
 
       const machinename = 'PBPC0124'
@@ -397,6 +566,13 @@ if (!module.parent) {
         $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
       })
       console.log(instances)
+
+      instances = await api.queueDefinition.findByName('QueueTest')
+      console.table(instances)
+
+      const queueDef = await api.queueDefinition.find(1)
+      console.table(queueDef)
+
     } catch (error) {
       console.log(error)
     }
