@@ -1,6 +1,6 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData, postData, deleteData } from './utils'
+import { getData, getArray, putData, postData, deleteData, addProxy } from './utils'
 
 /**
  * Orchestrator API Wrapper
@@ -136,7 +136,7 @@ class OrchestratorApi implements IOrchestratorApi {
       logger.main.info(this.config.robotInfo.machineName)
       logger.main.info(this.config.robotInfo.userName)
 
-      const auth_options = {
+      const auth_options_tmp = {
         uri: servername + '/api/robotsservice/BeginSession',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
@@ -147,13 +147,12 @@ class OrchestratorApi implements IOrchestratorApi {
           Accept: 'application/json',
         },
         json: { UserName: this.config.robotInfo.userName },
-        // proxy: 'http://xxxxx:8888',
-        // strictSSL: false,
       }
+      const auth_options = addProxy(this.config, auth_options_tmp)
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err, response, body) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -175,7 +174,7 @@ class OrchestratorApi implements IOrchestratorApi {
       logger.main.info(this.config.userinfo.usernameOrEmailAddress)
       logger.main.info(this.config.userinfo.password)
 
-      const auth_options = {
+      const auth_options_tmp = {
         uri: servername + '/api/Account/Authenticate',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -183,10 +182,11 @@ class OrchestratorApi implements IOrchestratorApi {
         },
         form: this.config.userinfo,
       }
+      const auth_options = addProxy(this.config, auth_options_tmp)
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function(err, response, body) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -208,7 +208,7 @@ class OrchestratorApi implements IOrchestratorApi {
       const form = Object.assign(this.config.serverinfo, {
         grant_type: 'refresh_token',
       })
-      const auth_options = {
+      const auth_options_tmp = {
         uri: 'https://account.uipath.com/oauth/token',
         headers: {
           'Content-Type': 'application/json',
@@ -216,10 +216,11 @@ class OrchestratorApi implements IOrchestratorApi {
         },
         form: form,
       }
+      const auth_options = addProxy(this.config, auth_options_tmp)
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function(err, response, body) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
