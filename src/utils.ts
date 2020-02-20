@@ -169,8 +169,17 @@ const createOption = (config_: any, accessToken: string, apiPath: string): any =
     // uri: url.resolve(servername, apiPath),
     uri: servername + apiPath,
     headers: headers(config_, accessToken),
-    // proxy: 'http://xxx:8888',
-    // strictSSL: false,
+  }
+  return addProxy(config_, option)
+}
+
+export const addProxy = (config_: any, option: any): any => {
+  if (config_.proxy) { // プロパティ proxy があって
+    if (config_.proxy.useProxy) { // useProxy がtrue ならプロキシを設定する
+      return Object.assign(option, {
+        proxy: config_.proxy.url, strictSSL: false
+      })
+    }
   }
   return option
 }
