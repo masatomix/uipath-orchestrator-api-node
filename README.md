@@ -379,6 +379,7 @@ const api2 = new OrchestratorApi({
 
 ## 改訂履歴
 
+- 0.3.2 認証ナシプロキシを設定できるように。電文を見たいときなどデバッグ時にご活用ください
 - 0.3.1 Queue/Transactionを操作するAPIに対応。
 - 0.3.0 QueueItemのCRUDを追加(もともとqueueって名前だったけどqueueItemに変更しました)。QueueDefinitionのCRUDを追加
 - 0.2.5 findAllもOptionalな引数を追加(GETのパラメタとして)。ActionsでUTするように整理
