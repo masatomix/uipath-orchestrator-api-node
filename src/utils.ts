@@ -76,6 +76,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
         reject(body)
@@ -103,7 +104,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug(options.method)
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -138,7 +139,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
         logger.error(body)

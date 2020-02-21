@@ -269,6 +269,10 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
 
+    create(robot: any): Promise<any> {
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Robots', robot)
+    }
+
     update(robot: any): Promise<void> {
       return putData(
         this.parent.config,
@@ -276,6 +280,10 @@ class OrchestratorApi implements IOrchestratorApi {
         `/odata/Robots(${robot.Id})`,
         robot,
       )
+    }
+
+    delete(id: number): Promise<any> {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
   })(this)
 
@@ -317,6 +325,27 @@ class OrchestratorApi implements IOrchestratorApi {
     findAll(queries?: any): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries)
     }
+
+    find(id: number): Promise<any> {
+      return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    }
+
+    create(machine: any): Promise<any> {
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+    }
+
+    update(machine: any): Promise<void> {
+      return putData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Machines(${machine.Id})`,
+        machine,
+      )
+    }
+    delete(id: number): Promise<any> {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    }
+
   })(this)
 
   process: ICrudService = new (class extends BaseCrudService {
@@ -523,15 +552,6 @@ if (!module.parent) {
       const license: any = await api.license.find()
       console.log(license)
 
-      // // ロボットを取得する
-      instances = await api.robot.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-        const robotId: number = instance.Id
-        const robot = await api.robot.find(robotId)
-        console.log(robot)
-      }
-
       // Userを取得する
       instances = await api.user.findAll()
       for (const instance of instances) {
@@ -539,13 +559,6 @@ if (!module.parent) {
         const user = await api.user.find(userId)
         console.log(user)
       }
-
-      // Machineを取得する
-      instances = await api.machine.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-      }
-
       // Processesを取得する
       instances = await api.process.findAll()
       for (const instance of instances) {
@@ -577,13 +590,6 @@ if (!module.parent) {
       const queueItemId = instances[0].Id
       const result = await api.queueItem.find(queueItemId)
       console.log(result)
-
-      const machinename = 'PBPC0124'
-      const userName = 'xx\\kino'
-      instances = await api.robot.findAll({
-        $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
-      })
-      // console.log(instances)
 
       let queueDef = await api.queueDefinition.findByName('QueueTest')
       // console.table(queueDef)
