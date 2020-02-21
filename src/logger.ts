@@ -9,7 +9,7 @@ if (log4jsConfig) {
     log4js.configure(
         {
             'appenders': { 'main': { 'type': 'console' } },
-            'categories': { 'default': { 'appenders': ['main'], 'level': 'debug' } }
+            'categories': { 'default': { 'appenders': ['main'], 'level': 'info' } }
         })
 }
 
