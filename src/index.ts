@@ -125,16 +125,16 @@ class OrchestratorApi implements IOrchestratorApi {
    */
   authenticate(): Promise<any> {
     const servername = this.config.serverinfo.servername
-    logger.main.info(servername)
+    logger.debug(servername)
 
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
     if (this.isRobot) {
-      logger.main.info('Robotモードとして処理開始')
-      logger.main.info(this.config.robotInfo.machineKey)
-      logger.main.info(this.config.robotInfo.machineName)
-      logger.main.info(this.config.robotInfo.userName)
+      logger.info('Robotモードとして処理開始')
+      logger.debug(this.config.robotInfo.machineKey)
+      logger.debug(this.config.robotInfo.machineName)
+      logger.debug(this.config.robotInfo.userName)
 
       const auth_options_tmp = {
         uri: servername + '/api/robotsservice/BeginSession',
@@ -164,15 +164,15 @@ class OrchestratorApi implements IOrchestratorApi {
           }
           const access_token = obj.robotKey
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
     } else if (this.isEnterprise) {
-      logger.main.info('Enterprise版として処理開始')
-      logger.main.info(this.config.userinfo.tenancyName)
-      logger.main.info(this.config.userinfo.usernameOrEmailAddress)
-      logger.main.info(this.config.userinfo.password)
+      logger.info('Enterprise版として処理開始')
+      logger.debug(this.config.userinfo.tenancyName)
+      logger.debug(this.config.userinfo.usernameOrEmailAddress)
+      logger.debug(this.config.userinfo.password)
 
       const auth_options_tmp = {
         uri: servername + '/api/Account/Authenticate',
@@ -199,12 +199,12 @@ class OrchestratorApi implements IOrchestratorApi {
 
           const access_token = obj.result
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
     } else {
-      logger.main.info('Community版として処理開始')
+      logger.info('Community版として処理開始')
       const form = Object.assign(this.config.serverinfo, {
         grant_type: 'refresh_token',
       })
@@ -232,11 +232,11 @@ class OrchestratorApi implements IOrchestratorApi {
             return
           }
 
-          logger.main.info(obj)
+          logger.debug(obj)
 
           const access_token = obj.access_token
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
