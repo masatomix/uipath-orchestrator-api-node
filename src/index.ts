@@ -125,16 +125,16 @@ class OrchestratorApi implements IOrchestratorApi {
    */
   authenticate(): Promise<any> {
     const servername = this.config.serverinfo.servername
-    logger.main.info(servername)
+    logger.debug(servername)
 
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
     if (this.isRobot) {
-      logger.main.info('Robotモードとして処理開始')
-      logger.main.info(this.config.robotInfo.machineKey)
-      logger.main.info(this.config.robotInfo.machineName)
-      logger.main.info(this.config.robotInfo.userName)
+      logger.info('Robotモードとして処理開始')
+      logger.debug(this.config.robotInfo.machineKey)
+      logger.debug(this.config.robotInfo.machineName)
+      logger.debug(this.config.robotInfo.userName)
 
       const auth_options_tmp = {
         uri: servername + '/api/robotsservice/BeginSession',
@@ -164,15 +164,15 @@ class OrchestratorApi implements IOrchestratorApi {
           }
           const access_token = obj.robotKey
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
     } else if (this.isEnterprise) {
-      logger.main.info('Enterprise版として処理開始')
-      logger.main.info(this.config.userinfo.tenancyName)
-      logger.main.info(this.config.userinfo.usernameOrEmailAddress)
-      logger.main.info(this.config.userinfo.password)
+      logger.info('Enterprise版として処理開始')
+      logger.debug(this.config.userinfo.tenancyName)
+      logger.debug(this.config.userinfo.usernameOrEmailAddress)
+      logger.debug(this.config.userinfo.password)
 
       const auth_options_tmp = {
         uri: servername + '/api/Account/Authenticate',
@@ -199,12 +199,12 @@ class OrchestratorApi implements IOrchestratorApi {
 
           const access_token = obj.result
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
     } else {
-      logger.main.info('Community版として処理開始')
+      logger.info('Community版として処理開始')
       const form = Object.assign(this.config.serverinfo, {
         grant_type: 'refresh_token',
       })
@@ -232,11 +232,11 @@ class OrchestratorApi implements IOrchestratorApi {
             return
           }
 
-          logger.main.info(obj)
+          logger.debug(obj)
 
           const access_token = obj.access_token
           me.accessToken = access_token
-          logger.main.info(access_token)
+          logger.debug(access_token)
           resolve(obj)
         })
       })
@@ -269,6 +269,10 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
 
+    create(robot: any): Promise<any> {
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Robots', robot)
+    }
+
     update(robot: any): Promise<void> {
       return putData(
         this.parent.config,
@@ -276,6 +280,10 @@ class OrchestratorApi implements IOrchestratorApi {
         `/odata/Robots(${robot.Id})`,
         robot,
       )
+    }
+
+    delete(id: number): Promise<any> {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
   })(this)
 
@@ -317,6 +325,27 @@ class OrchestratorApi implements IOrchestratorApi {
     findAll(queries?: any): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries)
     }
+
+    find(id: number): Promise<any> {
+      return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    }
+
+    create(machine: any): Promise<any> {
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+    }
+
+    update(machine: any): Promise<void> {
+      return putData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Machines(${machine.Id})`,
+        machine,
+      )
+    }
+    delete(id: number): Promise<any> {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    }
+
   })(this)
 
   process: ICrudService = new (class extends BaseCrudService {
@@ -523,15 +552,6 @@ if (!module.parent) {
       const license: any = await api.license.find()
       console.log(license)
 
-      // // ロボットを取得する
-      instances = await api.robot.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-        const robotId: number = instance.Id
-        const robot = await api.robot.find(robotId)
-        console.log(robot)
-      }
-
       // Userを取得する
       instances = await api.user.findAll()
       for (const instance of instances) {
@@ -539,13 +559,6 @@ if (!module.parent) {
         const user = await api.user.find(userId)
         console.log(user)
       }
-
-      // Machineを取得する
-      instances = await api.machine.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-      }
-
       // Processesを取得する
       instances = await api.process.findAll()
       for (const instance of instances) {
@@ -577,13 +590,6 @@ if (!module.parent) {
       const queueItemId = instances[0].Id
       const result = await api.queueItem.find(queueItemId)
       console.log(result)
-
-      const machinename = 'PBPC0124'
-      const userName = 'xx\\kino'
-      instances = await api.robot.findAll({
-        $filter: `MachineName eq '${machinename}' and Username eq '${userName}'`,
-      })
-      // console.log(instances)
 
       let queueDef = await api.queueDefinition.findByName('QueueTest')
       // console.table(queueDef)

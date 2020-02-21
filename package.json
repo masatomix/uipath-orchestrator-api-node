@@ -1,6 +1,6 @@
 {
   "name": "uipath-orchestrator-api-node",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "UiPath Orchestrator API wrapper for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
     "build": "npm-run-all clean tsc",
     "pack": "npm pack",
     "start": "node .",
-    "test": "NODE_ENV= jest"
+    "test": "NODE_ENV= jest --coverage"
   },
   "jest": {
     "moduleFileExtensions": [

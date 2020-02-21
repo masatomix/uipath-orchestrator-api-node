@@ -76,11 +76,12 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
-        logger.main.error(body)
+        logger.error(body)
         reject(body)
       }
-      logger.main.info(body)
+      logger.debug(body)
       const obj = JSON.parse(body)
       if (isOdata) {
         resolve(obj.value) // valueプロパティが配列である場合。
@@ -103,10 +104,10 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.main.info(options.method)
-      logger.main.info(body)
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      logger.debug(body)
       if (response.statusCode >= 400) {
-        logger.main.error(body)
+        logger.error(body)
         reject(body)
       }
       if (body === null || body === '') {
@@ -138,10 +139,10 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.main.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
-      logger.main.info(body)
+      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      logger.debug(body)
       if (response.statusCode >= 400) {
-        logger.main.error(body)
+        logger.error(body)
         reject(body)
       }
 

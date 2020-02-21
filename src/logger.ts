@@ -1,11 +1,16 @@
 import log4js from 'log4js'
+import config from 'config'
 
-log4js.configure({
-    appenders: { main: { type: 'file', filename: './logs/main.log', 'pattern': '-yyyy-MM-dd' } },
-    categories: { default: { appenders: ['main'], level: 'trace' } }
-})
+const log4jsConfig = (config as any).log4js
 
-const logger: any = {}
-logger.main = log4js.getLogger('main')
+if (log4jsConfig) {
+    log4js.configure(log4jsConfig)
+} else {
+    log4js.configure(
+        {
+            'appenders': { 'main': { 'type': 'console' } },
+            'categories': { 'default': { 'appenders': ['main'], 'level': 'debug' } }
+        })
+}
 
-export default logger
+export default log4js.getLogger('main')
