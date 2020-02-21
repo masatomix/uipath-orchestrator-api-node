@@ -1,7 +1,7 @@
 import config from 'config'
 import OrchestratorApi from '../index'
 import logger from '../logger'
-import { randomName, createMachine } from './sampleUtils'
+import { randomName } from './sampleUtils'
 
 
 async function sample() {
@@ -14,7 +14,6 @@ async function sample() {
     const random = randomName()
     const machineName = `Machine_${random}`
     const testMachine = await api.machine.create({ Name: machineName }) // 登録する
-
 
     // サンプル１．ロボットの登録
     const expectedRobot = createRobotData(testMachine) // 登録データを作成
