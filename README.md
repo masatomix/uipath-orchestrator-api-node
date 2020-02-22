@@ -24,10 +24,10 @@
 - [Quick Examples](#quick-examples)
     - [Robot一覧を取得する](#robot一覧を取得する)
     - [条件を指定してみる](#条件を指定してみる)
+- [API対応状況(2020/02/22時点)](#対応状況20200222時点)
 - [使用するための前準備](#使用するための前準備)
 - [利用方法(TypeScriptから)](#利用方法typescriptから)
 - [利用方法(JavaScriptから)](#利用方法javascriptから)
-- [API対応状況(2020/02/19時点)](#対応状況20200219時点)
 - [設定ファイル書き方いろいろ](#設定ファイル書き方いろいろ)
 - [ソースコードなどリポジトリ](#ソースコードなどリポジトリ)
 - [改訂履歴](#改訂履歴)
@@ -133,6 +133,32 @@ console.log(robots)
 ``「`MachineName eq '${machinename}' and Username eq '${userName}'`」``などとRobotの
 プロパティ名とその値を指定することで、条件に一致するRobotを検索することができました。
 条件指定は ``$filter`` 以外にも ``$top`` や ``$select`` などいくつかありますが、その仕様は [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) のサイトに詳しく書いてあります。
+
+
+
+## 対応状況(2020/02/22時点)
+
+各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
+専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
+
+
+
+| No. | リソース        | 検索(findAll) | 検索(find) | 作成(create) | 更新(update) | 削除(delete) | その他                                                                                                                   | 備考           |
+|:---:|-----------------|:-------------:|:----------:|:------------:|:------------:|:------------:|--------------------------------------------------------------------------------------------------------------------------|----------------|
+|  1  | license         |       〇      |            |              |              |              |                                                                                                                          |                |
+|  2  | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)           |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
+|  3  | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
+|  4  | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)         |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
+|  5  | process         |       〇      |            |              |              |              |                                                                                                                          |                |
+|  6  | schedule        |       〇      |            |              |              |              |                                                                                                                          |                |
+|  7  | queueDefinition |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
+|  8  | queueItem       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
+|  9  | queueOperation  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
+|  10 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+
+
+
+
 
 
 ## 使用するための前準備
@@ -337,28 +363,6 @@ $ npm i
 $ node index.js
 ```
 
-## 対応状況(2020/02/21時点)
-
-各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
-専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
-
-
-
-| No. | リソース        | 検索(findAll) | 検索(find) | 作成(create) | 更新(update) | 削除(delete) | その他                                                                                                                   | 備考           |
-|:---:|-----------------|:-------------:|:----------:|:------------:|:------------:|:------------:|--------------------------------------------------------------------------------------------------------------------------|----------------|
-|  1  | license         |       〇      |            |              |              |              |                                                                                                                          |                |
-|  2  | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/robotSample.ts)           |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  3  | user            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
-|  4  | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/robotSample.ts)         |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  5  | process         |       〇      |            |              |              |              |                                                                                                                          |                |
-|  6  | schedule        |       〇      |            |              |              |              |                                                                                                                          |                |
-|  7  | queueDefinition |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
-|  8  | queueItem       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  9  | queueOperation  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
-|  10 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
-
-
-
 ## 設定ファイル書き方いろいろ
 
 ちなみに設定ファイルは Own Coding で、
@@ -392,6 +396,7 @@ const api2 = new OrchestratorApi({
 
 ## 改訂履歴
 
+- 0.3.4 ODataをそのまま返すオプションを追加
 - 0.3.3 Robot/Machine のCRUD作成完了。テストコードも追加。Loggerの設定を見なおし。設定ファイルに外だし。
 - 0.3.2 認証ナシプロキシを設定できるように。電文を見たいときなどデバッグ時にご活用ください
 - 0.3.1 Queue/Transactionを操作するAPIに対応。
