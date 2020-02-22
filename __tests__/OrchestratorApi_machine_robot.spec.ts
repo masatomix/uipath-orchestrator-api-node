@@ -1,8 +1,7 @@
 import OrchestratorApi from '../src/index'
-import { createRobotData } from '../src/samples/robotSample'
+import { randomName, createRobotData } from '../src/samples/sampleUtils'
 import config from 'config'
 import logger from '../src/logger'
-import { randomName } from '../src/samples/sampleUtils'
 
 describe('OrchestratorApi_machine_robot', () => {
   const api = new OrchestratorApi(config)

@@ -283,7 +283,7 @@ describe('OrchestratorApi_queue', () => {
 
     afterEach(async () => {
       const queueDef = await api.queueDefinition.findByName(testQueueDef.Name)
-      // await api.queueDefinition.delete(queueDef.Id)
+      await api.queueDefinition.delete(queueDef.Id)
     })
   })
 })
