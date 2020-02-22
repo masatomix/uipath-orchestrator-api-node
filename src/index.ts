@@ -30,7 +30,7 @@ interface IOrchestratorApi {
 }
 
 interface ICrudService {
-  findAll: (obj?: any) => Promise<Array<any>>
+  findAll: (obj?: any, asArray?: boolean) => Promise<Array<any>>
   find: (obj?: any) => Promise<any> // licenseなどはパラメタ不要だったりするのでOption
   create: (obj: any) => Promise<any>
   update: (obj: any) => Promise<void>
@@ -45,7 +45,7 @@ class BaseCrudService implements ICrudService {
   constructor(parent_: OrchestratorApi) {
     this.parent = parent_
   }
-  findAll(obj?: any): Promise<Array<any>> {
+  findAll(obj?: any, asArray: boolean = true): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
   find(obj?: any): Promise<any> {
@@ -261,8 +261,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', queries, asArray)
     }
 
     find(id: number): Promise<any> {
@@ -291,8 +291,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries, asArray)
     }
 
     find(id: number): Promise<any> {
@@ -322,8 +322,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
     }
 
     find(id: number): Promise<any> {
@@ -352,8 +352,8 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
     }
   })(this)
 
@@ -361,12 +361,13 @@ class OrchestratorApi implements IOrchestratorApi {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
-    findAll(queries?: any): Promise<Array<any>> {
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(
         this.parent.config,
         this.parent.accessToken,
         '/odata/ProcessSchedules',
         queries,
+        asArray
       )
     }
   })(this)
@@ -376,8 +377,8 @@ class OrchestratorApi implements IOrchestratorApi {
       super(parent_)
     }
 
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries, asArray)
     }
 
     find(id: number): Promise<Array<any>> {
@@ -426,8 +427,8 @@ class OrchestratorApi implements IOrchestratorApi {
       super(parent_)
     }
     // QueueItemを一覧する
-    findAll(queries?: any): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries)
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries, asArray)
     }
 
     // PK指定で取得する
@@ -552,13 +553,6 @@ if (!module.parent) {
       const license: any = await api.license.find()
       console.log(license)
 
-      // Userを取得する
-      instances = await api.user.findAll()
-      for (const instance of instances) {
-        const userId: number = instance.Id
-        const user = await api.user.find(userId)
-        console.log(user)
-      }
       // Processesを取得する
       instances = await api.process.findAll()
       for (const instance of instances) {

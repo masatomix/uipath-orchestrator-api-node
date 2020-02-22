@@ -19,3 +19,16 @@ const randomValue = (): string => {
     return ('0'.repeat(length) + random).slice(-length)
 }
 
+
+// マシン名、ロボット名、そのWindowsアカウントとも一意になる任意の名称RobotのObjを作成するメソッド。
+export function createRobotData(testMachine: any) {
+    const random = randomName()
+    return {
+      MachineName: testMachine.Name, // 取得したマシン名
+      LicenseKey: testMachine.LicenseKey, // 取得したライセンスキー
+      Name: `${randomName('test_')}_${random}`, // ランダム値
+      Username: `xx\\xxxx_${random}`, // ランダム値
+      Type: 'Development', //未指定だとNonProduction
+      // RobotEnvironments: ''
+    }
+  }
