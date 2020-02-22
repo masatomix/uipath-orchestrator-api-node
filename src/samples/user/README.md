@@ -70,6 +70,12 @@ $ npx ts-node src/samples/user/userSample.ts
 ## コード抜粋
 
 ```typescript
+import config from 'config'
+import OrchestratorApi from '../../index'
+import logger from '../../logger'
+import { randomName } from '../sampleUtils'
+
+
 const api = new OrchestratorApi(config)
 // まずは認証
 await api.authenticate()
