@@ -69,6 +69,11 @@ $ npx ts-node src/samples/machine_robot/robotSample.ts
 ## コード抜粋
 
 ```typescript
+import config from 'config'
+import OrchestratorApi from '../../index'
+import logger from '../../logger'
+import { randomName, createRobotData } from '../sampleUtils'
+
 const api = new OrchestratorApi(config)
 
 // まずは認証
