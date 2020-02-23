@@ -76,6 +76,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
+      logger.debug('option:',options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
