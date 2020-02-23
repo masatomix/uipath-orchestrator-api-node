@@ -142,7 +142,7 @@ console.log(robots)
 
 ## Development status
 
-**対応状況**(2020/02/22時点)
+**対応状況**(2020/02/24時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
@@ -155,12 +155,14 @@ console.log(robots)
 |  2  | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)           |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
 |  3  | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
 |  4  | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)         |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  5  | process         |       〇      |            |              |              |              |                                                                                                                          |                |
-|  6  | schedule        |       〇      |            |              |              |              |                                                                                                                          |                |
-|  7  | queueDefinition |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
-|  8  | queueItem       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  9  | queueOperation  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
-|  10 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+|  5  | release         |       〇      |            |              |              |              |   findByProcessKey(プロセス画面上の「名前」で検索)。                                                                 |                |
+|  6  | process         |       〇      |            |              |              |              |   releaseと似ている、、そのうち整理するべきかも、、。                                                                           |                |
+|  7  | job             |       〇     |     〇     |              |              |              |   StartJobs/StopJob                                                                                                      |                |
+|  8  | schedule        |       〇      |            |              |              |              |                                                                                                                          |                |
+|  9  | queueDefinition |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
+|  10  | queueItem       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
+|  11  | queueOperation  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
+|  12 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
 
@@ -406,6 +408,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.3.5 release追加、jobの開始・停止を追加。
 - 0.3.4 ODataを[そのまま返すオプション](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/index.ts#L33)を追加。[UserのCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)追加。
 - 0.3.3 [Robot/Machine のCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/machine_robot)作成完了。テストコードも追加。Loggerの設定を見なおし。設定ファイルに外だし。
 - 0.3.2 認証ナシプロキシを設定できるように。電文を見たいときなどデバッグ時にご活用ください

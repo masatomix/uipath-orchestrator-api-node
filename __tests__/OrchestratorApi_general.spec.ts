@@ -84,39 +84,4 @@ describe('OrchestratorApi_general', () => {
     // └─────────┴──────────────┴───────┴────────────────┘
     console.table(instances)
   })
-
-  // あとでリファクタリングする
-  // ロボットとプロセスがある前提のテストになってるが。。
-  it('Release のテスト', async () => {
-    // ロボットを検索、リリースを検索、それぞれのキー項目で、JobをStartさせる
-    const processKey = 'MyAttendedFramework'
-    // const release = await api.release.findByProcessKey(processKey)
-    // logger.debug(release.Key)
-
-    const robots = await api.robot.findAll()
-    const robotNames: string[] = robots.map(robot => robot.Name)
-
-    if (robotNames && robotNames.length > 0) {
-      let result
-      result = await api.job.startJobs(processKey, robotNames)
-      logger.debug(result.value.length)
-
-      await Promise.all(
-        result.value.map((element: any) => {
-          return api.job.stopJob(element.Id)
-        }),
-      )
-
-      result = await api.job.startJobs(processKey, [], 5)
-      logger.debug(result.value.length)
-
-      await Promise.all(
-        result.value.map((element: any) => {
-          return api.job.stopJob(element.Id)
-        }),
-      )
-    } else {
-      console.log('Robotが存在しないため、テストできず。')
-    }
-  })
 })
