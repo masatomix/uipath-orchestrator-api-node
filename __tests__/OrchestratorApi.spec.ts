@@ -3,12 +3,6 @@ import OrchestratorApi from '../src/index'
 
 import config from 'config'
 
-// async function main() {
-//   const robot = await api.robot.find(1)
-//   robot.Description = 'test3'
-//   await api.robot.update(robot)
-// }
-
 describe('OrchestratorApi', () => {
   const api = new OrchestratorApi(config)
 
@@ -26,96 +20,15 @@ describe('OrchestratorApi', () => {
       console.log(license.Used)
     })
 
-    it('Robot のテスト', async () => {
-      // // ロボットを取得する
-      const instances: any[] = await api.robot.findAll()
-      expect(instances.length).toBeGreaterThanOrEqual(1)
-
-      for (const instance of instances) {
-        const robotId: number = instance.Id
-        const robot = await api.robot.find(robotId)
-        // console.log('RobotId:', robot.Id)
-        expect(robot.Id).toBe(robotId)
-      }
-    })
-    it('Robot のテスト', async () => {
-      // // ロボットを取得する
-      const machinename = 'PBPC0124'
-      const username = 'pb\\pbkino'
-      const instances: any[] = await api.robot.findAll({
-        $filter: `MachineName eq '${machinename}' and Username eq '${username}'`,
-      })
-      expect(instances.length).toBeGreaterThanOrEqual(1)
+    it('Release のテスト', async () => {
+      const instances = await api.release.findAll()
+      expect(instances.length).toBeGreaterThanOrEqual(0)
 
       for (const instance of instances) {
         // console.log(instance)
-        const robotId: number = instance.Id
-        const robot = await api.robot.find(robotId)
-        // console.log('RobotId:', robot.Id)
-        expect(robot.Id).toBe(robotId)
-      }
-    })
-    describe('User登録テスト', () => {
-      const user = {
-        Name: 'user002',
-        Surname: 'LastName002',
-        UserName: 'てすと',
-        FullName: 'User002_LastName002',
-        EmailAddress: 'masatomix@example.com',
-        IsActive: true,
-        Password: 'afjlaf#adA0!',
-        RolesList: ['Robot'],
-        // TenantId: 1,
-      }
-      if (api.isEnterprise) {
-        it('User登録/更新テスト', async () => {
-          try {
-            // ユーザ作成
-            let testUser = await api.user.create(user)
-            const testUserId = testUser.Id
-            expect(testUser.UserName).toBe(user.UserName) // 戻り値がテストユーザと同じであること
-
-            const expectedName: string = 'テストさん'
-            // 検索する
-            testUser = await api.user.find(testUserId)
-            testUser.Name = expectedName
-            // 更新をしてみる
-            testUser = await api.user.update(testUser)
-            // updateは戻り値は空
-            expect(testUser).toBeUndefined()
-
-            testUser = await api.user.find(testUserId)
-            expect(testUser.Name).toBe(expectedName)
-          } catch (error) {
-            console.log('Community版の場合は失敗するかもしれない')
-            fail(error)
-          }
-        })
-      } else {
-        console.log('Community版のため、スキップ')
-      }
-
-      afterEach(async () => {
-        try {
-          const result: any[] = await api.user.findByUserName(user.UserName)
-          expect(result.length).toBe(1)
-          expect(result[0].UserName).toBe(user.UserName)
-
-          await api.user.delete(result[0].Id)
-        } catch (error) {
-          fail(error)
-        }
-      })
-    })
-
-    it('Machine のテスト', async () => {
-      // Machineを取得する
-      const instances = await api.machine.findAll()
-      expect(instances.length).toBeGreaterThanOrEqual(1)
-
-      for (const instance of instances) {
-        // console.log(instance)
-        expect(instance.Name).not.toBeUndefined()
+        expect(instance.Id).not.toBeUndefined()
+        expect(instance.Key).not.toBeUndefined()
+        expect(instance.ProcessKey).not.toBeUndefined()
       }
     })
 
@@ -141,7 +54,6 @@ describe('OrchestratorApi', () => {
         expect(instance.ReleaseKey).not.toBeUndefined()
       }
     })
-
   })
 
   describe('Enterprise判別テスト。と認証エラー系', () => {

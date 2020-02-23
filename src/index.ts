@@ -436,9 +436,9 @@ class OrchestratorApi implements IOrchestratorApi {
       const release = await this.parent.release.findByProcessKey(processKey)
       let promise: Promise<any>
       if (robotNames && robotNames.length > 0) {
-        logger.debug('Specific')
-        logger.debug(robotNames)
-        logger.debug(robotNames.length)
+        // logger.debug('Specific')
+        // logger.debug(robotNames)
+        // logger.debug(robotNames.length)
 
         const robotIdsPromise: Promise<number>[] = robotNames.map(async element => {
           const instance = await this.parent.robot.findByRobotName(element)
@@ -446,9 +446,6 @@ class OrchestratorApi implements IOrchestratorApi {
         })
 
         const robotIds = await Promise.all(robotIdsPromise)
-        console.log(robotIds)
-
-        const robot = await this.parent.robot.findByRobotName(robotNames[0])
         promise = this._startJobs({
           startInfo: {
             ReleaseKey: release.Key,
@@ -459,9 +456,9 @@ class OrchestratorApi implements IOrchestratorApi {
           },
         })
       } else {
-        logger.debug('JobsCount')
-        logger.debug(robotNames)
-        logger.debug(robotNames.length)
+        // logger.debug('JobsCount')
+        // logger.debug(robotNames)
+        // logger.debug(robotNames.length)
         promise = this._startJobs({
           startInfo: {
             ReleaseKey: release.Key,
@@ -668,30 +665,11 @@ if (!module.parent) {
       const license: any = await api.license.find()
       console.log(license)
 
-      // Processesを取得する
-      const Id = 'MyAttendedFramework'
-      instances = await api.process.findAll({
-        $filter: `Id eq '${Id}'`,
-      })
+      // Schedulesを取得する
+      instances = await api.schedule.findAll()
       for (const instance of instances) {
         console.log(instance)
       }
-
-      // // Schedulesを取得する
-      // instances = await api.schedule.findAll()
-      // for (const instance of instances) {
-      //   console.log(instance)
-      // }
-
-      // instances = await api.getArray('/odata/Folders')
-      // for (const instance of instances) {
-      //   console.log(instance)
-      // }
-
-      // instances = await api.getArray('/odata/Users')
-      // for (const instance of instances) {
-      //   console.log(instance)
-      // }
 
       // instances = await api.queueItem.findAll()
       // for (const instance of instances) {
