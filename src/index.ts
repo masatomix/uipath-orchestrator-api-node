@@ -9,12 +9,14 @@ import { getData, getArray, putData, postData, deleteData, addProxy } from './ut
 interface IOrchestratorApi {
   authenticate: () => Promise<any>
   license: ICrudService
-  robot: ICrudService
+  robot: RobotCrudService
   user: UserCrudService
   machine: ICrudService
+  release: ReleaseCrudService
   process: ICrudService
+  job: ICrudService
   schedule: ICrudService
-  queueDefinition: ICrudService
+  queueDefinition: QueueDefinitionCrudService
   queueItem: ICrudService
   queueOperation: QueueCrudService // Queueの処理をするのに、Robotの情報が必要かもしれないので、これはisRobotのときのみ動くようにする？
   // 以下、汎用的なメソッド
@@ -66,7 +68,39 @@ class UserCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByUserName(userName: String): Promise<Array<any>> {
+  findByUserName(userName: String): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class RobotCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findByRobotName(robotName: String): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class ReleaseCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findByProcessKey(processKey: String): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class JobCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+
+  startJobs(processKey: string, robotName?: string[], jobsCount: number = 0): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+
+  stopJob(jobId: number, force: boolean = false): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -106,7 +140,8 @@ class OrchestratorApi implements IOrchestratorApi {
   constructor(config_: any) {
     this.config = config_
     // Enterpriseだったら、trueにする
-    if (!this.config.serverinfo.client_id) { // serverinfo.client_idプロパティがなければEnterprise
+    if (!this.config.serverinfo.client_id) {
+      // serverinfo.client_idプロパティがなければEnterprise
       this.isEnterprise = true
     } else {
     }
@@ -141,9 +176,7 @@ class OrchestratorApi implements IOrchestratorApi {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
           'X-ROBOT-LICENSE': this.config.robotInfo.machineKey,
-          'X-ROBOT-MACHINE-ENCODED': Buffer.from(this.config.robotInfo.machineName).toString(
-            'base64',
-          ),
+          'X-ROBOT-MACHINE-ENCODED': Buffer.from(this.config.robotInfo.machineName).toString('base64'),
           Accept: 'application/json',
         },
         json: { UserName: this.config.robotInfo.userName },
@@ -152,7 +185,7 @@ class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, function(err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -186,7 +219,7 @@ class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, function(err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -220,7 +253,7 @@ class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, function(err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -257,7 +290,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  robot: ICrudService = new (class extends BaseCrudService {
+  robot: RobotCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
@@ -269,17 +302,23 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
 
+    _findByName(name: String): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', {
+        $filter: `Name eq '${name}'`,
+      })
+    }
+
+    async findByRobotName(name: String): Promise<any> {
+      const robos: any[] = await this._findByName(name)
+      return robos[0]
+    }
+
     create(robot: any): Promise<any> {
       return postData(this.parent.config, this.parent.accessToken, '/odata/Robots', robot)
     }
 
     update(robot: any): Promise<void> {
-      return putData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Robots(${robot.Id})`,
-        robot,
-      )
+      return putData(this.parent.config, this.parent.accessToken, `/odata/Robots(${robot.Id})`, robot)
     }
 
     delete(id: number): Promise<any> {
@@ -335,17 +374,31 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     update(machine: any): Promise<void> {
-      return putData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Machines(${machine.Id})`,
-        machine,
-      )
+      return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
     }
     delete(id: number): Promise<any> {
       return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
     }
+  })(this)
 
+  release: ReleaseCrudService = new (class extends BaseCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
+    }
+
+    _findByProcessName(name: String): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', {
+        $filter: `ProcessKey eq '${name}'`,
+      })
+    }
+    async findByProcessKey(processKey: String): Promise<any> {
+      // processKey は画面上のプロセスの名前
+      const objs: any[] = await this._findByProcessName(processKey)
+      return objs[0]
+    }
   })(this)
 
   process: ICrudService = new (class extends BaseCrudService {
@@ -353,8 +406,102 @@ class OrchestratorApi implements IOrchestratorApi {
       super(parent_)
     }
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
     }
+  })(this)
+
+  job: JobCrudService = new (class extends BaseCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/Jobs', queries, asArray)
+    }
+
+    find(id: number): Promise<any> {
+      return getData(this.parent.config, this.parent.accessToken, `/odata/Jobs(${id})`)
+    }
+
+    _startJobs(startInfo: any): Promise<any> {
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        '/odata/Jobs/UiPath.Server.Configuration.OData.StartJobs',
+        startInfo,
+      )
+    }
+
+    async startJobs(processKey: string, robotNames: string[], jobsCount: number = 0): Promise<any> {
+      const release = await this.parent.release.findByProcessKey(processKey)
+      let promise: Promise<any>
+      if (robotNames && robotNames.length > 0) {
+        logger.debug('Specific')
+        logger.debug(robotNames)
+        logger.debug(robotNames.length)
+
+        const robotIdsPromise: Promise<number>[] = robotNames.map(async element => {
+          const instance = await this.parent.robot.findByRobotName(element)
+          return instance.Id
+        })
+
+        const robotIds = await Promise.all(robotIdsPromise)
+        console.log(robotIds)
+
+        const robot = await this.parent.robot.findByRobotName(robotNames[0])
+        promise = this._startJobs({
+          startInfo: {
+            ReleaseKey: release.Key,
+            RobotIds: robotIds,
+            JobsCount: 0,
+            Strategy: 'Specific',
+            InputArguments: '{}',
+          },
+        })
+      } else {
+        logger.debug('JobsCount')
+        logger.debug(robotNames)
+        logger.debug(robotNames.length)
+        promise = this._startJobs({
+          startInfo: {
+            ReleaseKey: release.Key,
+            RobotIds: [],
+            JobsCount: jobsCount,
+            Strategy: 'JobsCount',
+            InputArguments: '{}',
+          },
+        })
+      }
+      return promise
+    }
+
+    stopJob(jobId: number, force: boolean = false): Promise<any> {
+      let strategy: string
+      if (force) {
+        strategy = '2'
+      } else {
+        strategy = '1'
+      }
+      return postData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Jobs(${jobId})/UiPath.Server.Configuration.OData.StopJob`,
+        {
+          strategy: strategy,
+        },
+      )
+    }
+
+    // create(machine: any): Promise<any> {
+    //   return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+    // }
+
+    // update(machine: any): Promise<void> {
+    //   return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
+    // }
+    // delete(id: number): Promise<any> {
+    //   return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    // }
   })(this)
 
   schedule: ICrudService = new (class extends BaseCrudService {
@@ -362,13 +509,7 @@ class OrchestratorApi implements IOrchestratorApi {
       super(parent_)
     }
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(
-        this.parent.config,
-        this.parent.accessToken,
-        '/odata/ProcessSchedules',
-        queries,
-        asArray
-      )
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/ProcessSchedules', queries, asArray)
     }
   })(this)
 
@@ -382,11 +523,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     find(id: number): Promise<Array<any>> {
-      return getData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/QueueDefinitions(${id})`,
-      )
+      return getData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
     }
 
     _findByName(name: String): Promise<Array<any>> {
@@ -401,24 +538,20 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     create(queueDefinition: any): Promise<any> {
-      return postData(
+      return postData(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queueDefinition)
+    }
+
+    update(queueDefinition: any): Promise<any> {
+      return putData(
         this.parent.config,
         this.parent.accessToken,
-        '/odata/QueueDefinitions',
+        `/odata/QueueDefinitions(${queueDefinition.Id})`,
         queueDefinition,
       )
     }
 
-    update(queueDefinition: any): Promise<any> {
-      return putData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${queueDefinition.Id})`, queueDefinition)
-    }
-
     delete(id: number): Promise<any> {
-      return deleteData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/QueueDefinitions(${id})`,
-      )
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
     }
   })(this)
 
@@ -433,29 +566,16 @@ class OrchestratorApi implements IOrchestratorApi {
 
     // PK指定で取得する
     find(queueItemId: number): Promise<Array<any>> {
-      return getData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/QueueItems(${queueItemId})`,
-      )
+      return getData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
     }
 
     create(queue: any): Promise<any> {
-      return postData(
-        this.parent.config,
-        this.parent.accessToken,
-        '/odata/Queues/UiPathODataSvc.AddQueueItem',
-        queue,
-      )
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.AddQueueItem', queue)
     }
 
     // PK指定で、削除済みにする。
     delete(queueItemId: number): Promise<any> {
-      return deleteData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/QueueItems(${queueItemId})`,
-      )
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
     }
   })(this)
 
@@ -464,17 +584,12 @@ class OrchestratorApi implements IOrchestratorApi {
       super(parent_)
     }
     getQueueAndStartTransaction(queueName: string): Promise<any> {
-      return postData(
-        this.parent.config,
-        this.parent.accessToken,
-        '/odata/Queues/UiPathODataSvc.StartTransaction',
-        {
-          'transactionData': {
-            'Name': queueName,
-            'RobotIdentifier': this.parent.accessToken
-          }
+      return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.StartTransaction', {
+        transactionData: {
+          Name: queueName,
+          RobotIdentifier: this.parent.accessToken,
         },
-      )
+      })
     }
     setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
       return postData(
@@ -554,43 +669,45 @@ if (!module.parent) {
       console.log(license)
 
       // Processesを取得する
-      instances = await api.process.findAll()
+      const Id = 'MyAttendedFramework'
+      instances = await api.process.findAll({
+        $filter: `Id eq '${Id}'`,
+      })
       for (const instance of instances) {
         console.log(instance)
       }
 
-      // Schedulesを取得する
-      instances = await api.schedule.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-      }
+      // // Schedulesを取得する
+      // instances = await api.schedule.findAll()
+      // for (const instance of instances) {
+      //   console.log(instance)
+      // }
 
-      instances = await api.getArray('/odata/Folders')
-      for (const instance of instances) {
-        console.log(instance)
-      }
+      // instances = await api.getArray('/odata/Folders')
+      // for (const instance of instances) {
+      //   console.log(instance)
+      // }
 
-      instances = await api.getArray('/odata/Users')
-      for (const instance of instances) {
-        console.log(instance)
-      }
+      // instances = await api.getArray('/odata/Users')
+      // for (const instance of instances) {
+      //   console.log(instance)
+      // }
 
-      instances = await api.queueItem.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-      }
-      console.log(instances.length)
+      // instances = await api.queueItem.findAll()
+      // for (const instance of instances) {
+      //   console.log(instance)
+      // }
+      // console.log(instances.length)
 
-      const queueItemId = instances[0].Id
-      const result = await api.queueItem.find(queueItemId)
-      console.log(result)
+      // const queueItemId = instances[0].Id
+      // const result = await api.queueItem.find(queueItemId)
+      // console.log(result)
 
-      let queueDef = await api.queueDefinition.findByName('QueueTest')
+      // let queueDef = await api.queueDefinition.findByName('QueueTest')
+      // // console.table(queueDef)
+
+      // queueDef = await api.queueDefinition.find(1)
       // console.table(queueDef)
-
-      queueDef = await api.queueDefinition.find(1)
-      // console.table(queueDef)
-
     } catch (error) {
       console.log(error)
     }

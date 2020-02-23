@@ -13,6 +13,8 @@
   </a>
 </p>
 
+<p><img alt="Node.js CI" src="https://github.com/masatomix/uipath-orchestrator-api-node/workflows/Node.js%20CI/badge.svg?branch=master" /></p>
+
 # uipath-orchestrator-api-node
 
 [UiPath Orchestrator のAPI](https://docs.uipath.com/orchestrator/lang-ja/reference#about-odata-and-references) を、Node.jsから呼び出すライブラリです。
@@ -22,15 +24,16 @@
 
 - [Installation](#installation)
 - [Quick Examples](#quick-examples)
-    - [Robot一覧を取得する](#robot一覧を取得する)
-    - [条件を指定してみる](#条件を指定してみる)
-- [API対応状況(2020/02/22時点)](#対応状況20200222時点)
-- [使用するための前準備](#使用するための前準備)
-- [利用方法(TypeScriptから)](#利用方法typescriptから)
-- [利用方法(JavaScriptから)](#利用方法javascriptから)
-- [設定ファイル書き方いろいろ](#設定ファイル書き方いろいろ)
-- [ソースコードなどリポジトリ](#ソースコードなどリポジトリ)
-- [改訂履歴](#改訂履歴)
+    - [Robot一覧を取得する](#get-a-list-of-robots)
+    - [条件を指定してみる](#search-for-robots)
+- [API対応状況](#development-status)
+- [使用するための前準備](#preferences)
+- [使い方](#usage)
+    - [利用方法(TypeScriptから)](#how-to-use-in-typescript)
+    - [利用方法(JavaScriptから)](#how-to-use-in-javascript)
+    - [設定ファイル書き方いろいろ](#how-to-customize-with-configuration-file)
+- [ソースコードなどリポジトリ](#source-and-npm-repository)
+- [改訂履歴](#revision-history)
 
 
 ## Installation
@@ -41,7 +44,9 @@ $ npm install uipath-orchestrator-api-node
 
 ## Quick Examples
 
-### Robot一覧を取得する
+### Get a list of Robots
+
+**ロボット一覧を取得**してみます。
 
 ```typescript
 const api = new OrchestratorApi(config)
@@ -82,13 +87,12 @@ for (const robot of robots) {
   ...
 ```
 
-こんな感じでOrchestrator上の情報をAPI経由で取得することができます。
+このように、Orchestrator上の情報をAPI経由で取得することができます。
 
 
-### 条件を指定してみる
+### Search for Robots
 
-検索条件を指定することで、条件に合致するリソースを検索することもできます。
-
+**検索条件を指定**することで、条件に合致するリソースを検索することもできます。
 
 ```typescript
 const api = new OrchestratorApi(config)
@@ -106,7 +110,8 @@ console.log(robots)
 実行結果
 
 ```typescript
-{
+[
+  {
   LicenseKey: null,
   MachineName: 'PBPC0124',
   MachineId: 4,
@@ -127,6 +132,7 @@ console.log(robots)
   Id: 2,
   ExecutionSettings: null
 }
+]
 ```
 
 ``「`MachineName eq '${machinename}' and Username eq '${userName}'`」``などとRobotの
@@ -134,8 +140,9 @@ console.log(robots)
 条件指定は ``$filter`` 以外にも ``$top`` や ``$select`` などいくつかありますが、その仕様は [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) のサイトに詳しく書いてあります。
 
 
+## Development status
 
-## 対応状況(2020/02/22時点)
+**対応状況**(2020/02/22時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
@@ -158,12 +165,9 @@ console.log(robots)
 
 
 
+## Preferences
 
-
-## 使用するための前準備
-
-さて、本ライブラリを使用するには、接続するUiPath Orchestratorの情報など環境設定が必要です。
-
+さて本ライブラリを使用するには、接続するUiPath Orchestratorの情報など**環境設定**が必要です。
 
 UiPath Orchestrator がEnterprise版の場合:
 
@@ -197,8 +201,11 @@ $ cat config/local.json
 
 という設定ファイルを作成しておいてください。
 
-## 利用方法(TypeScriptから)
+## Usage
 
+### How to use in TypeScript
+
+**TypeScriptから利用する方法**です。
 最終的に、ディレクトリ構成はこんな感じになります。
 
 ```console
@@ -295,9 +302,9 @@ $ node dist/index.js
 ```
 
 
+### How to use in JavaScript
 
-## 利用方法(JavaScriptから)
-
+**JavaScriptから利用する方法**です。
 最終的に、ディレクトリ構成はこんな感じになります。
 
 ```console
@@ -362,7 +369,7 @@ $ npm i
 $ node index.js
 ```
 
-## 設定ファイル書き方いろいろ
+### How to customize with configuration file
 
 ちなみに設定ファイルは Own Coding で、
 
@@ -387,13 +394,17 @@ const api2 = new OrchestratorApi({
 
 
 
-## ソースコードなどリポジトリ
+## source and npm repository
+
+**ソースコードやnpmのリポジトリ**です。
 
 - https://github.com/masatomix/uipath-orchestrator-api-node
 - https://www.npmjs.com/package/uipath-orchestrator-api-node
 
 
-## 改訂履歴
+## Revision history
+
+改訂履歴
 
 - 0.3.4 ODataを[そのまま返すオプション](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/index.ts#L33)を追加。[UserのCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)追加。
 - 0.3.3 [Robot/Machine のCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/machine_robot)作成完了。テストコードも追加。Loggerの設定を見なおし。設定ファイルに外だし。
