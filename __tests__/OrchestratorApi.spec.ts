@@ -125,7 +125,10 @@ describe('OrchestratorApi', () => {
 
       for (const instance of instances) {
         // console.log(instance)
-        expect(instance.ProcessKey).not.toBeUndefined()
+        expect(instance.Id).not.toBeUndefined()
+        expect(instance.IsActive).not.toBeUndefined()
+        expect(instance.Version).not.toBeUndefined()
+        expect(instance.Key).not.toBeUndefined()
       }
     })
 
