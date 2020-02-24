@@ -4,6 +4,7 @@ import logger from '../src/logger'
 import config from 'config'
 
 describe('OrchestratorApi_job', () => {
+  jest.setTimeout(10000)
   const api = new OrchestratorApi(config)
 
   beforeEach(async () => {

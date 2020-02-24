@@ -23,7 +23,7 @@ jobs:
     #   env:
     #     CI: true
     #     ENTERPRISE_CONFIG: ${{ secrets.ENTERPRISE_CONFIG }}
-    - run: NODE_CONFIG=${ENTERPRISE_CONFIG} npm test
+    - run: NODE_CONFIG=${ENTERPRISE_CONFIG} npm test -- --runInBand
       env:
         CI: true
         ENTERPRISE_CONFIG: ${{ secrets.ENTERPRISE_CONFIG }}
