@@ -661,10 +661,6 @@ if (!module.parent) {
 
       let instances: any[] = []
 
-      // ライセンスを取得する
-      const license: any = await api.license.find()
-      console.log(license)
-
       // Schedulesを取得する
       instances = await api.schedule.findAll()
       for (const instance of instances) {
