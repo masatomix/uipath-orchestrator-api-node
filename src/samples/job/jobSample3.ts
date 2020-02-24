@@ -8,15 +8,15 @@ async function sample() {
 
   const processKey: string = await createProcessKey(api)
 
-  const result: any = await api.job.startJobs(processKey, [], 3)
-  logger.info(result.value)
+  const jobs: any = await api.job.startJobs(processKey, [], 3)
+  logger.info(jobs.value)
 
   await Promise.all(
-    result.value.map((element: any) => {
-      return api.job.stopJob(element.Id)
-      // const force: boolean = true
-      // return api.job.stopJob(element.Id, force)
-    })
+    jobs.value.map((job: any) => {
+      return api.job.stopJob(job.Id)
+      // ちなみに引数にtrueを渡すと、強制終了を行います。
+      // return api.job.stopJob(element.Id, true)
+    }),
   )
 }
 

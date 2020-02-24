@@ -1,18 +1,3 @@
-<p>
-  <a href="https://www.npmjs.com/package/uipath-orchestrator-api-node" target="_blank">
-    <img alt="Version" src="https://img.shields.io/npm/v/uipath-orchestrator-api-node.svg">
-  </a>
-  <a href="https://github.com/masatomix/uipath-orchestrator-api-node#readme" target="_blank">
-    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
-  </a>
-  <a href="https://github.com/masatomix/uipath-orchestrator-api-node/graphs/commit-activity" target="_blank">
-    <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
-  </a>
-  <a href="https://github.com/masatomix/uipath-orchestrator-api-node/blob/master/LICENSE" target="_blank">
-    <img alt="License: Apache--2.0" src="https://img.shields.io/github/license/masatomix/uipath-orchestrator-api-node" />
-  </a>
-</p>
-
 ## サンプルを実行してみる
 
 ```console
@@ -43,8 +28,6 @@ $ npx ts-node src/samples/release/releaseSample.ts
 ]
 ```
 
-だいたいこんな結果が得られます。
-
 **ProcessKey** とありますが、この値は画面上に表示されるプロセスの「名前」です。
 
 ![release01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/1c27be55-340d-ecd2-5463-4023a6c2a9d2.png)
@@ -53,7 +36,7 @@ $ npx ts-node src/samples/release/releaseSample.ts
 
 ![release02.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/2e23bbdc-789b-7d93-d0f9-e31e8b445650.png)
 
-## コード抜粋
+## サンプルコード
 
 ```typescript
 import config from 'config'
