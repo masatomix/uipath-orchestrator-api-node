@@ -402,10 +402,10 @@ const api2 = new OrchestratorApi({
   "serverinfo": {
     "servername": "https://www.example.com/"
   },
-  // ココより下
+  // ココより下を追記 (debugは出力しない設定)
   "log4js": {
     "appenders": { "main": { "type": "console" } },
-    "categories": { "default": { "appenders": ["main"], "level": "info" } } // debugは表示しない
+    "categories": { "default": { "appenders": ["main"], "level": "info" } }
   }
 ```
 
