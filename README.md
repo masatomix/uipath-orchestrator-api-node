@@ -394,6 +394,22 @@ const api2 = new OrchestratorApi({
 
 などと実行時の環境変数として渡してあげてもOKです。
 
+#### ライブラリのログ出力
+
+本ライブラリはコンソールに[Log4js](https://log4js-node.github.io/log4js-node)を用いてdebugレベルのログを出力しています。表示がじゃまだなーって場合は、local.jsonに
+
+```json
+  "serverinfo": {
+    "servername": "https://www.example.com/"
+  },
+  // ココより下
+  "log4js": {
+    "appenders": { "main": { "type": "console" } },
+    "categories": { "default": { "appenders": ["main"], "level": "info" } } // debugは表示しない
+  }
+```
+
+など設定して、適宜表示を制御してください([参考](https://log4js-node.github.io/log4js-node/layouts.html#pattern-format))。
 
 
 ## source and npm repository
