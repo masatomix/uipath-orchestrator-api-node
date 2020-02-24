@@ -424,6 +424,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.3.6 ドキュメントの整理のみ。
 - 0.3.5 release追加、jobの開始・停止を追加。Statのサンプルを追加
 - 0.3.4 ODataを[そのまま返すオプション](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/index.ts#L33)を追加。[UserのCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)追加。
 - 0.3.3 [Robot/Machine のCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/machine_robot)作成完了。テストコードも追加。Loggerの設定を見なおし。設定ファイルに外だし。
