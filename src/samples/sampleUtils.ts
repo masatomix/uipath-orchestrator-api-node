@@ -1,5 +1,7 @@
 import OrchestratorApi from '../index'
-
+import path from 'path'
+import fs from 'fs'
+import request from 'request'
 
 export function createMachine(machineName: string, api_: OrchestratorApi) {
     return api_.machine.create({ Name: machineName }) // 登録する
@@ -32,3 +34,21 @@ export function createRobotData(testMachine: any) {
       // RobotEnvironments: ''
     }
   }
+
+export const downloadFile = (url: string): Promise<string> => {
+    const option = {
+        uri: url,
+        method: 'GET',
+        encoding: null,
+    }
+    return new Promise((resolve, reject) => {
+        request(option, (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                fs.writeFileSync(path.basename(url), body, 'binary')
+                resolve(path.basename(url))
+            } else {
+                reject(error)
+            }
+        })
+    })
+}
