@@ -246,3 +246,16 @@ if (!module.parent) {
   })()
 }
 ```
+
+
+
+## Orchestrator API との対応表
+
+- findAll (queries?: any)
+    - GET ``/odata/Jobs``
+- find (id: number)
+    - GET ``/odata/Jobs(${id})``
+- startJobs (processKey: string, robotNames: string[], jobsCount: number)
+    - POST ``/odata/Jobs/UiPath.Server.Configuration.OData.StartJobs``
+- stopJob (jobId: number, force: boolean = false)
+    - POST ``/odata/Jobs(${jobId})/UiPath.Server.Configuration.OData.StopJob``

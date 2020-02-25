@@ -97,3 +97,37 @@ try {
   logger.error(error)
 }
 ```
+
+
+
+## Orchestrator API との対応表
+
+Machine
+
+- findAll (queries?: any)
+    - GET ``/odata/Machines``
+- find (id: number)
+    - GET ``/odata/Machines(${id})``
+- create (machine: any)
+    - POST ``/odata/Machines``
+- update (machine: any)
+    - PUT ``/odata/Machines(${user.Id})``
+- delete (id: number)
+    - DELETE ``/odata/Machines(${id})``
+ 
+
+Robot
+
+- findAll (queries?: any)
+    - GET ``/odata/Robots``
+- find (id: number)
+    - GET ``/odata/Robots(${id})``
+- findByRobotName (name: string)
+    - GET ``/odata/Robots`` に `` $filter: `Name eq '${name}'` ``
+- create (robot: any)
+    - POST ``/odata/Robots``
+- update (robot: any)
+    - PUT ``/odata/Robots(${user.Id})``
+- delete (id: number)
+    - DELETE ``/odata/Robots(${id})``
+ 
