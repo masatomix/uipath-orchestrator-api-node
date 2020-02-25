@@ -26,6 +26,7 @@
 - [Quick Examples](#quick-examples)
     - [Robot一覧を取得する](#get-a-list-of-robots)
     - [条件を指定してみる](#search-for-robots)
+- [ドキュメント](#documents)
 - [API対応状況](#development-status)
 - [使用するための前準備](#preferences)
 - [使い方](#usage)
@@ -139,6 +140,10 @@ console.log(robots)
 プロパティ名とその値を指定することで、条件に一致するRobotを検索することができました。
 条件指定は ``$filter`` 以外にも ``$top`` や ``$select`` などいくつかありますが、その仕様は [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) のサイトに詳しく書いてあります。
 
+## Documents
+
+[こちら](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples) に、サンプルとともにドキュメントを整理しています。
+
 
 ## Development status
 
@@ -153,15 +158,15 @@ console.log(robots)
 |:---:|-----------------|:-------------:|:----------:|:------------:|:------------:|:------------:|--------------------------------------------------------------------------------------------------------------------------|----------------|
 |  1  | [license](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/license/)         |       〇      |            |              |              |              |                                                                                                                          |                |
 |  2  | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)           |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  3  | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
+|  3  | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user/)            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
 |  4  | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)         |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
 |  5  | [release](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/release/)        |       〇      |            |              |              |              |   プロセス画面上の「名前」で検索(findByProcessKey)                                                                 |                |
-|  6  | process         |       〇      |            |              |              |              |   releaseと似ている、、そのうち整理するべきかも、、。                                                                           |                |
+|  6  | [process](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/process/)         |       〇      |            |              |              |              | Packageの検索(findPackage) <br>Packageの削除(deletePackage) <br>Packageのアップロード(uploadPackage)<br>Packageのダウンロード(downloadPackage)                                                            |                |
 |  7  | [job](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/job/)             |       〇     |     〇     |              |              |              |   ジョブの開始/終了(StartJobs/StopJob)                                                                                                      |                |
-|  8  | schedule        |       〇      |            |              |              |              |                                                                                                                          |                |
-|  9  | queueDefinition |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
-|  10  | queueItem       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  11  | queueOperation  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
+|  8  | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/)        |       〇      |            |              |              |              |                                                                                                                          |                |
+|  9  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
+|  10  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
+|  11  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
 |  12 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
@@ -424,9 +429,10 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.3.7 [nupkg関連のアップロード・ダウンロード機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/process)を追加。各種機能の[ドキュメント](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples)を追加
 - 0.3.6 ドキュメントの整理のみ。
 - 0.3.5 release追加、jobの開始・停止を追加。Statのサンプルを追加
-- 0.3.4 ODataを[そのまま返すオプション](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/index.ts#L33)を追加。[UserのCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)追加。
+- 0.3.4 ODataを[そのまま返すオプション](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/index.ts)を追加。[UserのCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user)追加。
 - 0.3.3 [Robot/Machine のCRUD](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/machine_robot)作成完了。テストコードも追加。Loggerの設定を見なおし。設定ファイルに外だし。
 - 0.3.2 認証ナシプロキシを設定できるように。電文を見たいときなどデバッグ時にご活用ください
 - 0.3.1 Queue/Transactionを操作するAPIに対応。

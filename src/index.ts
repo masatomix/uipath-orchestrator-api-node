@@ -1,6 +1,6 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy } from './utils'
+import { getData, getArray, putData, postData, deleteData, addProxy, uploadData, downloadData } from './utils'
 
 /**
  * Orchestrator API Wrapper
@@ -13,8 +13,8 @@ interface IOrchestratorApi {
   user: UserCrudService
   machine: ICrudService
   release: ReleaseCrudService
-  process: ICrudService
-  job: ICrudService
+  process: ProcessCrudService
+  job: JobCrudService
   schedule: ICrudService
   queueDefinition: QueueDefinitionCrudService
   queueItem: ICrudService
@@ -68,7 +68,7 @@ class UserCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByUserName(userName: String): Promise<any> {
+  findByUserName(userName: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -77,7 +77,7 @@ class RobotCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByRobotName(robotName: String): Promise<any> {
+  findByRobotName(robotName: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -86,7 +86,25 @@ class ReleaseCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByProcessKey(processKey: String): Promise<any> {
+  findByProcessKey(processKey: string): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class ProcessCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
+    throw Error('Not implemented yet.')
+  }
+  findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
+    throw Error('Not implemented yet.')
+  }
+  deletePackage(processId: string, version?: string): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+  downloadPackage(id: string, version: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -109,7 +127,7 @@ class QueueDefinitionCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByName(name: String): Promise<any> {
+  findByName(name: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -302,13 +320,13 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
     }
 
-    _findByName(name: String): Promise<Array<any>> {
+    _findByName(name: string): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', {
         $filter: `Name eq '${name}'`,
       })
     }
 
-    async findByRobotName(name: String): Promise<any> {
+    async findByRobotName(name: string): Promise<any> {
       const robos: any[] = await this._findByName(name)
       return robos[0]
     }
@@ -338,7 +356,7 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
     }
 
-    findByUserName(userName: String): Promise<any> {
+    findByUserName(userName: string): Promise<any> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', {
         $filter: `UserName eq '${userName}'`,
       })
@@ -389,24 +407,74 @@ class OrchestratorApi implements IOrchestratorApi {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
     }
 
-    _findByProcessName(name: String): Promise<Array<any>> {
+    _findByProcessName(name: string): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', {
         $filter: `ProcessKey eq '${name}'`,
       })
     }
-    async findByProcessKey(processKey: String): Promise<any> {
+    async findByProcessKey(processKey: string): Promise<any> {
       // processKey は画面上のプロセスの名前
       const objs: any[] = await this._findByProcessName(processKey)
       return objs[0]
     }
   })(this)
 
-  process: ICrudService = new (class extends BaseCrudService {
+  process: ProcessCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
+    /**
+     * アクティブなバージョンに対しての検索。つまりプロセス一覧。
+     * @param queries 
+     * @param asArray 
+     */
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
+    }
+
+    uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
+      return uploadData(
+        this.parent.config,
+        this.parent.accessToken,
+        'odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
+        fullPath,
+        asArray,
+      )
+    }
+
+    /**
+     * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
+     * @param processId 
+     * @param asArray 
+     */
+    findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')`,
+        {},
+        asArray,
+      )
+    }
+
+    deletePackage(processId: string, version?: string): Promise<any> {
+      if (version) {
+        return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}:${version}')`)
+      }
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}')`)
+    }
+
+    /**
+     * 
+     * @param key Sample:1.0.2 など、[processId:version]
+     */
+    downloadPackage(id: string, version: string): Promise<any> {
+      return downloadData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
+        id, version
+      )
     }
   })(this)
 
@@ -523,13 +591,13 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
     }
 
-    _findByName(name: String): Promise<Array<any>> {
+    _findByName(name: string): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', {
         $filter: `Name eq '${name}'`,
       })
     }
 
-    async findByName(name: String): Promise<any> {
+    async findByName(name: string): Promise<any> {
       const defs: any[] = await this._findByName(name)
       return defs[0]
     }
