@@ -1,6 +1,6 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy } from './utils'
+import { getData, getArray, putData, postData, deleteData, addProxy, uploadData, downloadData } from './utils'
 
 /**
  * Orchestrator API Wrapper
@@ -13,8 +13,8 @@ interface IOrchestratorApi {
   user: UserCrudService
   machine: ICrudService
   release: ReleaseCrudService
-  process: ICrudService
-  job: ICrudService
+  process: ProcessCrudService
+  job: JobCrudService
   schedule: ICrudService
   queueDefinition: QueueDefinitionCrudService
   queueItem: ICrudService
@@ -87,6 +87,24 @@ class ReleaseCrudService extends BaseCrudService {
     super(parent_)
   }
   findByProcessKey(processKey: String): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class ProcessCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
+    throw Error('Not implemented yet.')
+  }
+  findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
+    throw Error('Not implemented yet.')
+  }
+  deletePackage(processId: string, version?: string): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+  downloadPackage(id: string, version: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -401,12 +419,62 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  process: ICrudService = new (class extends BaseCrudService {
+  process: ProcessCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
+    /**
+     * アクティブなバージョンに対しての検索。つまりプロセス一覧。
+     * @param queries 
+     * @param asArray 
+     */
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
+    }
+
+    uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
+      return uploadData(
+        this.parent.config,
+        this.parent.accessToken,
+        'odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
+        fullPath,
+        asArray,
+      )
+    }
+
+    /**
+     * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
+     * @param processId 
+     * @param asArray 
+     */
+    findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')`,
+        {},
+        asArray,
+      )
+    }
+
+    deletePackage(processId: string, version?: string): Promise<any> {
+      if (version) {
+        return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}:${version}')`)
+      }
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}')`)
+    }
+
+    /**
+     * 
+     * @param key Sample:1.0.2 など、[processId:version]
+     */
+    downloadPackage(id: string, version: string): Promise<any> {
+      return downloadData(
+        this.parent.config,
+        this.parent.accessToken,
+        `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
+        id, version
+      )
     }
   })(this)
 

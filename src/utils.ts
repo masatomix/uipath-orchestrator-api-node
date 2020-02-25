@@ -1,5 +1,7 @@
 import request from 'request'
 import logger from './logger'
+import fs from 'fs'
+import path from 'path'
 // import url from 'url'
 
 export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
@@ -39,12 +41,56 @@ export const postData = (
   )
 }
 
-export const putData = (
+export const uploadData = async (
   config_: any,
   accessToken: string,
   apiPath: string,
-  obj: any,
+  fullPath: string,
+  isOdata: boolean = true
 ): Promise<any> => {
+  const option = createOption(config_, accessToken, apiPath, 'multipart/form-data')
+
+  const p: Promise<any> = new Promise((resolve, reject) => {
+    fs.readFile(fullPath, (err, data_) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(data_)
+      return
+    })
+  })
+
+  const data = await p
+  return createArrayPromise(
+    Object.assign({}, option, {
+      method: 'POST',
+      multipart: [
+        {
+          'Content-Disposition': `form-data; name="uploads[]"; filename="${path.basename(fullPath)}"`,
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': data.length,
+          body: data,
+        },
+      ],
+    }),
+    isOdata
+  )
+}
+
+export const downloadData = (config_: any, accessToken: string, apiPath: string, id: string, version: string): Promise<any> => {
+  const option = createOption(config_, accessToken, apiPath)
+  option.headers['Accept'] = 'application/octet-stream'
+  return createDownloadPromise(
+    Object.assign({}, option, {
+      method: 'GET',
+      encoding: null,
+    }), id, version
+  )
+}
+
+
+export const putData = (config_: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
   return createJSONPromise(
     Object.assign(option, {
@@ -105,6 +151,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
+      logger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -140,6 +187,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
+      logger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -165,12 +213,40 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
   return promise
 }
 
-const createOption = (config_: any, accessToken: string, apiPath: string): any => {
+const createDownloadPromise = (option: any, id: string, version: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    request(option, (err: any, response: any, body: any) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      logger.debug('option:', option)
+      logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
+      if (response.statusCode >= 400) {
+        logger.error(body)
+        reject(body)
+      }
+      if (response.statusCode === 200) {
+        fs.writeFileSync(`${id}.${version}.nupkg`, body, 'binary')
+        resolve()
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
+
+const createOption = (
+  config_: any,
+  accessToken: string,
+  apiPath: string,
+  contentType: string = 'application/json',
+): any => {
   const servername = config_.serverinfo.servername
   const option = {
     // uri: url.resolve(servername, apiPath),
     uri: servername + apiPath,
-    headers: headers(config_, accessToken),
+    headers: headers(config_, accessToken, contentType),
   }
   return addProxy(config_, option)
 }
@@ -186,19 +262,19 @@ export const addProxy = (config_: any, option: any): any => {
   return option
 }
 
-const headers = (config_: any, accessToken: string): any => {
+const headers = (config_: any, accessToken: string, contentType: string): any => {
   const tenant_logical_name = config_.serverinfo.tenant_logical_name
   let ret = {}
   if (config_.robotInfo) {
     ret = {
       Authorization: 'UiRobot ' + accessToken,
-      'content-type': 'application/json',
+      'content-type': contentType,
       // 'X-UIPATH-OrganizationUnitId': 1
     }
   } else {
     ret = {
       Authorization: 'Bearer ' + accessToken,
-      'content-type': 'application/json',
+      'content-type': contentType,
       // 'X-UIPATH-OrganizationUnitId': 1
     }
   }
