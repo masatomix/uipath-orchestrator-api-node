@@ -149,3 +149,16 @@ if (!module.parent) {
 }
 ```
 
+## Orchestrator API との対応表
+
+- findAll (queries?: any)
+    - GET ``/odata/Processes``
+- findPackage (processId: string)
+    - GET ``/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')``
+- deletePackage (processId: string, version?: string)
+    - DELETE ``/odata/Processes('${processId}:${version}')``
+- uploadPackage (fullPath: string)
+    - POST ``/odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()``
+- downloadPackage (id: string, version: string)
+    - GET ``/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')``
+ 

@@ -56,3 +56,10 @@ if (!module.parent) {
   })()
 }
 ```
+
+
+
+## Orchestrator API との対応表
+
+- find ()
+    - GET ``/odata/Settings/UiPath.Server.Configuration.OData.GetLicense``

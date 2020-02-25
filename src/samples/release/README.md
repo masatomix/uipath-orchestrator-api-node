@@ -65,3 +65,12 @@ if (!module.parent) {
   })()
 }
 ```
+
+
+
+## Orchestrator API との対応表
+
+- findAll (queries?: any)
+    - GET ``/odata/Releases``
+- findByProcessKey (processKey: string)
+    - GET ``/odata/Releases`` に `` $filter: `ProcessKey eq '${processKey}'` ``

@@ -110,3 +110,20 @@ if (api.isEnterprise) {
   console.log('Community版のため、スキップ')
 }
 ```
+
+
+## Orchestrator API との対応表
+
+- findAll (queries?: any)
+    - GET ``/odata/Users``
+- find (id: number)
+    - GET ``/odata/Users(${id})``
+- findByUserName (userName: string)
+    - GET ``/odata/Users`` に `` $filter: `UserName eq '${userName}'` ``
+- create (user: any)
+    - POST ``/odata/Users``
+- update (user: any)
+    - PUT ``/odata/Users(${user.Id})``
+- delete (id: number)
+    - DELETE ``/odata/Users(${id})``
+ 
