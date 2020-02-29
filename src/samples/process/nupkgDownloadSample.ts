@@ -27,9 +27,8 @@ async function sample() {
     // └─────────┴──────────┴───────┴──────────────────┴─────────────────────────────────────┴──────────────────────────────┴────────────────────────────────┴─────────────────┴────────────┴──────────────┴──────────┴──────────────────────┴───────────────────────────────┘
 
     await Promise.all(
-      samplePackages.map(
-        samplePackage => api.process.downloadPackage(samplePackage.Id, samplePackage.Version)
-      ))
+      samplePackages.map(samplePackage => api.process.downloadPackage(samplePackage.Id, samplePackage.Version)),
+    )
   } catch (error) {
     logger.error(error)
   }

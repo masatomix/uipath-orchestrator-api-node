@@ -54,7 +54,6 @@ describe('OrchestratorApi_queue_transaction', () => {
       const result = await api.queueDefinition.create(testQueueDef)
     })
 
-
     it('Transactionの成功と失敗のテスト。', async () => {
       const newQueue1 = createQueueItem(testQueueDef.Name)
       const newQueue2 = createQueueItem(testQueueDef.Name)
@@ -63,9 +62,7 @@ describe('OrchestratorApi_queue_transaction', () => {
         const result2 = await api.queueItem.create(newQueue2)
         {
           // 1個目成功
-          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(
-            testQueueDef.Name,
-          )
+          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(testQueueDef.Name)
           const queueItemId: number = queueItem.Id
 
           expect(queueItem.Reference).toBe(result1.Reference)
@@ -81,9 +78,7 @@ describe('OrchestratorApi_queue_transaction', () => {
         let systemFailRef: string = ''
         {
           // 2個目失敗、システム例外なので、再ラン
-          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(
-            testQueueDef.Name,
-          )
+          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(testQueueDef.Name)
           const queueItemId: number = queueItem.Id
           systemFailRef = queueItem.Reference
 
@@ -102,9 +97,7 @@ describe('OrchestratorApi_queue_transaction', () => {
         }
         {
           // システム例外後の再度のStartTransactionなので、先ほどと同じやつのリトライが取れるはず
-          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(
-            testQueueDef.Name,
-          )
+          const queueItem = await robotApi.queueOperation.getQueueAndStartTransaction(testQueueDef.Name)
           const queueItemId: number = queueItem.Id
 
           expect(queueItem.Reference).toBe(systemFailRef) // 先ほどのRefと同じはず
