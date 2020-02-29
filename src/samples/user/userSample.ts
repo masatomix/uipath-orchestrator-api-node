@@ -44,7 +44,6 @@ async function sample() {
       // そのユーザが検索できることを確認
       testUser = await api.user.find(testUserId)
       logger.info(testUser)
-
     } catch (error) {
       logger.error(error)
     } finally {

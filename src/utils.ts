@@ -14,7 +14,7 @@ export const getArray = (
   accessToken: string,
   apiPath: string,
   queries?: any,
-  isOdata: boolean = true
+  isOdata: boolean = true,
 ): Promise<Array<any>> => {
   let optionTmp = createOption(config_, accessToken, apiPath)
   optionTmp = Object.assign(optionTmp, { method: 'GET' })
@@ -26,12 +26,7 @@ export const getArray = (
   return createArrayPromise(option, isOdata)
 }
 
-export const postData = (
-  config_: any,
-  accessToken: string,
-  apiPath: string,
-  obj: any,
-): Promise<any> => {
+export const postData = (config_: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
   return createJSONPromise(
     Object.assign(option, {
@@ -46,7 +41,7 @@ export const uploadData = async (
   accessToken: string,
   apiPath: string,
   fullPath: string,
-  isOdata: boolean = true
+  isOdata: boolean = true,
 ): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath, 'multipart/form-data')
 
@@ -74,21 +69,28 @@ export const uploadData = async (
         },
       ],
     }),
-    isOdata
+    isOdata,
   )
 }
 
-export const downloadData = (config_: any, accessToken: string, apiPath: string, id: string, version: string): Promise<any> => {
+export const downloadData = (
+  config_: any,
+  accessToken: string,
+  apiPath: string,
+  id: string,
+  version: string,
+): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
   option.headers['Accept'] = 'application/octet-stream'
   return createDownloadPromise(
     Object.assign({}, option, {
       method: 'GET',
       encoding: null,
-    }), id, version
+    }),
+    id,
+    version,
   )
 }
-
 
 export const putData = (config_: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
@@ -117,12 +119,12 @@ export const deleteData = (config_: any, accessToken: string, apiPath: string): 
 const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>> => {
   // promiseを返す処理は毎回おなじ。Request処理して、コールバックで値を設定するPromiseを作って返すところを共通化
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(options, function (err: any, response: any, body: string) {
+    request(options, function(err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
       }
-      logger.debug('option:',options)
+      logger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -252,10 +254,13 @@ const createOption = (
 }
 
 export const addProxy = (config_: any, option: any): any => {
-  if (config_.proxy) { // プロパティ proxy があって
-    if (config_.proxy.useProxy) { // useProxy がtrue ならプロキシを設定する
+  if (config_.proxy) {
+    // プロパティ proxy があって
+    if (config_.proxy.useProxy) {
+      // useProxy がtrue ならプロキシを設定する
       return Object.assign(option, {
-        proxy: config_.proxy.url, strictSSL: false
+        proxy: config_.proxy.url,
+        strictSSL: false,
       })
     }
   }

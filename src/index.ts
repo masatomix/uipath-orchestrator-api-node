@@ -425,8 +425,8 @@ class OrchestratorApi implements IOrchestratorApi {
     }
     /**
      * アクティブなバージョンに対しての検索。つまりプロセス一覧。
-     * @param queries 
-     * @param asArray 
+     * @param queries
+     * @param asArray
      */
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
@@ -444,8 +444,8 @@ class OrchestratorApi implements IOrchestratorApi {
 
     /**
      * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
-     * @param processId 
-     * @param asArray 
+     * @param processId
+     * @param asArray
      */
     findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
       return getArray(
@@ -465,7 +465,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     /**
-     * 
+     *
      * @param key Sample:1.0.2 など、[processId:version]
      */
     downloadPackage(id: string, version: string): Promise<any> {
@@ -473,7 +473,8 @@ class OrchestratorApi implements IOrchestratorApi {
         this.parent.config,
         this.parent.accessToken,
         `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
-        id, version
+        id,
+        version,
       )
     }
   })(this)

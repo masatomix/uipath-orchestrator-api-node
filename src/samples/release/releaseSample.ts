@@ -19,7 +19,7 @@ async function sample() {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
