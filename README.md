@@ -166,7 +166,7 @@ console.log(robots)
 |  8  | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/)        |       〇      |            |              |              |              |                                                                                                                          |                |
 |  9  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
 |  10  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  11  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
+|  11  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
 |  12 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
@@ -174,9 +174,9 @@ console.log(robots)
 
 ## Preferences
 
-さて本ライブラリを使用するには、接続するUiPath Orchestratorの情報など**環境設定**が必要です。
+さて本ライブラリを使用するには、接続するUiPath Orchestratorの情報など、**環境設定**が必要です。
 
-UiPath Orchestrator がEnterprise版の場合:
+UiPath Orchestrator がEnterprise版の場合は、テナント名、OCへログインするユーザ名とパスワードなどを下記のように:
 
 ```json
 $ cat config/local.json
@@ -192,7 +192,8 @@ $ cat config/local.json
 }
 ```
 
-UiPath Orchestrator がCommunity版の場合:
+
+UiPath Orchestrator がCommunity版の場合は、Community版OC画面から取得できる情報を下記のように:
 
 ```json
 $ cat config/local.json
@@ -206,7 +207,30 @@ $ cat config/local.json
 }
 ```
 
-という設定ファイルを作成しておいてください。
+参考: [UiPath Orchestrator Community Edition のAPIを呼び出す件と、カスタムアクティビティをつくってみた](https://qiita.com/masatomix/items/1b03d61d7f5319ceb65f)
+
+
+もしくは、Enterprise/Community にかかわらず、APIをロボット(ワークフロー)から呼び出す方式にしたい場合は、下記の設定画面から取得できる情報について、
+
+
+![001.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/84ac8134-dbb0-fe9d-0b8d-131a165c305c.png)
+
+以下のように設定します。
+
+```json
+{
+  "robotInfo": {
+    "machineKey": "4eccxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx[マシンキー]",
+    "machineName": "[マシン名]",
+    "userName": "xx\\xxxx[Windowsアカウント]"
+  },
+  "serverinfo": {
+    "servername": "https://www.example.com/"
+  }
+}
+```
+
+上記のような設定ファイルを環境に応じて作成してください。
 
 ## Usage
 

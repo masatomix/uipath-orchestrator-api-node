@@ -16,6 +16,7 @@ describe('OrchestratorApi_machine_robot', () => {
   })
 
   it('マシンの登録・ロボットの登録・検索・削除、のテスト。マシンの削除も。', async () => {
+    jest.setTimeout(10000)
     try {
       // サンプル０．マシン登録
       const random = randomName()
