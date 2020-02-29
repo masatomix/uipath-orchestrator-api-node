@@ -210,7 +210,7 @@ $ cat config/local.json
 参考: [UiPath Orchestrator Community Edition のAPIを呼び出す件と、カスタムアクティビティをつくってみた](https://qiita.com/masatomix/items/1b03d61d7f5319ceb65f)
 
 
-もしくは、Enterprise/Community にかかわらず、APIをロボット(ワークフロー)から呼び出す方式にしたい場合は、下記の設定画面から取得できる情報について、
+もしくは、Enterprise/Community にかかわらず、APIをワークフローから呼び出すつまり「Orchestrator への HTTP 要求」アクティビティと同等にしたい場合は、下記の設定画面から取得できる情報を用いて
 
 
 ![001.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/84ac8134-dbb0-fe9d-0b8d-131a165c305c.png)
@@ -425,13 +425,13 @@ const api2 = new OrchestratorApi({
 
 #### ライブラリのログ出力
 
-本ライブラリはコンソールに[Log4js](https://log4js-node.github.io/log4js-node)を用いてdebugレベルのログを出力しています。表示がじゃまだなーって場合は、local.jsonに
+本ライブラリは[Log4js](https://log4js-node.github.io/log4js-node)を用いて、debugレベルのログをコンソールに出力しています。表示がじゃまだなーって場合は、local.jsonに
 
 ```json
   "serverinfo": {
     "servername": "https://www.example.com/"
   },
-  // ココより下を追記 (debugは出力しない設定)
+  // ココより下を追記 (下記は、debugは出力しない設定)
   "log4js": {
     "appenders": { "main": { "type": "console" } },
     "categories": { "default": { "appenders": ["main"], "level": "info" } }
@@ -452,7 +452,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
-
+- 0.3.8 [queueDefinition/queue](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queue),[queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queueOperation) についてドキュメントを整備。あとコードのフォーマット(lint)。ロジックは変更なしです。
 - 0.3.7 [nupkg関連のアップロード・ダウンロード機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/process)を追加。各種機能の[ドキュメント](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples)を追加
 - 0.3.6 ドキュメントの整理のみ。
 - 0.3.5 release追加、jobの開始・停止を追加。Statのサンプルを追加
