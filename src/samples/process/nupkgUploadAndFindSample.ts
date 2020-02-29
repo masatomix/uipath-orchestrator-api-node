@@ -10,8 +10,10 @@ async function sample() {
   await api.authenticate()
   let processId: string = ''
   try {
-    const url1 = 'https://github.com/masatomix/My_Attended_Framework/releases/download/1.0.7115.18328/Attended_FrameWork.1.0.7115.18328.nupkg'
-    const url2 = 'https://github.com/masatomix/My_Attended_Framework/releases/download/1.0.7120.2411/Attended_FrameWork.1.0.7120.2411.nupkg'
+    const url1 =
+      'https://github.com/masatomix/My_Attended_Framework/releases/download/1.0.7115.18328/Attended_FrameWork.1.0.7115.18328.nupkg'
+    const url2 =
+      'https://github.com/masatomix/My_Attended_Framework/releases/download/1.0.7120.2411/Attended_FrameWork.1.0.7120.2411.nupkg'
     // uploadしたいファイルをローカルにダウンロードして、
     const fileNames: string[] = []
     fileNames.push(await downloadFile(url1))
@@ -49,10 +51,6 @@ async function sample() {
     // await api.process.deletePackage(processId, '1.0.6')
   }
 }
-
-
-
-
 
 if (!module.parent) {
   (async () => {

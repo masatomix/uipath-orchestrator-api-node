@@ -36,7 +36,7 @@ async function createProcessKey(api_: OrchestratorApi): Promise<string> {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }

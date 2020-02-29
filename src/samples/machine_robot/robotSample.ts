@@ -3,7 +3,6 @@ import OrchestratorApi from '../../index'
 import logger from '../../logger'
 import { randomName, createRobotData } from '../sampleUtils'
 
-
 async function sample() {
   const api = new OrchestratorApi(config)
 
@@ -40,7 +39,6 @@ async function sample() {
       const robot = await api.robot.find(robotId)
       logger.info(robot)
     }
-
   } catch (error) {
     logger.error(error)
   }

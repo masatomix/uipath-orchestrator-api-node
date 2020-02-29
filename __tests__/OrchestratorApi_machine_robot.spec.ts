@@ -16,6 +16,7 @@ describe('OrchestratorApi_machine_robot', () => {
   })
 
   it('マシンの登録・ロボットの登録・検索・削除、のテスト。マシンの削除も。', async () => {
+    jest.setTimeout(10000)
     try {
       // サンプル０．マシン登録
       const random = randomName()
@@ -86,15 +87,12 @@ describe('OrchestratorApi_machine_robot', () => {
       const resultRobot = await api.robot.find(testRobot.Id)
 
       assertEqualsRobotWithOutkey(testRobot, resultRobot)
-
-
     } catch (error) {
       logger.error(error)
       fail(error)
     } finally {
     }
   })
-
 
   afterEach(async () => {
     logger.info(`Id: ${testRobotId} のロボットを削除`)
@@ -104,7 +102,6 @@ describe('OrchestratorApi_machine_robot', () => {
   })
 })
 
-
 const assertEqualsMachine = (expectedMachine: any, actualMachine: any) => {
   delete expectedMachine.RobotVersions
   delete actualMachine.RobotVersions
@@ -113,29 +110,29 @@ const assertEqualsMachine = (expectedMachine: any, actualMachine: any) => {
 
 const assertEqualsRobot0 = (expectedRobot: any, resultRobot: any) => {
   const resultRobotForTest = {
-    'LicenseKey': resultRobot.LicenseKey,
-    'MachineName': resultRobot.MachineName,
-    'Name': resultRobot.Name,
-    'Type': resultRobot.Type,
-    'Username': resultRobot.Username
+    LicenseKey: resultRobot.LicenseKey,
+    MachineName: resultRobot.MachineName,
+    Name: resultRobot.Name,
+    Type: resultRobot.Type,
+    Username: resultRobot.Username,
   }
   expect(resultRobotForTest).toEqual(expectedRobot)
 }
 
 const assertEqualsRobotForSearch = (expected: any, actual: any) => {
   const resultRobotForTest = {
-    'LicenseKey': actual.LicenseKey,
-    'MachineName': actual.MachineName,
-    'Name': actual.Name,
-    'Type': actual.Type,
-    'Username': actual.Username
+    LicenseKey: actual.LicenseKey,
+    MachineName: actual.MachineName,
+    Name: actual.Name,
+    Type: actual.Type,
+    Username: actual.Username,
   }
   expect(resultRobotForTest).toEqual({
-    'LicenseKey': null, // 条件検索した場合は、LicensKeyがnullになっちゃう。
-    'MachineName': expected.MachineName,
-    'Name': expected.Name,
-    'Type': expected.Type,
-    'Username': expected.Username
+    LicenseKey: null, // 条件検索した場合は、LicensKeyがnullになっちゃう。
+    MachineName: expected.MachineName,
+    Name: expected.Name,
+    Type: expected.Type,
+    Username: expected.Username,
   })
 }
 

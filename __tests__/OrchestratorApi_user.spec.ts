@@ -1,5 +1,5 @@
 import OrchestratorApi from '../src/index'
-import { randomName, createRobotData } from '../src/samples/sampleUtils'
+import { randomName } from '../src/samples/sampleUtils'
 import config from 'config'
 import logger from '../src/logger'
 
@@ -14,6 +14,7 @@ describe('OrchestratorApi_user', () => {
   })
 
   it('ユーザの登録・検索・更新・削除のテスト', async () => {
+    jest.setTimeout(10000)
     const random = randomName('user_')
 
     if (api.isEnterprise) {
@@ -89,4 +90,3 @@ const assertEqualsUser2 = (expected: any, actual: any) => {
   expected.FullName = `${expected.Name} ${expected.Surname}`
   expect(actual).toEqual(expected)
 }
-
