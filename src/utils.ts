@@ -307,10 +307,12 @@ export const createFilterStr = async (
   const ret: string[] = []
   if (filters.from) {
     const fromUTC = filters.from.toISOString()
+    logger.debug(`from: ${fromUTC}`)
     ret.push(`TimeStamp ge ${fromUTC}`)
   }
   if (filters.to) {
     const toUTC = filters.to.toISOString()
+    logger.debug(`  to: ${toUTC}`)
     ret.push(`TimeStamp lt ${toUTC}`)
   }
   if (filters.robotName) {

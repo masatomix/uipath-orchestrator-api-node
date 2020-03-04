@@ -779,6 +779,7 @@ class OrchestratorApi implements IOrchestratorApi {
 
       let condition: any = {}
       if (obj) {
+        condition = obj
         condition['$filter'] = filter
       } else {
         condition = { $filter: filter }
@@ -788,10 +789,7 @@ class OrchestratorApi implements IOrchestratorApi {
   })(this)
 
   // ロボットグループ
-  // パッケージ
-  // ジョブ
   // ロール
-  // キュー
   // アセット
   // タスク(Enterpriseには、ない)
   // フォルダー(OU)
