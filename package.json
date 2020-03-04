@@ -1,6 +1,6 @@
 {
   "name": "uipath-orchestrator-api-node",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "UiPath Orchestrator API wrapper for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

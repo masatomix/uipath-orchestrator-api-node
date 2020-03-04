@@ -1,7 +1,8 @@
 import request from 'request'
-import logger from './logger'
+import logger, { httpLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
+import OrchestratorApi from './index'
 // import url from 'url'
 
 export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
@@ -124,7 +125,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -153,7 +154,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -189,7 +190,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -222,7 +223,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
         reject(err)
         return
       }
-      logger.debug('option:', option)
+      httpLogger.debug('option:', option)
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -287,6 +288,48 @@ const headers = (config_: any, accessToken: string, contentType: string): any =>
     return Object.assign(ret, {
       'X-UiPath-TenantName': tenant_logical_name,
     })
+  }
+  return ret
+}
+
+export const createFilterStr = async (
+  filters: {
+    from?: Date
+    to?: Date
+    robotName?: string
+    processName?: string
+    windowsIdentity?: string
+    level?: 'INFO' | 'TRACE' | 'WARN' | 'ERROR' | 'FATAL'
+    machineName?: string
+  },
+  api: OrchestratorApi,
+): Promise<string[]> => {
+  const ret: string[] = []
+  if (filters.from) {
+    const fromUTC = filters.from.toISOString()
+    logger.debug(`from: ${fromUTC}`)
+    ret.push(`TimeStamp ge ${fromUTC}`)
+  }
+  if (filters.to) {
+    const toUTC = filters.to.toISOString()
+    logger.debug(`  to: ${toUTC}`)
+    ret.push(`TimeStamp lt ${toUTC}`)
+  }
+  if (filters.robotName) {
+    ret.push(`RobotName eq '${filters.robotName}'`)
+  }
+  if (filters.processName) {
+    ret.push(`ProcessName eq '${filters.processName}'`)
+  }
+  if (filters.windowsIdentity) {
+    ret.push(`WindowsIdentity eq '${filters.windowsIdentity}'`)
+  }
+  if (filters.level) {
+    ret.push(`Level eq '${filters.level}'`)
+  }
+  if (filters.machineName) {
+    const machine = await api.machine.findByMachineName(filters.machineName)
+    ret.push(`MachineId eq ${machine.Id}`)
   }
   return ret
 }
