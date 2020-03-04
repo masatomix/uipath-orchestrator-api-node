@@ -29,13 +29,15 @@ $ npx ts-node ./src/samples/log/logSample.ts
 
 さて条件指定の仕方ですが、基本的に [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) この機能を用いてます。
 
-例: Id=2015 で検索
+例: Id = 2015 で検索
+
+スペースが ``%20``, = が ``eq`` となり
 
 ```console
 https://platform.uipath.com/odata/Environments?$filter=Id%20eq%2015
 ```
 
-この機能ですが、パラメタ指定がそこそこわかりにくいですね。なので、例えば下記のように、
+パラメタ指定がそこそこわかりにくいですね。なので、例えば下記のように、
 
 ```typescript
 const logs: any[] = await api.log.findByFilter({
@@ -48,6 +50,7 @@ const logs: any[] = await api.log.findByFilter({
 ```
 
 パラメタ指定をシンプルにできるようにしてみました。
+( ``contains`` などの部分一致指定は、今んとこ非対応)
 
 ## サンプルコード
 
@@ -64,7 +67,7 @@ async function sample() {
 
     // サンプル1、日付指定
     const from = '2020/03/02 00:00'
-    const to = '2020-03-03 00:00'
+    const to = '2020-03-03 00:00' // ハイフンもOK
 
     logs = await api.log.findByFilter({
       level: 'INFO',
@@ -157,6 +160,7 @@ if (!module.parent) {
 3 件でした
 ```
 
+おつかれさまでした。
 
 
 ## Orchestrator API との対応表
@@ -175,5 +179,5 @@ if (!module.parent) {
   )
   - GET `/odata/RobotLogs` + パラメタ。filters:$filter、obj:それ以外の条件 ($top,$expand,$select,$orderby, $skip) など。
 
-* findAll (queries?: any)
-  - GET `/odata/RobotLogs` 基本を上記を使うので十分だけど、自分でいろいろやりたいヒト向け
+- findAll (queries?: any)
+  - GET `/odata/RobotLogs` 原則、findByFilterで十分だけど、``contains``を使うとか自分でいろいろやりたいヒト向け
