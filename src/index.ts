@@ -357,7 +357,7 @@ class QueueDefinitionCrudService extends BaseCrudService {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries, asArray)
   }
 
-  find(id: number): Promise<Array<any>> {
+  find(id: number): Promise<any> {
     return getData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
   }
 
