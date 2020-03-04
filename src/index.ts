@@ -1,6 +1,16 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy, uploadData, downloadData } from './utils'
+import {
+  getData,
+  getArray,
+  putData,
+  postData,
+  deleteData,
+  addProxy,
+  uploadData,
+  downloadData,
+  createFilterStr,
+} from './utils'
 
 /**
  * Orchestrator API Wrapper
@@ -11,14 +21,16 @@ interface IOrchestratorApi {
   license: ICrudService
   robot: RobotCrudService
   user: UserCrudService
-  machine: ICrudService
+  machine: MachineCrudService
   release: ReleaseCrudService
   process: ProcessCrudService
   job: JobCrudService
   schedule: ICrudService
   queueDefinition: QueueDefinitionCrudService
   queueItem: ICrudService
-  queueOperation: QueueCrudService // Queueの処理をするのに、Robotの情報が必要かもしれないので、これはisRobotのときのみ動くようにする？
+  queueOperation: QueueCrudService
+  // asset: ICrudService
+  log: LogCrudService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
@@ -69,6 +81,15 @@ class UserCrudService extends BaseCrudService {
     super(parent_)
   }
   findByUserName(userName: string): Promise<any> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+class MachineCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findByMachineName(machineName: string): Promise<any> {
     throw Error('Not implemented yet.')
   }
 }
@@ -140,6 +161,31 @@ class QueueCrudService extends BaseCrudService {
     throw Error('Not implemented yet.')
   }
   setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
+    throw Error('Not implemented yet.')
+  }
+}
+
+/**
+ * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
+ */
+class LogCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+
+  findByFilter(
+    filters: {
+      from?: Date
+      to?: Date
+      robotName?: string
+      processName?: string
+      windowsIdentity?: string
+      level?: 'TRACE' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL'
+      machineName?: string
+    },
+    obj?: any,
+    asArray: boolean = true,
+  ): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
 }
@@ -321,9 +367,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     _findByName(name: string): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', {
-        $filter: `Name eq '${name}'`,
-      })
+      return this.findAll({ $filter: `Name eq '${name}'` })
     }
 
     async findByRobotName(name: string): Promise<any> {
@@ -356,10 +400,13 @@ class OrchestratorApi implements IOrchestratorApi {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
     }
 
-    findByUserName(userName: string): Promise<any> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', {
-        $filter: `UserName eq '${userName}'`,
-      })
+    _findByUserName(userName: string): Promise<Array<any>> {
+      return this.findAll({ $filter: `UserName eq '${userName}'` })
+    }
+
+    async findByUserName(userName: string): Promise<any> {
+      const users: any[] = await this._findByUserName(userName)
+      return users[0]
     }
 
     update(user: any): Promise<any> {
@@ -375,7 +422,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  machine: ICrudService = new (class extends BaseCrudService {
+  machine: MachineCrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
       super(parent_)
     }
@@ -385,6 +432,15 @@ class OrchestratorApi implements IOrchestratorApi {
 
     find(id: number): Promise<any> {
       return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+    }
+
+    _findByMachineName(machineName: string): Promise<Array<any>> {
+      return this.findAll({ $filter: `Name eq '${machineName}'` })
+    }
+
+    async findByMachineName(machineName: string): Promise<any> {
+      const machines: any[] = await this._findByMachineName(machineName)
+      return machines[0]
     }
 
     create(machine: any): Promise<any> {
@@ -667,11 +723,73 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
+  // Todo:
+  // asset: ICrudService = new (class extends BaseCrudService {
+  //   constructor(parent_: OrchestratorApi) {
+  //     super(parent_)
+  //   }
+  //   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+  //     return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
+  //   }
+
+  //   find(id: number): Promise<any> {
+  //     return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+  //   }
+
+  //   create(machine: any): Promise<any> {
+  //     return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+  //   }
+
+  //   update(machine: any): Promise<void> {
+  //     return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
+  //   }
+  //   delete(id: number): Promise<any> {
+  //     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+  //   }
+  // })(this)
+
+  log: LogCrudService = new (class extends LogCrudService {
+    constructor(parent_: OrchestratorApi) {
+      super(parent_)
+    }
+
+    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/RobotLogs', queries, asArray)
+    }
+
+    async findByFilter(
+      filters: {
+        from?: Date
+        to?: Date
+        robotName?: string
+        processName?: string
+        windowsIdentity?: string
+        level?: 'TRACE' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL'
+        machineName?: string
+      },
+      obj?: any,
+      asArray: boolean = true,
+    ): Promise<Array<any>> {
+      const filterArray: string[] = await createFilterStr(filters, this.parent)
+      const filter = filterArray.join(' and ')
+
+      if (filter === '') {
+        return this.findAll(obj, asArray)
+      }
+
+      let condition: any = {}
+      if (obj) {
+        condition = obj
+        condition['$filter'] = filter
+      } else {
+        condition = { $filter: filter }
+      }
+      return this.findAll(condition, asArray)
+    }
+  })(this)
+
   // ロボットグループ
-  // パッケージ
-  // ジョブ
   // ロール
-  // キュー
   // アセット
   // タスク(Enterpriseには、ない)
   // フォルダー(OU)
