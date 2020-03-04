@@ -64,7 +64,7 @@ async function printLog(api: OrchestratorApi, from: Date, to: Date) {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }

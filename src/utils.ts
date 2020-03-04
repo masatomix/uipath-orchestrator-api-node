@@ -1,5 +1,5 @@
 import request from 'request'
-import logger from './logger'
+import logger, { httpLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
 import OrchestratorApi from './index'
@@ -125,7 +125,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -154,7 +154,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -190,7 +190,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      logger.debug('option:', options)
+      httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       logger.debug(body)
       if (response.statusCode >= 400) {
@@ -223,7 +223,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
         reject(err)
         return
       }
-      logger.debug('option:', option)
+      httpLogger.debug('option:', option)
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
