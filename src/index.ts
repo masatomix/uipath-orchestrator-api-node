@@ -80,8 +80,33 @@ class UserCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByUserName(userName: string): Promise<any> {
-    throw Error('Not implemented yet.')
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries, asArray)
+  }
+
+  find(id: number): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
+  }
+
+  _findByUserName(userName: string): Promise<Array<any>> {
+    return this.findAll({ $filter: `UserName eq '${userName}'` })
+  }
+
+  async findByUserName(userName: string): Promise<any> {
+    const users: any[] = await this._findByUserName(userName)
+    return users[0]
+  }
+
+  update(user: any): Promise<any> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Users(${user.Id})`, user)
+  }
+
+  create(user: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Users', user)
+  }
+
+  delete(id: number): Promise<any> {
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
   }
 }
 
@@ -89,8 +114,32 @@ class MachineCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByMachineName(machineName: string): Promise<any> {
-    throw Error('Not implemented yet.')
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
+  }
+
+  find(id: number): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+  }
+
+  _findByMachineName(machineName: string): Promise<Array<any>> {
+    return this.findAll({ $filter: `Name eq '${machineName}'` })
+  }
+
+  async findByMachineName(machineName: string): Promise<any> {
+    const machines: any[] = await this._findByMachineName(machineName)
+    return machines[0]
+  }
+
+  create(machine: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+  }
+
+  update(machine: any): Promise<void> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
+  }
+  delete(id: number): Promise<any> {
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
   }
 }
 
@@ -98,8 +147,33 @@ class RobotCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByRobotName(robotName: string): Promise<any> {
-    throw Error('Not implemented yet.')
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', queries, asArray)
+  }
+
+  find(id: number): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
+  }
+
+  _findByName(name: string): Promise<Array<any>> {
+    return this.findAll({ $filter: `Name eq '${name}'` })
+  }
+
+  async findByRobotName(name: string): Promise<any> {
+    const robos: any[] = await this._findByName(name)
+    return robos[0]
+  }
+
+  create(robot: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Robots', robot)
+  }
+
+  update(robot: any): Promise<void> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Robots(${robot.Id})`, robot)
+  }
+
+  delete(id: number): Promise<any> {
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
   }
 }
 
@@ -107,8 +181,19 @@ class ReleaseCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByProcessKey(processKey: string): Promise<any> {
-    throw Error('Not implemented yet.')
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
+  }
+
+  _findByProcessName(name: string): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', {
+      $filter: `ProcessKey eq '${name}'`,
+    })
+  }
+  async findByProcessKey(processKey: string): Promise<any> {
+    // processKey は画面上のプロセスの名前
+    const objs: any[] = await this._findByProcessName(processKey)
+    return objs[0]
   }
 }
 
@@ -116,17 +201,59 @@ class ProcessCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
+  /**
+   * アクティブなバージョンに対しての検索。つまりプロセス一覧。
+   * @param queries
+   * @param asArray
+   */
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
+  }
+
   uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
-    throw Error('Not implemented yet.')
+    return uploadData(
+      this.parent.config,
+      this.parent.accessToken,
+      'odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
+      fullPath,
+      asArray,
+    )
   }
+
+  /**
+   * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
+   * @param processId
+   * @param asArray
+   */
   findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
-    throw Error('Not implemented yet.')
+    return getArray(
+      this.parent.config,
+      this.parent.accessToken,
+      `/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')`,
+      {},
+      asArray,
+    )
   }
+
   deletePackage(processId: string, version?: string): Promise<any> {
-    throw Error('Not implemented yet.')
+    if (version) {
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}:${version}')`)
+    }
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}')`)
   }
+
+  /**
+   *
+   * @param key Sample:1.0.2 など、[processId:version]
+   */
   downloadPackage(id: string, version: string): Promise<any> {
-    throw Error('Not implemented yet.')
+    return downloadData(
+      this.parent.config,
+      this.parent.accessToken,
+      `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
+      id,
+      version,
+    )
   }
 }
 
@@ -135,21 +262,131 @@ class JobCrudService extends BaseCrudService {
     super(parent_)
   }
 
-  startJobs(processKey: string, robotName?: string[], jobsCount: number = 0): Promise<any> {
-    throw Error('Not implemented yet.')
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Jobs', queries, asArray)
+  }
+
+  find(id: number): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Jobs(${id})`)
+  }
+
+  _startJobs(startInfo: any): Promise<any> {
+    return postData(
+      this.parent.config,
+      this.parent.accessToken,
+      '/odata/Jobs/UiPath.Server.Configuration.OData.StartJobs',
+      startInfo,
+    )
+  }
+
+  async startJobs(processKey: string, robotNames: string[], jobsCount: number = 0): Promise<any> {
+    const release = await this.parent.release.findByProcessKey(processKey)
+    let promise: Promise<any>
+    if (robotNames && robotNames.length > 0) {
+      // logger.debug('Specific')
+      // logger.debug(robotNames)
+      // logger.debug(robotNames.length)
+
+      const robotIdsPromise: Promise<number>[] = robotNames.map(async element => {
+        const instance = await this.parent.robot.findByRobotName(element)
+        return instance.Id
+      })
+
+      const robotIds = await Promise.all(robotIdsPromise)
+      promise = this._startJobs({
+        startInfo: {
+          ReleaseKey: release.Key,
+          RobotIds: robotIds,
+          JobsCount: 0,
+          Strategy: 'Specific',
+          InputArguments: '{}',
+        },
+      })
+    } else {
+      // logger.debug('JobsCount')
+      // logger.debug(robotNames)
+      // logger.debug(robotNames.length)
+      promise = this._startJobs({
+        startInfo: {
+          ReleaseKey: release.Key,
+          RobotIds: [],
+          JobsCount: jobsCount,
+          Strategy: 'JobsCount',
+          InputArguments: '{}',
+        },
+      })
+    }
+    return promise
   }
 
   stopJob(jobId: number, force: boolean = false): Promise<any> {
-    throw Error('Not implemented yet.')
+    let strategy: string
+    if (force) {
+      strategy = '2'
+    } else {
+      strategy = '1'
+    }
+    return postData(
+      this.parent.config,
+      this.parent.accessToken,
+      `/odata/Jobs(${jobId})/UiPath.Server.Configuration.OData.StopJob`,
+      {
+        strategy: strategy,
+      },
+    )
   }
+
+  // create(machine: any): Promise<any> {
+  //   return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
+  // }
+
+  // update(machine: any): Promise<void> {
+  //   return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
+  // }
+  // delete(id: number): Promise<any> {
+  //   return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+  // }
 }
 
 class QueueDefinitionCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
   }
-  findByName(name: string): Promise<any> {
-    throw Error('Not implemented yet.')
+
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries, asArray)
+  }
+
+  find(id: number): Promise<Array<any>> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
+  }
+
+  _findByName(name: string): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', {
+      $filter: `Name eq '${name}'`,
+    })
+  }
+
+  async findByName(name: string): Promise<any> {
+    const defs: any[] = await this._findByName(name)
+    return defs[0]
+  }
+
+  create(queueDefinition: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queueDefinition)
+  }
+
+  update(queueDefinition: any): Promise<any> {
+    return putData(
+      this.parent.config,
+      this.parent.accessToken,
+      `/odata/QueueDefinitions(${queueDefinition.Id})`,
+      queueDefinition,
+    )
+  }
+
+  delete(id: number): Promise<any> {
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
   }
 }
 
@@ -158,10 +395,20 @@ class QueueCrudService extends BaseCrudService {
     super(parent_)
   }
   getQueueAndStartTransaction(queueName: string): Promise<any> {
-    throw Error('Not implemented yet.')
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.StartTransaction', {
+      transactionData: {
+        Name: queueName,
+        RobotIdentifier: this.parent.accessToken,
+      },
+    })
   }
   setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
-    throw Error('Not implemented yet.')
+    return postData(
+      this.parent.config,
+      this.parent.accessToken,
+      `/odata/Queues(${queueItemId})/UiPathODataSvc.SetTransactionResult`,
+      statusObj,
+    )
   }
 }
 
@@ -173,7 +420,11 @@ class LogCrudService extends BaseCrudService {
     super(parent_)
   }
 
-  findByFilter(
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/RobotLogs', queries, asArray)
+  }
+
+  async findByFilter(
     filters: {
       from?: Date
       to?: Date
@@ -186,7 +437,70 @@ class LogCrudService extends BaseCrudService {
     obj?: any,
     asArray: boolean = true,
   ): Promise<Array<any>> {
-    throw Error('Not implemented yet.')
+    const filterArray: string[] = await createFilterStr(filters, this.parent)
+    const filter = filterArray.join(' and ')
+
+    if (filter === '') {
+      return this.findAll(obj, asArray)
+    }
+
+    let condition: any = {}
+    if (obj) {
+      condition = obj
+      condition['$filter'] = filter
+    } else {
+      condition = { $filter: filter }
+    }
+    return this.findAll(condition, asArray)
+  }
+
+  async findStartEndLogs(
+    filters: {
+      from?: Date
+      to?: Date
+      robotName?: string
+      processName?: string
+      windowsIdentity?: string
+      level?: 'TRACE' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL'
+      machineName?: string
+    },
+    obj?: any,
+  ): Promise<Array<any>> {
+    const results: any[] = await this.findByFilter(filters, obj)
+
+    return Promise.all(
+      results
+        .filter((data: any) => {
+          const message: string = data.Message
+          const rawMessageObj = JSON.parse(data.RawMessage)
+          if (rawMessageObj.hasOwnProperty('totalExecutionTimeInSeconds')) {
+            return true
+          } else if (message.match(/の実行を開始しました/) || message.match(/execution started/)) {
+            return true
+          }
+          return false
+        })
+        .map(async (data: any) => {
+          const machine = await this.parent.machine.find(data.MachineId)
+
+          delete data.Level
+          delete data.MachineId
+          const rawMessageObj = JSON.parse(data.RawMessage)
+          if (rawMessageObj.hasOwnProperty('totalExecutionTimeInSeconds')) {
+            return Object.assign({}, data, {
+              MachineName: machine.Name,
+              LogType: 'end',
+              TotalExecutionTimeInSeconds: rawMessageObj.totalExecutionTimeInSeconds,
+            })
+          } else {
+            return Object.assign({}, data, {
+              MachineName: machine.Name,
+              LogType: 'start',
+              TotalExecutionTimeInSeconds: 0,
+            })
+          }
+        }),
+    )
   }
 }
 
@@ -198,8 +512,8 @@ class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
   isRobot: boolean = false
-  private config: any
-  private accessToken: string = ''
+  config: any
+  accessToken: string = ''
 
   constructor(config_: any) {
     this.config = config_
@@ -354,277 +668,17 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  robot: RobotCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Robots', queries, asArray)
-    }
+  robot: RobotCrudService = new RobotCrudService(this)
 
-    find(id: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
-    }
+  user: UserCrudService = new UserCrudService(this)
 
-    _findByName(name: string): Promise<Array<any>> {
-      return this.findAll({ $filter: `Name eq '${name}'` })
-    }
+  machine: MachineCrudService = new MachineCrudService(this)
 
-    async findByRobotName(name: string): Promise<any> {
-      const robos: any[] = await this._findByName(name)
-      return robos[0]
-    }
+  release: ReleaseCrudService = new ReleaseCrudService(this)
 
-    create(robot: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Robots', robot)
-    }
+  process: ProcessCrudService = new ProcessCrudService(this)
 
-    update(robot: any): Promise<void> {
-      return putData(this.parent.config, this.parent.accessToken, `/odata/Robots(${robot.Id})`, robot)
-    }
-
-    delete(id: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
-    }
-  })(this)
-
-  user: UserCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries, asArray)
-    }
-
-    find(id: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
-    }
-
-    _findByUserName(userName: string): Promise<Array<any>> {
-      return this.findAll({ $filter: `UserName eq '${userName}'` })
-    }
-
-    async findByUserName(userName: string): Promise<any> {
-      const users: any[] = await this._findByUserName(userName)
-      return users[0]
-    }
-
-    update(user: any): Promise<any> {
-      return putData(this.parent.config, this.parent.accessToken, `/odata/Users(${user.Id})`, user)
-    }
-
-    create(user: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Users', user)
-    }
-
-    delete(id: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
-    }
-  })(this)
-
-  machine: MachineCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
-    }
-
-    find(id: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-    }
-
-    _findByMachineName(machineName: string): Promise<Array<any>> {
-      return this.findAll({ $filter: `Name eq '${machineName}'` })
-    }
-
-    async findByMachineName(machineName: string): Promise<any> {
-      const machines: any[] = await this._findByMachineName(machineName)
-      return machines[0]
-    }
-
-    create(machine: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
-    }
-
-    update(machine: any): Promise<void> {
-      return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
-    }
-    delete(id: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-    }
-  })(this)
-
-  release: ReleaseCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)
-    }
-
-    _findByProcessName(name: string): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', {
-        $filter: `ProcessKey eq '${name}'`,
-      })
-    }
-    async findByProcessKey(processKey: string): Promise<any> {
-      // processKey は画面上のプロセスの名前
-      const objs: any[] = await this._findByProcessName(processKey)
-      return objs[0]
-    }
-  })(this)
-
-  process: ProcessCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    /**
-     * アクティブなバージョンに対しての検索。つまりプロセス一覧。
-     * @param queries
-     * @param asArray
-     */
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
-    }
-
-    uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
-      return uploadData(
-        this.parent.config,
-        this.parent.accessToken,
-        'odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
-        fullPath,
-        asArray,
-      )
-    }
-
-    /**
-     * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
-     * @param processId
-     * @param asArray
-     */
-    findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')`,
-        {},
-        asArray,
-      )
-    }
-
-    deletePackage(processId: string, version?: string): Promise<any> {
-      if (version) {
-        return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}:${version}')`)
-      }
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}')`)
-    }
-
-    /**
-     *
-     * @param key Sample:1.0.2 など、[processId:version]
-     */
-    downloadPackage(id: string, version: string): Promise<any> {
-      return downloadData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
-        id,
-        version,
-      )
-    }
-  })(this)
-
-  job: JobCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/Jobs', queries, asArray)
-    }
-
-    find(id: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/Jobs(${id})`)
-    }
-
-    _startJobs(startInfo: any): Promise<any> {
-      return postData(
-        this.parent.config,
-        this.parent.accessToken,
-        '/odata/Jobs/UiPath.Server.Configuration.OData.StartJobs',
-        startInfo,
-      )
-    }
-
-    async startJobs(processKey: string, robotNames: string[], jobsCount: number = 0): Promise<any> {
-      const release = await this.parent.release.findByProcessKey(processKey)
-      let promise: Promise<any>
-      if (robotNames && robotNames.length > 0) {
-        // logger.debug('Specific')
-        // logger.debug(robotNames)
-        // logger.debug(robotNames.length)
-
-        const robotIdsPromise: Promise<number>[] = robotNames.map(async element => {
-          const instance = await this.parent.robot.findByRobotName(element)
-          return instance.Id
-        })
-
-        const robotIds = await Promise.all(robotIdsPromise)
-        promise = this._startJobs({
-          startInfo: {
-            ReleaseKey: release.Key,
-            RobotIds: robotIds,
-            JobsCount: 0,
-            Strategy: 'Specific',
-            InputArguments: '{}',
-          },
-        })
-      } else {
-        // logger.debug('JobsCount')
-        // logger.debug(robotNames)
-        // logger.debug(robotNames.length)
-        promise = this._startJobs({
-          startInfo: {
-            ReleaseKey: release.Key,
-            RobotIds: [],
-            JobsCount: jobsCount,
-            Strategy: 'JobsCount',
-            InputArguments: '{}',
-          },
-        })
-      }
-      return promise
-    }
-
-    stopJob(jobId: number, force: boolean = false): Promise<any> {
-      let strategy: string
-      if (force) {
-        strategy = '2'
-      } else {
-        strategy = '1'
-      }
-      return postData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Jobs(${jobId})/UiPath.Server.Configuration.OData.StopJob`,
-        {
-          strategy: strategy,
-        },
-      )
-    }
-
-    // create(machine: any): Promise<any> {
-    //   return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
-    // }
-
-    // update(machine: any): Promise<void> {
-    //   return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
-    // }
-    // delete(id: number): Promise<any> {
-    //   return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-    // }
-  })(this)
+  job: JobCrudService = new JobCrudService(this)
 
   schedule: ICrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
@@ -635,47 +689,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  queueDefinition: QueueDefinitionCrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queries, asArray)
-    }
-
-    find(id: number): Promise<Array<any>> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
-    }
-
-    _findByName(name: string): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', {
-        $filter: `Name eq '${name}'`,
-      })
-    }
-
-    async findByName(name: string): Promise<any> {
-      const defs: any[] = await this._findByName(name)
-      return defs[0]
-    }
-
-    create(queueDefinition: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/QueueDefinitions', queueDefinition)
-    }
-
-    update(queueDefinition: any): Promise<any> {
-      return putData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/QueueDefinitions(${queueDefinition.Id})`,
-        queueDefinition,
-      )
-    }
-
-    delete(id: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
-    }
-  })(this)
+  queueDefinition: QueueDefinitionCrudService = new QueueDefinitionCrudService(this)
 
   queueItem: ICrudService = new (class extends BaseCrudService {
     constructor(parent_: OrchestratorApi) {
@@ -701,27 +715,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
-  queueOperation: QueueCrudService = new (class extends QueueCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    getQueueAndStartTransaction(queueName: string): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.StartTransaction', {
-        transactionData: {
-          Name: queueName,
-          RobotIdentifier: this.parent.accessToken,
-        },
-      })
-    }
-    setTransactionResult(queueItemId: number, statusObj: any): Promise<void> {
-      return postData(
-        this.parent.config,
-        this.parent.accessToken,
-        `/odata/Queues(${queueItemId})/UiPathODataSvc.SetTransactionResult`,
-        statusObj,
-      )
-    }
-  })(this)
+  queueOperation: QueueCrudService = new QueueCrudService(this)
 
   // Todo:
   // asset: ICrudService = new (class extends BaseCrudService {
@@ -748,45 +742,7 @@ class OrchestratorApi implements IOrchestratorApi {
   //   }
   // })(this)
 
-  log: LogCrudService = new (class extends LogCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/RobotLogs', queries, asArray)
-    }
-
-    async findByFilter(
-      filters: {
-        from?: Date
-        to?: Date
-        robotName?: string
-        processName?: string
-        windowsIdentity?: string
-        level?: 'TRACE' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL'
-        machineName?: string
-      },
-      obj?: any,
-      asArray: boolean = true,
-    ): Promise<Array<any>> {
-      const filterArray: string[] = await createFilterStr(filters, this.parent)
-      const filter = filterArray.join(' and ')
-
-      if (filter === '') {
-        return this.findAll(obj, asArray)
-      }
-
-      let condition: any = {}
-      if (obj) {
-        condition = obj
-        condition['$filter'] = filter
-      } else {
-        condition = { $filter: filter }
-      }
-      return this.findAll(condition, asArray)
-    }
-  })(this)
+  log: LogCrudService = new LogCrudService(this)
 
   // ロボットグループ
   // ロール
