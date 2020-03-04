@@ -754,7 +754,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/RobotLogs ', queries, asArray)
+      return getArray(this.parent.config, this.parent.accessToken, '/odata/RobotLogs', queries, asArray)
     }
 
     async findByFilter(
