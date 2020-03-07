@@ -165,10 +165,11 @@ console.log(robots)
 |  7  | [job](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/job/)             |       〇     |     〇     |              |              |              |   ジョブの開始/終了(StartJobs/StopJob)                                                                                                      |                |
 |  8  | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/)        |       〇      |            |              |              |              |                                                                                                                          |                |
 |  9  | [log](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/log/) |       〇      |          |            |            |            | 条件で検索(findByFilter)                                                                                                   |                |
-|  10  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
-|  11  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  12  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
-|  13 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+|  10  | [auditlog](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/auditlog/) |       〇      |          |            |            |            | 条件で検索(findByFilter)                                                                                                   |                |
+|  11  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
+|  12  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
+|  13  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
+|  14 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
 
@@ -454,6 +455,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.4.0 構成をリファクタリング,xlsx ダウンロードのための xlsx-populate-wrapper 追加,AuditLog追加.ダウンロードサンプルを追加。割とテストレベルかも、、。
 - 0.3.9 実行ログのダウンロード機能を追加。またその[log機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/log)についてドキュメントを整備。
 - 0.3.8 [queueDefinition/queue](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queue),[queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queueOperation) についてドキュメントを整備。あとコードのフォーマット(lint)。ロジックは変更なしです。
 - 0.3.7 [nupkg関連のアップロード・ダウンロード機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/process)を追加。各種機能の[ドキュメント](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples)を追加

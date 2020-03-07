@@ -1,6 +1,6 @@
 {
   "name": "uipath-orchestrator-api-node",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "description": "UiPath Orchestrator API wrapper for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,10 +10,12 @@
     "lint": "tslint --fix --project tsconfig.json",
     "clean": "rimraf dist/*",
     "tsc": "tsc",
-    "build": "npm-run-all clean tsc",
+    "build": "npm-run-all clean tsc && npm run copy-files",
+    "copy-files": "cpx src/**/*.xlsx dist",
     "pack": "npm pack",
     "start": "node .",
-    "test": "NODE_ENV= jest --coverage"
+    "test": "NODE_ENV= jest --coverage",
+    "prepublish": "npm run build"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -52,6 +54,7 @@
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.0",
     "@types/request": "^2.48.4",
+    "cpx": "^1.5.0",
     "jest": "^25.1.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.1",
@@ -64,6 +67,7 @@
   "dependencies": {
     "config": "^3.2.5",
     "log4js": "^6.1.1",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "xlsx-populate-wrapper": "https://github.com/masatomix/xlsx-populate-wrapper.git#develop"
   }
 }
