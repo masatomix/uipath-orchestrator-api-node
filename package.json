@@ -1,6 +1,6 @@
 {
   "name": "uipath-orchestrator-api-node",
-  "version": "0.4.0-SNAPSHOT",
+  "version": "0.4.0",
   "description": "UiPath Orchestrator API wrapper for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,8 @@
     "copy-files": "cpx src/**/*.xlsx dist",
     "pack": "npm pack",
     "start": "node .",
-    "test": "NODE_ENV= jest --coverage"
+    "test": "NODE_ENV= jest --coverage",
+    "prepublish": "npm run build"
   },
   "jest": {
     "moduleFileExtensions": [
