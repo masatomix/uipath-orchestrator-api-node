@@ -29,7 +29,7 @@ $ npx ts-node ./src/samples/log/logSample.ts
 
 さて条件指定の仕方ですが、基本的に [API リクエストの構築](https://docs.uipath.com/orchestrator/lang-ja/reference#building-api-requests) この機能を用いてます。
 
-例: Id = 2015 で検索
+例: Id = 15 で検索
 
 スペースが ``%20``, = が ``eq`` となり
 
