@@ -455,6 +455,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.4.0 構成をリファクタリング,xlsx ダウンロードのための xlsx-populate-wrapper 追加,AuditLog追加.ダウンロードサンプルを追加。割とテストレベルかも、、。
 - 0.3.9 実行ログのダウンロード機能を追加。またその[log機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/log)についてドキュメントを整備。
 - 0.3.8 [queueDefinition/queue](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queue),[queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queueOperation) についてドキュメントを整備。あとコードのフォーマット(lint)。ロジックは変更なしです。
 - 0.3.7 [nupkg関連のアップロード・ダウンロード機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/process)を追加。各種機能の[ドキュメント](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples)を追加
