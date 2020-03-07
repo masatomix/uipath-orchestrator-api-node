@@ -334,6 +334,45 @@ export const createFilterStr = async (
   return ret
 }
 
+export const createAuditFilterStr = async (
+  filters: {
+    action?: string
+    userName?: string
+    component?: string
+    methodName?: string
+    from?: Date
+    to?: Date
+  },
+  api: OrchestratorApi,
+): Promise<string[]> => {
+  const ret: string[] = []
+
+  if (filters.from) {
+    const fromUTC = filters.from.toISOString()
+    logger.debug(`from: ${fromUTC}`)
+    ret.push(`ExecutionTime ge ${fromUTC}`)
+    // ret.push(`ExecutionTime lt ${fromUTC}`)
+  }
+  if (filters.to) {
+    const toUTC = filters.to.toISOString()
+    logger.debug(`  to: ${toUTC}`)
+    ret.push(`ExecutionTime lt ${toUTC}`)
+  }
+  if (filters.action) {
+    ret.push(`Action eq '${filters.action}'`)
+  }
+  if (filters.userName) {
+    ret.push(`UserName eq '${filters.userName}'`)
+  }
+  if (filters.component) {
+    ret.push(`Component eq '${filters.component}'`)
+  }
+  if (filters.methodName) {
+    ret.push(`MethodName eq '${filters.methodName}'`)
+  }
+  return ret
+}
+
 if (!module.parent) {
   //   main()
 }

@@ -10,6 +10,7 @@ import {
   uploadData,
   downloadData,
   createFilterStr,
+  createAuditFilterStr,
 } from './utils'
 
 /**
@@ -31,6 +32,7 @@ interface IOrchestratorApi {
   queueOperation: QueueCrudService
   // asset: ICrudService
   log: LogCrudService
+  auditLog: AuditLogCrudService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
@@ -412,9 +414,6 @@ class QueueCrudService extends BaseCrudService {
   }
 }
 
-/**
- * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
- */
 class LogCrudService extends BaseCrudService {
   constructor(parent_: OrchestratorApi) {
     super(parent_)
@@ -501,6 +500,45 @@ class LogCrudService extends BaseCrudService {
           }
         }),
     )
+  }
+}
+
+class AuditLogCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/AuditLogs', queries, asArray)
+  }
+
+  async findByFilter(
+    filters: {
+      action?: string
+      userName?: string
+      component?: string
+      methodName?: string
+      from?: Date
+      to?: Date
+    },
+    obj?: any,
+    asArray: boolean = true,
+  ): Promise<Array<any>> {
+    const filterArray: string[] = await createAuditFilterStr(filters, this.parent)
+    const filter = filterArray.join(' and ')
+
+    if (filter === '') {
+      return this.findAll(obj, asArray)
+    }
+
+    let condition: any = {}
+    if (obj) {
+      condition = obj
+      condition['$filter'] = filter
+    } else {
+      condition = { $filter: filter }
+    }
+    return this.findAll(condition, asArray)
   }
 }
 
@@ -743,6 +781,7 @@ class OrchestratorApi implements IOrchestratorApi {
   // })(this)
 
   log: LogCrudService = new LogCrudService(this)
+  auditLog: AuditLogCrudService = new AuditLogCrudService(this)
 
   // ロボットグループ
   // ロール
