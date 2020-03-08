@@ -5,6 +5,21 @@ import path from 'path'
 import OrchestratorApi from './index'
 // import url from 'url'
 
+class BaseError extends Error {
+  constructor(e?: string) {
+    super(e)
+    this.name = new.target.name
+    // 下記の行はTypeScriptの出力ターゲットがES2015より古い場合(ES3, ES5)のみ必要
+    Object.setPrototypeOf(this, new.target.prototype)
+  }
+}
+
+export class NetworkAccessError extends BaseError {
+  constructor(public statusCode: number, public body: any, e?: string) {
+    super(e)
+  }
+}
+
 export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
   const option = createOption(config_, accessToken, apiPath)
   return createStrPromise(Object.assign(option, { method: 'GET' }))
@@ -128,8 +143,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
-        logger.error(body)
-        reject(body)
+        reject(new NetworkAccessError(response.statusCode, body))
       }
       logger.debug(body)
       const obj = JSON.parse(body)
@@ -156,10 +170,8 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
       }
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
-      logger.debug(body)
       if (response.statusCode >= 400) {
-        logger.error(body)
-        reject(body)
+        reject(new NetworkAccessError(response.statusCode, body))
       }
       if (body === null || body === '') {
         resolve()
@@ -192,10 +204,8 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
       }
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
-      logger.debug(body)
       if (response.statusCode >= 400) {
-        logger.error(body)
-        reject(body)
+        reject(new NetworkAccessError(response.statusCode, body))
       }
 
       // PUTのばあい、StatusCodeが200で、Bodyが空のためundefinedになったが正常終了させる。
@@ -226,8 +236,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
       httpLogger.debug('option:', option)
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
-        logger.error(body)
-        reject(body)
+        reject(new NetworkAccessError(response.statusCode, body))
       }
       if (response.statusCode === 200) {
         fs.writeFileSync(`${id}.${version}.nupkg`, body, 'binary')
@@ -371,6 +380,34 @@ export const createAuditFilterStr = async (
     ret.push(`MethodName eq '${filters.methodName}'`)
   }
   return ret
+}
+
+export const applyStyles = (logs: any[], workbook: any, sheetName: string) => {
+  const sheet = workbook.getWorkbook().sheet(sheetName)
+  const rowCount = logs.length
+
+  // A列に、J列にあるUTCデータから JST変換を行う関数を入れている。
+  // I列は、なぜかゼロがNULL値になっているので、0を入れる処理を入れている。
+  for (let i = 0; i < rowCount; i++) {
+    const rowIndex = i + 2
+    sheet
+      .cell(`A${rowIndex}`)
+      .formula(`=DATEVALUE(MIDB(J${rowIndex},1,10))+TIMEVALUE(MIDB(J${rowIndex},12,8))+TIME(9,0,0)`)
+    if (logs[i].TotalExecutionTimeInSeconds === 0) {
+      sheet.cell(`I${rowIndex}`).value(0)
+    }
+  }
+
+  // JSTの時刻を入れている箇所に、日付フォーマットを適用
+  sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
+
+  // データがあるところには罫線を引く(細いヤツ)
+  sheet.range(`A2:K${rowCount + 1}`).style('border', {
+    top: { style: 'hair' },
+    left: { style: 'hair' },
+    bottom: { style: 'hair' },
+    right: { style: 'hair' },
+  })
 }
 
 if (!module.parent) {
