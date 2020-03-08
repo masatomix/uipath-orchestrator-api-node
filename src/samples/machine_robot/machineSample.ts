@@ -20,21 +20,23 @@ async function sample() {
   // まずは認証
   await api.authenticate()
   try {
-    // // サンプル０．マシン登録
-    // const random = randomName()
-    // const machineName = `Machine_${random}`
-    // const testMachine = await api.machine.create({ Name: machineName }) // 登録する
-    // logger.info(testMachine)
+    // サンプル０．マシン登録
+    const random = randomName()
+    const machineName = `Machine_${random}`
+    const testMachine = await api.machine.create({ Name: machineName }) // 登録する
+    logger.info(testMachine)
 
-    // // サンプル１．ロボットの登録
-    // const expectedRobot = createRobotData(testMachine) // 登録データを作成
-    // logger.info(expectedRobot)
-    // const resultRobot = await api.robot.create(expectedRobot) // 登録
-    // logger.info(resultRobot)
+    // サンプル１．ロボットの登録
+    const expectedRobot = createRobotData(testMachine) // 登録データを作成
+    logger.info(expectedRobot)
+    const resultRobot = await api.robot.create(expectedRobot) // 登録
+    logger.info(resultRobot)
 
-    const theMachine = await api.machine.findByMachineName('Machine_0330')
+    const theMachine = await api.machine.findByMachineName(machineName)
     console.log(theMachine)
 
+    // todo いずれサービス化予定
+    // 無効にしてみた。
     await api.postData(`/odata/LicensesRuntime('${theMachine.Name}')/UiPath.Server.Configuration.OData.ToggleEnabled`, {
       key: theMachine.Name,
       robotType: 'Unattended',
@@ -61,7 +63,7 @@ async function sample() {
 }
 
 if (!module.parent) {
-  (async () => {
+  ;(async () => {
     await sample()
   })()
 }
