@@ -1,4 +1,12 @@
+.github/
+attic/
+config/
+coverage/
+logs/
+node_modules/
 src/
 tsconfig.json
 tslint.json
+__tests__
 dist/samples/
+.DS_Store
