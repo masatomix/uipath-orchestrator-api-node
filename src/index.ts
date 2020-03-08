@@ -11,7 +11,11 @@ import {
   downloadData,
   createFilterStr,
   createAuditFilterStr,
+  applyStyles,
+  NetworkAccessError,
 } from './utils'
+import path from 'path'
+import xPopWrapper = require('xlsx-populate-wrapper')
 
 /**
  * Orchestrator API Wrapper
@@ -480,26 +484,57 @@ class LogCrudService extends BaseCrudService {
           return false
         })
         .map(async (data: any) => {
-          const machine = await this.parent.machine.find(data.MachineId)
-
+          let machineName: string = ''
+          try {
+            const machine = await this.parent.machine.find(data.MachineId)
+            machineName = machine.Name
+          } catch (error) {
+            logger.error(`StatusCode: ${error.statusCode}`)
+            logger.error(error.body)
+            if (error instanceof NetworkAccessError) {
+              if (error.statusCode === 404) {
+                logger.error(`MachinId: ${data.MachineId}`)
+                // 404の場合は処理を継続
+              } else {
+                throw error
+              }
+            }
+          }
           delete data.Level
           delete data.MachineId
           const rawMessageObj = JSON.parse(data.RawMessage)
           if (rawMessageObj.hasOwnProperty('totalExecutionTimeInSeconds')) {
             return Object.assign({}, data, {
-              MachineName: machine.Name,
+              MachineName: machineName,
               LogType: 'end',
               TotalExecutionTimeInSeconds: rawMessageObj.totalExecutionTimeInSeconds,
             })
           } else {
             return Object.assign({}, data, {
-              MachineName: machine.Name,
+              MachineName: machineName,
               LogType: 'start',
               TotalExecutionTimeInSeconds: 0,
             })
           }
         }),
     )
+  }
+
+  async save2Excel(logs: any[], outputFullPath: string, templateFullPath?: string, sheetName = 'Sheet1') {
+    // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のuntitled.xlsxを使う
+    const inputPath = templateFullPath ? templateFullPath : path.join(__dirname, 'untitled.xlsx')
+    logger.debug(`template path: ${inputPath}`)
+    const workbook = new xPopWrapper(inputPath)
+    await workbook.init()
+
+    workbook.update(sheetName, logs) // 更新
+    if (!templateFullPath) {
+      applyStyles(logs, workbook, sheetName)
+    }
+
+    logger.debug(outputFullPath)
+    // 書き込んだファイルを保存
+    await workbook.commit(outputFullPath)
   }
 }
 
