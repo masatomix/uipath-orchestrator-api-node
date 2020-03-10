@@ -284,13 +284,17 @@ const headers = (config_: any, accessToken: string, contentType: string): any =>
     ret = {
       Authorization: 'UiRobot ' + accessToken,
       'content-type': contentType,
-      // 'X-UIPATH-OrganizationUnitId': 1
+    }
+    if (config_.robotInfo.organizationUnit) {
+      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config_.robotInfo.organizationUnit })
     }
   } else {
     ret = {
       Authorization: 'Bearer ' + accessToken,
       'content-type': contentType,
-      // 'X-UIPATH-OrganizationUnitId': 1
+    }
+    if (config_.userinfo.organizationUnit) {
+      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config_.userinfo.organizationUnit })
     }
   }
   if (tenant_logical_name) {
