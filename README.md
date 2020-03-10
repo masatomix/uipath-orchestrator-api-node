@@ -455,6 +455,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.4.3 Organization Unit に対応。configのuserinfoに、「"organizationUnit": 1」 などと記述出来るようにした。
 - 0.4.2 Excel形式のログダウンロード機能追加(xlsx-populate-wrapper 追加)、AuditLog機能追加。ダウンロードサンプルを追加。構成をリファクタリング、Networkがエラーを返すときはステータスコードなども返す。(割とテストレベルかも、、)。
 - 0.3.9 実行ログのダウンロード機能を追加。またその[log機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/log)についてドキュメントを整備。
 - 0.3.8 [queueDefinition/queue](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queue),[queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/queueOperation) についてドキュメントを整備。あとコードのフォーマット(lint)。ロジックは変更なしです。
