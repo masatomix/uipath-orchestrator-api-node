@@ -36,7 +36,7 @@ async function printLog(logs: any[]) {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
