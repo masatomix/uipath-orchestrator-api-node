@@ -11,7 +11,6 @@ import {
   downloadData,
   createFilterStr,
   createAuditFilterStr,
-  applyStyles,
   NetworkAccessError,
 } from './utils'
 import path from 'path'
@@ -37,6 +36,8 @@ interface IOrchestratorApi {
   // asset: ICrudService
   log: LogCrudService
   auditLog: AuditLogCrudService
+  setting: SettingCrudService
+  util: UtilService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
@@ -220,7 +221,7 @@ class ProcessCrudService extends BaseCrudService {
     return uploadData(
       this.parent.config,
       this.parent.accessToken,
-      'odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
+      '/odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
       fullPath,
       asArray,
     )
@@ -520,21 +521,43 @@ class LogCrudService extends BaseCrudService {
     )
   }
 
-  async save2Excel(logs: any[], outputFullPath: string, templateFullPath?: string, sheetName = 'Sheet1') {
-    // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のuntitled.xlsxを使う
-    const inputPath = templateFullPath ? templateFullPath : path.join(__dirname, 'untitled.xlsx')
-    logger.debug(`template path: ${inputPath}`)
-    const workbook = new xPopWrapper(inputPath)
-    await workbook.init()
+  async save2Excel(
+    logs: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateLogs.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateLogs.xlsxを使う
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ) {
+    const applyStyles_ = applyStyles
+      ? applyStyles
+      : (logs_: any[], workbook: any, sheetName_: string) => {
+          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const rowCount = logs_.length
 
-    workbook.update(sheetName, logs) // 更新
-    if (!templateFullPath) {
-      applyStyles(logs, workbook, sheetName)
-    }
+          // A列に、J列にあるUTCデータから JST変換を行う関数を入れている。
+          // I列は、なぜかゼロがNULL値になっているので、0を入れる処理を入れている。
+          for (let i = 0; i < rowCount; i++) {
+            const rowIndex = i + 2
+            sheet
+              .cell(`A${rowIndex}`)
+              .formula(`=DATEVALUE(MIDB(J${rowIndex},1,10))+TIMEVALUE(MIDB(J${rowIndex},12,8))+TIME(9,0,0)`)
+            if (logs_[i].TotalExecutionTimeInSeconds === 0) {
+              sheet.cell(`I${rowIndex}`).value(0)
+            }
+          }
 
-    logger.debug(outputFullPath)
-    // 書き込んだファイルを保存
-    await workbook.commit(outputFullPath)
+          // JSTの時刻を入れている箇所に、日付フォーマットを適用
+          sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
+
+          // データがあるところには罫線を引く(細いヤツ)
+          sheet.range(`A2:K${rowCount + 1}`).style('border', {
+            top: { style: 'hair' },
+            left: { style: 'hair' },
+            bottom: { style: 'hair' },
+            right: { style: 'hair' },
+          })
+        }
+    this.parent.util.save2Excel(logs, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
@@ -575,6 +598,157 @@ class AuditLogCrudService extends BaseCrudService {
     }
     return this.findAll(condition, asArray)
   }
+}
+
+class SettingCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Settings', queries, asArray)
+  }
+
+  find(id: string): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Settings('${id}')`)
+  }
+
+  // 可変長配列。使う側は、
+  // findByKey('Abp.Net.Mail.Smtp', 'Abp.Net.Mail.Smtp.Host')とか、
+  // これはあんま見ないけど
+  // findByKey(...['Abp.Net.Mail.Smtp', 'Abp.Net.Mail.Smtp.Host']) とか。
+  // keyは前方一致させている
+  findByKey(queries?: any): (...keys: string[]) => Promise<Array<any>> {
+    return async (...keys: string[]) => {
+      // まずは条件で検索
+      const apiResults: any[] = await this.findAll(queries)
+
+      // 案1
+      const tmpResults = keys // keyごとにFilterして
+        .map(key => apiResults.filter(apiResult => (apiResult.Id as string).startsWith(key)))
+        .reduce((previous, current) => {
+          current.push(...previous) // 配列同士を結合
+          return current
+        })
+      const resultSet = new Set(tmpResults) //ココで重複を除去
+
+      // 案2
+      // const resultSet = new Set()
+      // // わたされたkeyごとに、filterして、SetにAdd.
+      // for (const key of keys) {
+      //   apiResults
+      //     .filter(apiResult => (apiResult.Id as string).startsWith(key))
+      //     .map(filterResult => {
+      //       resultSet.add(filterResult) // ココで重複が除去
+      //     })
+      // }
+
+      // 最後は配列に戻して完成
+      return Array.from(resultSet)
+    }
+  }
+
+  update(settingObjs: any[]): Promise<any> {
+    return postData(
+      this.parent.config,
+      this.parent.accessToken,
+      '/odata/Settings/UiPath.Server.Configuration.OData.UpdateBulk',
+      { settings: settingObjs },
+    )
+  }
+
+  readSettingsFromFile(fullPath: string, sheetName = 'Sheet1'): Promise<any[]> {
+    return this.parent.util.xlsx2json(fullPath, sheetName, instance => {
+      return {
+        Id: instance.Id,
+        Name: instance.Name,
+        Value: String(instance.Value), // データによっては数値になっちゃったりするのでString化
+        Scope: instance.Scope,
+      }
+    })
+  }
+
+  save2Excel(
+    settings: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateSettings.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateSettings.xlsxを使う
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    const applyStyles_ = applyStyles
+      ? applyStyles
+      : (settings_: any[], workbook: any, sheetName_: string) => {
+          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const rowCount = settings_.length
+
+          sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
+          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
+          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
+
+          // データがあるところには罫線を引く(細いヤツ)
+          sheet.range(`A2:D${rowCount + 1}`).style('border', {
+            top: { style: 'hair' },
+            left: { style: 'hair' },
+            bottom: { style: 'hair' },
+            right: { style: 'hair' },
+          })
+        }
+    return this.parent.util.save2Excel(settings, outputFullPath, templateFullPath, sheetName, applyStyles_)
+  }
+}
+
+class UtilService {
+  constructor(public parent: OrchestratorApi) {}
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateUntitled.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+  /**
+   * Excelファイルを読み込み、各行をデータとして配列で返すメソッド。
+   * @param path Excelファイルパス
+   * @param sheet シート名
+   * @param format_func フォーマット関数。instanceは各行データが入ってくるので、任意に整形して返せばよい
+   */
+  async xlsx2json(
+    inputFullPath: string,
+    sheetName = 'Sheet1',
+    format_func?: (instance: any) => any,
+  ): Promise<Array<any>> {
+    const workbook = new xPopWrapper(inputFullPath)
+    await workbook.init()
+
+    const instances: Array<any> = workbook.getData(sheetName)
+    if (format_func) {
+      return instances.map(instance => format_func(instance))
+    }
+    return instances
+  }
+}
+
+async function internalSave2Excel(
+  instances: any[],
+  outputFullPath: string,
+  templateFullPath: string,
+  sheetName: string,
+  applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+): Promise<void> {
+  logger.debug(`template path: ${templateFullPath}`)
+  const workbook = new xPopWrapper(templateFullPath)
+  await workbook.init()
+
+  workbook.update(sheetName, instances) // 更新
+  if (applyStyles) {
+    applyStyles(instances, workbook, sheetName)
+  }
+
+  logger.debug(outputFullPath)
+  // 書き込んだファイルを保存
+  await workbook.commit(outputFullPath)
 }
 
 /**
@@ -774,7 +948,7 @@ class OrchestratorApi implements IOrchestratorApi {
     }
 
     // PK指定で取得する
-    find(queueItemId: number): Promise<Array<any>> {
+    find(queueItemId: number): Promise<any> {
       return getData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
     }
 
@@ -817,6 +991,8 @@ class OrchestratorApi implements IOrchestratorApi {
 
   log: LogCrudService = new LogCrudService(this)
   auditLog: AuditLogCrudService = new AuditLogCrudService(this)
+  setting: SettingCrudService = new SettingCrudService(this)
+  util: UtilService = new UtilService(this)
 
   // ロボットグループ
   // ロール
