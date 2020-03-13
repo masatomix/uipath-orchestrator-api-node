@@ -386,34 +386,6 @@ export const createAuditFilterStr = async (
   return ret
 }
 
-export const applyStyles = (logs: any[], workbook: any, sheetName: string) => {
-  const sheet = workbook.getWorkbook().sheet(sheetName)
-  const rowCount = logs.length
-
-  // A列に、J列にあるUTCデータから JST変換を行う関数を入れている。
-  // I列は、なぜかゼロがNULL値になっているので、0を入れる処理を入れている。
-  for (let i = 0; i < rowCount; i++) {
-    const rowIndex = i + 2
-    sheet
-      .cell(`A${rowIndex}`)
-      .formula(`=DATEVALUE(MIDB(J${rowIndex},1,10))+TIMEVALUE(MIDB(J${rowIndex},12,8))+TIME(9,0,0)`)
-    if (logs[i].TotalExecutionTimeInSeconds === 0) {
-      sheet.cell(`I${rowIndex}`).value(0)
-    }
-  }
-
-  // JSTの時刻を入れている箇所に、日付フォーマットを適用
-  sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
-
-  // データがあるところには罫線を引く(細いヤツ)
-  sheet.range(`A2:K${rowCount + 1}`).style('border', {
-    top: { style: 'hair' },
-    left: { style: 'hair' },
-    bottom: { style: 'hair' },
-    right: { style: 'hair' },
-  })
-}
-
 if (!module.parent) {
   //   main()
 }
