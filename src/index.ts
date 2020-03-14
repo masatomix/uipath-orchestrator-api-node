@@ -659,11 +659,13 @@ class SettingCrudService extends BaseCrudService {
 
   readSettingsFromFile(fullPath: string, sheetName = 'Sheet1'): Promise<any[]> {
     return this.parent.util.xlsx2json(fullPath, sheetName, instance => {
+      const value = instance.Value ? instance.Value : ''
+      const scope = instance.Scope ? instance.Scope : ''
       return {
         Id: instance.Id,
         Name: instance.Name,
-        Value: String(instance.Value), // データによっては数値になっちゃったりするのでString化
-        Scope: instance.Scope,
+        Value: String(value), // データによっては数値になっちゃったりするのでString化
+        Scope: String(scope),
       }
     })
   }
