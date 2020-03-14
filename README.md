@@ -169,7 +169,8 @@ console.log(robots)
 |  11  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
 |  12  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
 |  13  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
-|  14 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+|  14  | [setting](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/setting/)         |       〇      |    〇      |              |       〇      |              | キーで検索(findByKey) <br>ファイルからデータ作成(readSettingsFromFile)<br>データをExcel出力(save2Excel)                                                            |                |
+|  15 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
 
@@ -455,6 +456,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.4.4 Orchestratorの[環境設定操作のAPI](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/setting) 追加。設定情報をExcelファイルでダウンロードする機能も。
 - 0.4.3 Organization Unit に対応。configのuserinfoに、「"organizationUnit": 1」 などと記述出来るようにした。
 - 0.4.2 Excel形式のログダウンロード機能追加(xlsx-populate-wrapper 追加)、AuditLog機能追加。ダウンロードサンプルを追加。構成をリファクタリング、Networkがエラーを返すときはステータスコードなども返す。(割とテストレベルかも、、)。
 - 0.3.9 実行ログのダウンロード機能を追加。またその[log機能](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/log)についてドキュメントを整備。
