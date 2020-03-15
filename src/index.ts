@@ -81,6 +81,41 @@ class BaseCrudService implements ICrudService {
   delete(obj: any): Promise<any> {
     throw Error('Not implemented yet.')
   }
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath?: string,
+    sheetName?: string,
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    const applyStyles_ = applyStyles
+      ? applyStyles
+      : (instances_: any[], workbook: any, sheetName_: string) => {
+          // Object.keys(instances_[0]).forEach(key => console.log(key))
+          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const rowCount = instances_.length
+
+          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
+          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
+          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
+
+          // データがあるところには罫線を引く(細いヤツ)
+          const startCell = sheet.cell('A2')
+          const columnCount = sheet
+            .usedRange()
+            .value()
+            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
+          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+
+          sheet.range(startCell, endCell).style('border', {
+            top: { style: 'hair' },
+            left: { style: 'hair' },
+            bottom: { style: 'hair' },
+            right: { style: 'hair' },
+          })
+        }
+    return this.parent.util.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles_)
+  }
 }
 
 class UserCrudService extends BaseCrudService {
@@ -115,6 +150,16 @@ class UserCrudService extends BaseCrudService {
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Users(${id})`)
   }
+
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateUsers.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
 }
 
 class MachineCrudService extends BaseCrudService {
@@ -147,6 +192,15 @@ class MachineCrudService extends BaseCrudService {
   }
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
+  }
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateMachines.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -182,6 +236,16 @@ class RobotCrudService extends BaseCrudService {
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Robots(${id})`)
   }
+
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateRobots.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
 }
 
 class ReleaseCrudService extends BaseCrudService {
@@ -201,6 +265,16 @@ class ReleaseCrudService extends BaseCrudService {
     // processKey は画面上のプロセスの名前
     const objs: any[] = await this._findByProcessName(processKey)
     return objs[0]
+  }
+
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateReleases.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -261,6 +335,15 @@ class ProcessCrudService extends BaseCrudService {
       id,
       version,
     )
+  }
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateProcesses.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -343,6 +426,16 @@ class JobCrudService extends BaseCrudService {
     )
   }
 
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateJobs.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+
   // create(machine: any): Promise<any> {
   //   return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
   // }
@@ -394,6 +487,16 @@ class QueueDefinitionCrudService extends BaseCrudService {
 
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueDefinitions(${id})`)
+  }
+
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateQueueDefinitions.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -550,7 +653,14 @@ class LogCrudService extends BaseCrudService {
           sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
 
           // データがあるところには罫線を引く(細いヤツ)
-          sheet.range(`A2:K${rowCount + 1}`).style('border', {
+          const startCell = sheet.cell('A2')
+          const columnCount = sheet
+            .usedRange()
+            .value()
+            .shift().length
+          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+          sheet.range(startCell, endCell).style('border', {
+            // sheet.range(`A2:K${rowCount + 1}`).style('border', {
             top: { style: 'hair' },
             left: { style: 'hair' },
             bottom: { style: 'hair' },
@@ -598,6 +708,16 @@ class AuditLogCrudService extends BaseCrudService {
     }
     return this.findAll(condition, asArray)
   }
+
+  save2Excel(
+    instances: any[],
+    outputFullPath: string,
+    templateFullPath: string = path.join(__dirname, 'templateAuditLog.xlsx'),
+    sheetName = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<void> {
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
 }
 
 class SettingCrudService extends BaseCrudService {
@@ -626,10 +746,10 @@ class SettingCrudService extends BaseCrudService {
       // 案1
       const tmpResults = keys // keyごとにFilterして
         .map(key => apiResults.filter(apiResult => (apiResult.Id as string).startsWith(key)))
-        .reduce((previous, current) => {
-          current.push(...previous) // 配列同士を結合
-          return current
-        })
+        .reduce((accumulator, current) => {
+          accumulator.push(...current) // 配列同士を結合
+          return accumulator
+        }, [])
       const resultSet = new Set(tmpResults) //ココで重複を除去
 
       // 案2
@@ -688,7 +808,17 @@ class SettingCrudService extends BaseCrudService {
           // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
 
           // データがあるところには罫線を引く(細いヤツ)
-          sheet.range(`A2:D${rowCount + 1}`).style('border', {
+          const startCell = sheet.cell('A2')
+          // const endCell = sheet.cell(`D${rowCount + 1}`)
+          // const columnCount = Object.keys(instances_[0]).length
+          // const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+          const columnCount = sheet
+            .usedRange()
+            .value()
+            .shift().length
+          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+          sheet.range(startCell, endCell).style('border', {
+            // sheet.range(`A2:D${rowCount + 1}`).style('border', {
             top: { style: 'hair' },
             left: { style: 'hair' },
             bottom: { style: 'hair' },
@@ -743,6 +873,8 @@ async function internalSave2Excel(
   const workbook = new xPopWrapper(templateFullPath)
   await workbook.init()
 
+  // console.log(instances[0])
+  // console.table(instances)
   workbook.update(sheetName, instances) // 更新
   if (applyStyles) {
     applyStyles(instances, workbook, sheetName)
