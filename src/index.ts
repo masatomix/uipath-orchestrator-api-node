@@ -243,7 +243,51 @@ class MachineCrudService extends BaseCrudService {
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+    const applyStyles_ = applyStyles
+      ? applyStyles
+      : (instances_: any[], workbook: any, sheetName_: string) => {
+          // Object.keys(instances_[0]).forEach(key => console.log(key))
+          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const rowCount = instances_.length
+
+          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
+          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
+          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
+
+          for (let i = 0; i < rowCount; i++) {
+            const rowIndex = i + 2
+            if (instances_[i].NonProductionSlots === 0) {
+              sheet.cell(`F${rowIndex}`).value(0)
+            }
+            if (instances_[i].UnattendedSlots === 0) {
+              sheet.cell(`G${rowIndex}`).value(0)
+            }
+          }
+
+          // データがあるところには罫線を引く(細いヤツ)
+          const startCell = sheet.cell('A2')
+          const columnCount = sheet
+            .usedRange()
+            .value()
+            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
+          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+
+          sheet.range(startCell, endCell).style('border', {
+            top: { style: 'hair' },
+            left: { style: 'hair' },
+            bottom: { style: 'hair' },
+            right: { style: 'hair' },
+          })
+        }
+
+    // Excelに書き出すときは、Booleanを文字として書き出します。
+    const convertedDatas = instances.map(instance =>
+      Object.assign(instance, {
+        // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
+        RobotVersions: JSON.stringify(instance.RobotVersions),
+      }),
+    )
+    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
@@ -287,7 +331,51 @@ class RobotCrudService extends BaseCrudService {
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+    const applyStyles_ = applyStyles
+      ? applyStyles
+      : (instances_: any[], workbook: any, sheetName_: string) => {
+          // Object.keys(instances_[0]).forEach(key => console.log(key))
+          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const rowCount = instances_.length
+
+          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
+          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
+          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
+
+          // for (let i = 0; i < rowCount; i++) {
+          //   const rowIndex = i + 2
+          //   if (instances_[i].NonProductionSlots === 0) {
+          //     sheet.cell(`F${rowIndex}`).value(0)
+          //   }
+          //   if (instances_[i].UnattendedSlots === 0) {
+          //     sheet.cell(`G${rowIndex}`).value(0)
+          //   }
+          // }
+
+          // データがあるところには罫線を引く(細いヤツ)
+          const startCell = sheet.cell('A2')
+          const columnCount = sheet
+            .usedRange()
+            .value()
+            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
+          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
+
+          sheet.range(startCell, endCell).style('border', {
+            top: { style: 'hair' },
+            left: { style: 'hair' },
+            bottom: { style: 'hair' },
+            right: { style: 'hair' },
+          })
+        }
+
+    // Excelに書き出すときは、Booleanを文字として書き出します。
+    const convertedDatas = instances.map(instance =>
+      Object.assign(instance, {
+        // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
+        IsExternalLicensed: String(instance.IsExternalLicensed),
+      }),
+    )
+    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
