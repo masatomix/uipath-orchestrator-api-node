@@ -456,6 +456,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.4.5 各種APIにsave2ExcelというメソッドでExcelダウンロードできる機能を追加。まだダンプレベルで項目の精査中、レベル。対象は、machine,robot,release,process,job,user,queueDefinitions,setting,log,auditlog
 - 0.4.4 Orchestratorの[環境設定操作のAPI](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/setting) 追加。設定情報をExcelファイルでダウンロードする機能も。
 - 0.4.3 Organization Unit に対応。configのuserinfoに、「"organizationUnit": 1」 などと記述出来るようにした。
 - 0.4.2 Excel形式のログダウンロード機能追加(xlsx-populate-wrapper 追加)、AuditLog機能追加。ダウンロードサンプルを追加。構成をリファクタリング、Networkがエラーを返すときはステータスコードなども返す。(割とテストレベルかも、、)。
