@@ -11,22 +11,22 @@ async function main() {
 
     // まずは全件検索
     instances = await api.machine.findAll()
-    await api.machine.save2Excel(instances, 'machines.xlsx') //
+    await api.machine.save2Excel(instances, 'machines.xlsx')
 
     instances = await api.robot.findAll()
-    await api.robot.save2Excel(instances, 'robots.xlsx') //
+    await api.robot.save2Excel(instances, 'robots.xlsx')
 
     instances = await api.release.findAll()
-    await api.release.save2Excel(instances, 'releases.xlsx') //
+    await api.release.save2Excel(instances, 'releases.xlsx')
 
     instances = await api.process.findAll()
-    await api.process.save2Excel(instances, 'processes.xlsx') //
+    await api.process.save2Excel(instances, 'processes.xlsx')
 
     instances = await api.job.findAll()
     await api.job.save2Excel(instances, 'jobs.xlsx')
 
     instances = await api.user.findAll()
-    await api.user.save2Excel(instances, 'users.xlsx')
+    await api.user.save2Excel(instances, 'users.xlsx') //Fix
 
     instances = await api.setting.findAll()
     await api.setting.save2Excel(instances, 'settings.xlsx')
@@ -40,14 +40,14 @@ async function main() {
 
     instances = await api.log.findStartEndLogs({
       from: new Date('2020/03/02 00:00'),
-      to: new Date('2020/03/03 00:00'),
+      // to: new Date('2020/03/03 00:00'),
     })
     await api.log.save2Excel(instances, 'logs.xlsx')
 
     instances = await api.auditLog.findByFilter(
       {
         from: new Date('2020/03/07 01:00'),
-        to: new Date('2020/03/07 01:45'),
+        // to: new Date('2020/03/07 01:45'),
       },
       { $top: 100 },
     )

@@ -3,6 +3,8 @@ import logger, { httpLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
 import OrchestratorApi from './index'
+const XlsxPopulate = require('xlsx-populate')
+
 // import url from 'url'
 
 class BaseError extends Error {
@@ -385,6 +387,24 @@ export const createAuditFilterStr = async (
   }
   return ret
 }
+
+
+/**
+ * Excelのシリアル値を、Dateへ変換します。
+ * @param serialNumber シリアル値
+ */
+export const dateFromSn = (serialNumber: number): Date => {
+  return XlsxPopulate.numberToDate(serialNumber)
+}
+
+export const toBoolean = function (boolStr: string | boolean): boolean {
+  if (typeof boolStr === 'boolean') {
+    return boolStr
+  }
+  return boolStr.toLowerCase() === 'true'
+}
+
+
 
 if (!module.parent) {
   //   main()
