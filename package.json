@@ -68,6 +68,6 @@
     "config": "^3.3.0",
     "log4js": "^6.1.2",
     "request": "^2.88.2",
-    "xlsx-populate-wrapper": "https://github.com/masatomix/xlsx-populate-wrapper.git#develop"
+    "xlsx-populate": "^1.21.0"
   }
 }

@@ -12,9 +12,10 @@ import {
   createFilterStr,
   createAuditFilterStr,
   NetworkAccessError,
+  xlsx2json,
+  internalSave2Excel,
 } from './utils'
 import path from 'path'
-import xPopWrapper = require('xlsx-populate-wrapper')
 
 /**
  * Orchestrator API Wrapper
@@ -25,6 +26,7 @@ interface IOrchestratorApi {
   license: ICrudService
   robot: RobotCrudService
   user: UserCrudService
+  role: RoleCrudService
   machine: MachineCrudService
   release: ReleaseCrudService
   process: ProcessCrudService
@@ -88,33 +90,7 @@ class BaseCrudService implements ICrudService {
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    const applyStyles_ = applyStyles
-      ? applyStyles
-      : (instances_: any[], workbook: any, sheetName_: string) => {
-          // Object.keys(instances_[0]).forEach(key => console.log(key))
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
-          const rowCount = instances_.length
-
-          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-
-          sheet.range(startCell, endCell).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
-        }
-    return this.parent.util.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return this.parent.util.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -158,51 +134,120 @@ class UserCrudService extends BaseCrudService {
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    const applyStyles_ = applyStyles
-      ? applyStyles
-      : (instances_: any[], workbook: any, sheetName_: string) => {
-          // Object.keys(instances_[0]).forEach(key => console.log(key))
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
-          const rowCount = instances_.length
-
-          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-
-          sheet.range(startCell, endCell).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
-        }
-
-    // Excelに書き出すときは、Booleanを文字として書き出します。
-    const convertedDatas = instances.map(instance =>
-      Object.assign(instance, {
-        // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
-        IsEmailConfirmed: String(instance.IsEmailConfirmed),
-        IsActive: String(instance.IsActive),
-        IsExternalLicensed: String(instance.IsExternalLicensed),
-        MayHaveUserSession: String(instance.MayHaveUserSession),
-        MayHaveRobotSession: String(instance.MayHaveRobotSession),
-        BypassBasicAuthRestriction: String(instance.BypassBasicAuthRestriction),
-        RolesList: JSON.stringify(instance.RolesList),
-        LoginProviders: JSON.stringify(instance.LoginProviders),
-        RobotProvision: JSON.stringify(instance.RobotProvision),
-        NotificationSubscription: JSON.stringify(instance.NotificationSubscription),
-      }),
-    )
-    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
+}
+
+class RoleCrudService extends BaseCrudService {
+  constructor(parent_: OrchestratorApi) {
+    super(parent_)
+  }
+  findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Roles', queries, asArray)
+  }
+
+  find(id: number): Promise<any> {
+    return getData(this.parent.config, this.parent.accessToken, `/odata/Roles(${id})`)
+  }
+
+  findDetail(...keys: string[]): (...methods: ('' | 'View' | 'Edit' | 'Create' | 'Delete')[]) => Promise<Array<any>> {
+    return async (...methods: ('' | 'View' | 'Edit' | 'Create' | 'Delete')[]): Promise<Array<any>> => {
+      // まずは条件で検索
+      const apiResults: any[] = await this.parent.getArray(`/odata/Permissions`)
+
+      let filterResults = apiResults
+      if (keys.length > 0) {
+        const tmpResults = keys // keyごとにFilterして
+          .map(key => apiResults.filter(apiResult => (apiResult.Name as string).startsWith(key)))
+          .reduce((accumulator, current) => {
+            accumulator.push(...current) // 配列同士を結合
+            return accumulator
+          }, [])
+        const resultSet = new Set(tmpResults) //ココで重複を除去
+        // 最後は配列に戻して完成
+        filterResults = Array.from(resultSet)
+      }
+
+      if (methods.length === 0) {
+        console.log('引数なし')
+        return filterResults
+      }
+      return filterResults.filter(filterResult => {
+        for (const method of methods) {
+          if (method === '') {
+            if (!(filterResult.Name as string).includes('.')) {
+              return true
+            }
+          } else {
+            if ((filterResult.Name as string).includes(method)) {
+              return true
+            }
+          }
+        }
+        return false
+      })
+    }
+  }
+
+  // _findByUserName(userName: string): Promise<Array<any>> {
+  //   return this.findAll({ $filter: `UserName eq '${userName}'` })
+  // }
+
+  // async findByUserName(userName: string): Promise<any> {
+  //   const users: any[] = await this._findByUserName(userName)
+  //   return users[0]
+  // }
+
+  update(role: any): Promise<any> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Roles(${role.Id})`, role)
+  }
+
+  create(role: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Roles', role)
+  }
+
+  delete(id: number): Promise<any> {
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Roles(${id})`)
+  }
+
+  // save2Excel(
+  //   instances: any[],
+  //   outputFullPath: string,
+  //   templateFullPath: string = path.join(__dirname, 'templateRoles.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+  //   sheetName = 'Sheet1',
+  //   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  // ): Promise<void> {
+  //   const applyStyles_ = applyStyles
+  //     ? applyStyles
+  //     : (instances_: any[], workbook: any, sheetName_: string) => {
+  //         // Object.keys(instances_[0]).forEach(key => console.log(key))
+  //         const sheet = workbook.sheet(sheetName_)
+  //         const rowCount = instances_.length
+
+  //         // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
+  //         // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
+  //         // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
+
+  //       }
+
+  //   // Excelに書き出すときは、Booleanを文字として書き出します。
+  //   const convertedDatas = instances.map(instance =>
+  //     Object.assign(instance, {
+  //       // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
+  //       IsEmailConfirmed: String(instance.IsEmailConfirmed),
+  //       IsActive: String(instance.IsActive),
+  //       IsExternalLicensed: String(instance.IsExternalLicensed),
+  //       MayHaveUserSession: String(instance.MayHaveUserSession),
+  //       MayHaveRobotSession: String(instance.MayHaveRobotSession),
+  //       BypassBasicAuthRestriction: String(instance.BypassBasicAuthRestriction),
+  //       RolesList: JSON.stringify(instance.RolesList),
+  //       LoginProviders: JSON.stringify(instance.LoginProviders),
+  //       RobotProvision: JSON.stringify(instance.RobotProvision),
+  //       NotificationSubscription: JSON.stringify(instance.NotificationSubscription),
+  //     }),
+  //   )
+  //   return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
+  // }
 }
 
 class MachineCrudService extends BaseCrudService {
@@ -243,51 +288,7 @@ class MachineCrudService extends BaseCrudService {
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    const applyStyles_ = applyStyles
-      ? applyStyles
-      : (instances_: any[], workbook: any, sheetName_: string) => {
-          // Object.keys(instances_[0]).forEach(key => console.log(key))
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
-          const rowCount = instances_.length
-
-          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-          for (let i = 0; i < rowCount; i++) {
-            const rowIndex = i + 2
-            if (instances_[i].NonProductionSlots === 0) {
-              sheet.cell(`F${rowIndex}`).value(0)
-            }
-            if (instances_[i].UnattendedSlots === 0) {
-              sheet.cell(`G${rowIndex}`).value(0)
-            }
-          }
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-
-          sheet.range(startCell, endCell).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
-        }
-
-    // Excelに書き出すときは、Booleanを文字として書き出します。
-    const convertedDatas = instances.map(instance =>
-      Object.assign(instance, {
-        // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
-        RobotVersions: JSON.stringify(instance.RobotVersions),
-      }),
-    )
-    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -331,51 +332,7 @@ class RobotCrudService extends BaseCrudService {
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    const applyStyles_ = applyStyles
-      ? applyStyles
-      : (instances_: any[], workbook: any, sheetName_: string) => {
-          // Object.keys(instances_[0]).forEach(key => console.log(key))
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
-          const rowCount = instances_.length
-
-          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-          // for (let i = 0; i < rowCount; i++) {
-          //   const rowIndex = i + 2
-          //   if (instances_[i].NonProductionSlots === 0) {
-          //     sheet.cell(`F${rowIndex}`).value(0)
-          //   }
-          //   if (instances_[i].UnattendedSlots === 0) {
-          //     sheet.cell(`G${rowIndex}`).value(0)
-          //   }
-          // }
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-
-          sheet.range(startCell, endCell).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
-        }
-
-    // Excelに書き出すときは、Booleanを文字として書き出します。
-    const convertedDatas = instances.map(instance =>
-      Object.assign(instance, {
-        // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
-        IsExternalLicensed: String(instance.IsExternalLicensed),
-      }),
-    )
-    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -765,7 +722,7 @@ class LogCrudService extends BaseCrudService {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (logs_: any[], workbook: any, sheetName_: string) => {
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const sheet = workbook.sheet(sheetName_)
           const rowCount = logs_.length
 
           // A列に、J列にあるUTCデータから JST変換を行う関数を入れている。
@@ -782,23 +739,8 @@ class LogCrudService extends BaseCrudService {
 
           // JSTの時刻を入れている箇所に、日付フォーマットを適用
           sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-          sheet.range(startCell, endCell).style('border', {
-            // sheet.range(`A2:K${rowCount + 1}`).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
         }
-    this.parent.util.save2Excel(logs, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    super.save2Excel(logs, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
@@ -851,12 +793,8 @@ class AuditLogCrudService extends BaseCrudService {
       ? applyStyles
       : (instances_: any[], workbook: any, sheetName_: string) => {
           // Object.keys(instances_[0]).forEach(key => console.log(key))
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const sheet = workbook.sheet(sheetName_)
           const rowCount = instances_.length
-
-          // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-          // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-          // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
 
           // A列に、J列にあるUTCデータから JST変換を行う関数を入れている。
           // I列は、なぜかゼロがNULL値になっているので、0を入れる処理を入れている。
@@ -869,31 +807,8 @@ class AuditLogCrudService extends BaseCrudService {
 
           // JSTの時刻を入れている箇所に、日付フォーマットを適用
           sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length // ゼロ行目を取り出して、そのデータの列の個数。
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-
-          sheet.range(startCell, endCell).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
         }
-
-    // Excelに書き出すときは、Booleanを文字として書き出します。
-    const convertedDatas = instances.map(instance =>
-      Object.assign(instance, {
-        UserIsDeleted: String(instance.UserIsDeleted),
-        Entities: JSON.stringify(instance.Entities),
-      }),
-    )
-    return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
@@ -955,7 +870,7 @@ class SettingCrudService extends BaseCrudService {
   }
 
   readSettingsFromFile(fullPath: string, sheetName = 'Sheet1'): Promise<any[]> {
-    return this.parent.util.xlsx2json(fullPath, sheetName, instance => {
+    return xlsx2json(fullPath, sheetName, instance => {
       const value = instance.Value ? instance.Value : ''
       const scope = instance.Scope ? instance.Scope : ''
       return {
@@ -977,32 +892,14 @@ class SettingCrudService extends BaseCrudService {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (settings_: any[], workbook: any, sheetName_: string) => {
-          const sheet = workbook.getWorkbook().sheet(sheetName_)
+          const sheet = workbook.sheet(sheetName_)
           const rowCount = settings_.length
 
           sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
           // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
           // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-          // データがあるところには罫線を引く(細いヤツ)
-          const startCell = sheet.cell('A2')
-          // const endCell = sheet.cell(`D${rowCount + 1}`)
-          // const columnCount = Object.keys(instances_[0]).length
-          // const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-          const columnCount = sheet
-            .usedRange()
-            .value()
-            .shift().length
-          const endCell = startCell.relativeCell(rowCount - 1, columnCount - 1)
-          sheet.range(startCell, endCell).style('border', {
-            // sheet.range(`A2:D${rowCount + 1}`).style('border', {
-            top: { style: 'hair' },
-            left: { style: 'hair' },
-            bottom: { style: 'hair' },
-            right: { style: 'hair' },
-          })
         }
-    return this.parent.util.save2Excel(settings, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(settings, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }
 
@@ -1011,59 +908,39 @@ class UtilService {
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateUntitled.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+    templateFullPath: string = '',
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
     return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
-  /**
-   * Excelファイルを読み込み、各行をデータとして配列で返すメソッド。
-   * @param path Excelファイルパス
-   * @param sheet シート名
-   * @param format_func フォーマット関数。instanceは各行データが入ってくるので、任意に整形して返せばよい
-   */
-  async xlsx2json(
-    inputFullPath: string,
-    sheetName = 'Sheet1',
-    format_func?: (instance: any) => any,
-  ): Promise<Array<any>> {
-    const workbook = new xPopWrapper(inputFullPath)
-    await workbook.init()
-
-    const instances: Array<any> = workbook.getData(sheetName)
-    if (format_func) {
-      return instances.map(instance => format_func(instance))
-    }
-    return instances
-  }
 }
 
-async function internalSave2Excel(
-  instances: any[],
-  outputFullPath: string,
-  templateFullPath: string,
-  sheetName: string,
-  applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-): Promise<void> {
-  logger.debug(`template path: ${templateFullPath}`)
-  const workbook = new xPopWrapper(templateFullPath)
-  await workbook.init()
+// async function internalSave2Excel1(
+//   instances: any[],
+//   outputFullPath: string,
+//   templateFullPath: string,
+//   sheetName: string,
+//   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+// ): Promise<void> {
+//   logger.debug(`template path: ${templateFullPath}`)
+//   const workbook = new xPopWrapper(templateFullPath)
+//   await workbook.init()
 
-  console.log(instances[0])
-  console.table(instances)
+//   console.log(instances[0])
+//   console.table(instances)
 
-  if (instances.length > 0) {
-    workbook.update(sheetName, instances) // 更新
-    if (applyStyles) {
-      applyStyles(instances, workbook, sheetName)
-    }
-  }
+//   if (instances.length > 0) {
+//     workbook.update(sheetName, instances) // 更新
+//     if (applyStyles) {
+//       applyStyles(instances, workbook, sheetName)
+//     }
+//   }
 
-  logger.debug(outputFullPath)
-  // 書き込んだファイルを保存
-  await workbook.commit(outputFullPath)
-}
+//   logger.debug(outputFullPath)
+//   // 書き込んだファイルを保存
+//   await workbook.commit(outputFullPath)
+// }
 
 /**
  * OrchestratorのAPIのWrapperクラス
@@ -1233,6 +1110,8 @@ class OrchestratorApi implements IOrchestratorApi {
 
   user: UserCrudService = new UserCrudService(this)
 
+  role = new RoleCrudService(this)
+
   machine: MachineCrudService = new MachineCrudService(this)
 
   release: ReleaseCrudService = new ReleaseCrudService(this)
@@ -1366,13 +1245,7 @@ if (!module.parent) {
       // まずは認証
       await api.authenticate()
 
-      let instances: any[] = []
-
-      // Schedulesを取得する
-      instances = await api.schedule.findAll()
-      for (const instance of instances) {
-        console.log(instance)
-      }
+      // let instances: any[] = []
 
       // instances = await api.queueItem.findAll()
       // for (const instance of instances) {
