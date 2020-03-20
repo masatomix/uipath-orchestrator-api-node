@@ -1,12 +1,11 @@
 import request from 'request'
 import logger from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy } from './utils'
+import { getData, getArray, putData, postData, deleteData, addProxy, internalSave2Excel } from './utils'
 import {
   ICrudService,
   IRobotCrudService,
   IUserCrudService,
   IRoleCrudService,
-  IUtilService,
   ISettingCrudService,
   IAuditLogCrudService,
   ILogCrudService,
@@ -44,11 +43,11 @@ export class BaseCrudService implements ICrudService {
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath?: string,
-    sheetName?: string,
+    templateFullPath: string = '',
+    sheetName: string = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
-    return this.parent.util.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+    return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
 
@@ -321,7 +320,6 @@ class OrchestratorApi implements IOrchestratorApi {
   log: ILogCrudService = new LogCrudService(this)
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
-  util: IUtilService = new UtilService(this)
 
   // ロボットグループ
   // ロール
@@ -368,7 +366,6 @@ import { LogCrudService } from './LogCrudService'
 import { AuditLogCrudService } from './AuditLogCrudService'
 import { SettingCrudService } from './SettingCrudService'
 import { QueueCrudService } from './QueueCrudService'
-import { UtilService } from './UtilService'
 import { UserCrudService } from './UserCrudService'
 
 const getConfig = () => {

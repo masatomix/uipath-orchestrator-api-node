@@ -1,7 +1,6 @@
 import {
   ICrudService,
   IRobotCrudService,
-  IUtilService,
   IUserCrudService,
   IRoleCrudService,
   IReleaseCrudService,
@@ -37,7 +36,6 @@ export interface IOrchestratorApi {
   log: ILogCrudService
   auditLog: IAuditLogCrudService
   setting: ISettingCrudService
-  util: IUtilService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>

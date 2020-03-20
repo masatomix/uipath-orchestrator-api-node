@@ -16,7 +16,7 @@ export interface ICrudService {
 export interface IRobotCrudService extends ICrudService {
   findByRobotName(element: string): any
 }
-export interface IUtilService extends ICrudService {}
+// export interface IUtilService extends ICrudService {}
 export interface IUserCrudService extends ICrudService {
   findByUserName(userName: string): Promise<any>
 }
