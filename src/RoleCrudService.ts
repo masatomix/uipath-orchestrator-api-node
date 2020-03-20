@@ -74,43 +74,4 @@ export class RoleCrudService extends BaseCrudService implements IRoleCrudService
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Roles(${id})`)
   }
-
-  // save2Excel(
-  //   instances: any[],
-  //   outputFullPath: string,
-  //   templateFullPath: string = path.join(__dirname, 'templateRoles.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
-  //   sheetName = 'Sheet1',
-  //   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  // ): Promise<void> {
-  //   const applyStyles_ = applyStyles
-  //     ? applyStyles
-  //     : (instances_: any[], workbook: any, sheetName_: string) => {
-  //         // Object.keys(instances_[0]).forEach(key => console.log(key))
-  //         const sheet = workbook.sheet(sheetName_)
-  //         const rowCount = instances_.length
-
-  //         // sheet.range(`C2:C${rowCount + 1}`).style('numberFormat', '@') // 書式: 文字(コレをやらないと、見かけ上文字だが、F2で抜けると数字になっちゃう)
-  //         // sheet.range(`E2:F${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd') // 書式: 日付
-  //         // sheet.range(`H2:H${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm') // 書式: 日付+時刻
-
-  //       }
-
-  //   // Excelに書き出すときは、Booleanを文字として書き出します。
-  //   const convertedDatas = instances.map(instance =>
-  //     Object.assign(instance, {
-  //       // Booleanだけは、Excelでfalseが表示出来ず。文字列化することにした。
-  //       IsEmailConfirmed: String(instance.IsEmailConfirmed),
-  //       IsActive: String(instance.IsActive),
-  //       IsExternalLicensed: String(instance.IsExternalLicensed),
-  //       MayHaveUserSession: String(instance.MayHaveUserSession),
-  //       MayHaveRobotSession: String(instance.MayHaveRobotSession),
-  //       BypassBasicAuthRestriction: String(instance.BypassBasicAuthRestriction),
-  //       RolesList: JSON.stringify(instance.RolesList),
-  //       LoginProviders: JSON.stringify(instance.LoginProviders),
-  //       RobotProvision: JSON.stringify(instance.RobotProvision),
-  //       NotificationSubscription: JSON.stringify(instance.NotificationSubscription),
-  //     }),
-  //   )
-  //   return this.parent.util.save2Excel(convertedDatas, outputFullPath, templateFullPath, sheetName, applyStyles_)
-  // }
 }
