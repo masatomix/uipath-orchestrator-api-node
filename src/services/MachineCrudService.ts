@@ -1,6 +1,6 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
 import path from 'path'
 import { IMachineCrudService } from '../Interfaces'
 
@@ -43,5 +43,19 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+
+  async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
+    const machines = await xlsx2json(inputFullPath, sheetName)
+    const promises = machines.map(machine => {
+      if (allProperty) {
+        return this.create(machine)
+      } else {
+        return this.create({
+          Name: machine.Name,
+        })
+      }
+    })
+    return Promise.all(promises)
   }
 }

@@ -496,7 +496,7 @@ export const internalSave2Excel = async (
     const columnCount = headings.length
     const sheet = workbook.sheet(sheetName)
 
-    sheet.usedRange().clear() // Excel上野データを削除して。
+    sheet.usedRange().clear() // Excel上のデータを削除して。
     sheet.cell('A1').value(csvArrays)
 
     // データがあるところには罫線を引く(細いヤツ)

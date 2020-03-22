@@ -11,8 +11,6 @@ async function main() {
     let instances: any[] = []
     let r: any
 
-    // まずは全件検索
-
     instances = await api.machine.findAll()
     await api.machine.save2Excel(instances, 'machines.xlsx')
     r = await xlsx2json('machines.xlsx')
@@ -39,7 +37,7 @@ async function main() {
     console.table(r)
 
     instances = await api.user.findAll()
-    await api.user.save2Excel(instances, 'users.xlsx') //Fix
+    await api.user.save2Excel(instances, 'users.xlsx')
     r = await xlsx2json('users.xlsx')
     console.table(r)
 
@@ -55,7 +53,7 @@ async function main() {
     r = await xlsx2json('queueDefinitions.xlsx')
     console.table(r)
 
-    // // instances = await api.queueItem.findAll()
+    // instances = await api.queueItem.findAll()
 
     instances = await api.log.findStartEndLogs({
       from: new Date('2020/03/02 00:00'),
@@ -77,7 +75,7 @@ async function main() {
 }
 
 if (!module.parent) {
-  (async () => {
+  ;(async () => {
     await main()
   })()
 }

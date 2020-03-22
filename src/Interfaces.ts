@@ -16,6 +16,7 @@ export interface ICrudService {
 
 export interface IRobotCrudService extends ICrudService {
   findByRobotName(element: string): any
+  upload(inputFullPath: string, sheetName?: string): Promise<any>
 }
 // export interface IUtilService extends ICrudService {}
 export interface IUserCrudService extends ICrudService {
@@ -27,6 +28,7 @@ export interface IRoleCrudService extends ICrudService {
 }
 export interface IMachineCrudService extends ICrudService {
   findByMachineName(machineName: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string): Promise<any>
 }
 export interface IReleaseCrudService extends ICrudService {
   findByProcessKey(processKey: string): Promise<any>
