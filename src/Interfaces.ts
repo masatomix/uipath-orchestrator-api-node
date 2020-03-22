@@ -11,6 +11,7 @@ export interface ICrudService {
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void>
+  // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
 }
 
 export interface IRobotCrudService extends ICrudService {
@@ -19,6 +20,7 @@ export interface IRobotCrudService extends ICrudService {
 // export interface IUtilService extends ICrudService {}
 export interface IUserCrudService extends ICrudService {
   findByUserName(userName: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string): Promise<any>
 }
 export interface IRoleCrudService extends ICrudService {
   findDetail(...keys: string[]): (...methods: ('' | 'View' | 'Edit' | 'Create' | 'Delete')[]) => Promise<Array<any>>

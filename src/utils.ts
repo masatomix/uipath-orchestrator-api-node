@@ -145,6 +145,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       logger.debug(body)
@@ -173,6 +174,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       if (body === null || body === '') {
@@ -207,6 +209,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
 
@@ -238,6 +241,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
       httpLogger.debug('option:', option)
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       if (response.statusCode === 200) {
