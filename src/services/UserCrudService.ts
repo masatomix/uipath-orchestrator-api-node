@@ -40,7 +40,7 @@ export class UserCrudService extends BaseCrudService implements IUserCrudService
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templates', 'templateUsers.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateUsers.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUsers.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {

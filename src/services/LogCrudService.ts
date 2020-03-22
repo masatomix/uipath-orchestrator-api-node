@@ -107,13 +107,13 @@ export class LogCrudService extends BaseCrudService implements ILogCrudService {
     )
   }
 
-  async save2Excel(
+  save2Excel(
     logs: any[],
     outputFullPath: string,
     templateFullPath: string = path.join(__dirname, 'templates', 'templateLogs.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateLogs.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ) {
+  ): Promise<void> {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (logs_: any[], workbook: any, sheetName_: string) => {
@@ -135,6 +135,6 @@ export class LogCrudService extends BaseCrudService implements ILogCrudService {
           // JSTの時刻を入れている箇所に、日付フォーマットを適用
           sheet.range(`A2:A${rowCount + 1}`).style('numberFormat', 'yyyy/mm/dd hh:mm:ss;@')
         }
-    super.save2Excel(logs, outputFullPath, templateFullPath, sheetName, applyStyles_)
+    return super.save2Excel(logs, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
 }

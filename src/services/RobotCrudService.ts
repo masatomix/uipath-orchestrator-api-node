@@ -1,6 +1,6 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
 import path from 'path'
 import { IRobotCrudService } from '../Interfaces'
 
@@ -45,5 +45,29 @@ export class RobotCrudService extends BaseCrudService implements IRobotCrudServi
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+
+  async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
+    const robots = await xlsx2json(inputFullPath, sheetName)
+    const promises = robots.map(async robot => {
+      if (allProperty) {
+        return this.create(robot)
+      } else {
+        // Machineがなかったら、つくるって処理も入れるべきだが一旦ナシで。
+        // tmpを一度検索しているのは、Machine名検索だけだと、LicenseKey が空になるので、Idで再検索する。
+        const tmp = await this.parent.machine.findByMachineName(robot.MachineName)
+        const machine = await this.parent.machine.find(tmp.Id)
+        // console.log(machine)
+        return this.create({
+          MachineName: robot.MachineName,
+          LicenseKey: machine.LicenseKey,
+          Name: robot.Name,
+          Username: robot.Username,
+          Type: robot.Type,
+          RobotEnvironments: robot.RobotEnvironments,
+        })
+      }
+    })
+    return Promise.all(promises)
   }
 }
