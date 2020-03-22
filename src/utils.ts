@@ -2,7 +2,7 @@ import request from 'request'
 import logger, { httpLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
-import OrchestratorApi from './index'
+import { IOrchestratorApi } from './IOrchestratorApi'
 const XlsxPopulate = require('xlsx-populate')
 // import { Parser } from 'json2csv'
 // import url from 'url'
@@ -145,6 +145,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       logger.debug(body)
@@ -173,6 +174,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       if (body === null || body === '') {
@@ -207,6 +209,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
       httpLogger.debug('option:', options)
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
 
@@ -238,6 +241,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
       httpLogger.debug('option:', option)
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
+        logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
       }
       if (response.statusCode === 200) {
@@ -317,7 +321,7 @@ export const createFilterStr = async (
     level?: 'INFO' | 'TRACE' | 'WARN' | 'ERROR' | 'FATAL'
     machineName?: string
   },
-  api: OrchestratorApi,
+  api: IOrchestratorApi,
 ): Promise<string[]> => {
   const ret: string[] = []
   if (filters.from) {
@@ -358,7 +362,7 @@ export const createAuditFilterStr = async (
     from?: Date
     to?: Date
   },
-  api: OrchestratorApi,
+  api: IOrchestratorApi,
 ): Promise<string[]> => {
   const ret: string[] = []
 

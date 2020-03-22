@@ -14,7 +14,7 @@ async function main() {
     // まずは全件検索
 
     instances = await api.machine.findAll()
-    await api.machine.save2Excel(instances, 'machines.xlsx') // Fix
+    await api.machine.save2Excel(instances, 'machines.xlsx')
     r = await xlsx2json('machines.xlsx')
     console.table(r)
 
