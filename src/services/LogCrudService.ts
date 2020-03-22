@@ -1,9 +1,9 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, createFilterStr, NetworkAccessError } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, createFilterStr, NetworkAccessError } from '../utils'
 import path from 'path'
-import logger from './logger'
-import { ILogCrudService } from './Interfaces'
+import logger from '../logger'
+import { ILogCrudService } from '../Interfaces'
 
 export class LogCrudService extends BaseCrudService implements ILogCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -110,7 +110,7 @@ export class LogCrudService extends BaseCrudService implements ILogCrudService {
   async save2Excel(
     logs: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateLogs.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateLogs.xlsxを使う
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateLogs.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateLogs.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ) {

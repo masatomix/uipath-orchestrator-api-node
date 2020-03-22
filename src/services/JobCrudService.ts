@@ -1,8 +1,8 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, getData, postData } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, getData, postData } from '../utils'
 import path from 'path'
-import { IJobCrudService } from './Interfaces'
+import { IJobCrudService } from '../Interfaces'
 
 export class JobCrudService extends BaseCrudService implements IJobCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -86,7 +86,7 @@ export class JobCrudService extends BaseCrudService implements IJobCrudService {
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateJobs.xlsx'),
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateJobs.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {

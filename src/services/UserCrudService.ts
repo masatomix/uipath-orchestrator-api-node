@@ -1,8 +1,8 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, getData, putData, postData, deleteData } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
 import path from 'path'
-import { IUserCrudService } from './Interfaces'
+import { IUserCrudService } from '../Interfaces'
 
 export class UserCrudService extends BaseCrudService implements IUserCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -40,10 +40,31 @@ export class UserCrudService extends BaseCrudService implements IUserCrudService
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateUsers.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateUsers.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateUntitled.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+
+  async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
+    const users = await xlsx2json(inputFullPath, sheetName)
+    const promises = users.map(user => {
+      if (allProperty) {
+        return this.create(user)
+      } else {
+        return this.create({
+          Name: user.Name,
+          Surname: user.Surname,
+          UserName: user.UserName,
+          // FullName: 'User LastName',
+          EmailAddress: user.EmailAddress,
+          IsActive: user.IsActive,
+          Password: user.Password,
+          RolesList: JSON.parse(user.RolesList),
+        })
+      }
+    })
+    return Promise.all(promises)
   }
 }

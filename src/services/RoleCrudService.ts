@@ -1,7 +1,7 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, getData, putData, postData, deleteData } from './utils'
-import { IRoleCrudService } from './Interfaces'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { IRoleCrudService } from '../Interfaces'
 
 export class RoleCrudService extends BaseCrudService implements IRoleCrudService {
   constructor(parent_: IOrchestratorApi) {

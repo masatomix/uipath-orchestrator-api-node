@@ -1,8 +1,8 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, getData, putData, postData, deleteData } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
 import path from 'path'
-import { IMachineCrudService } from './Interfaces'
+import { IMachineCrudService } from '../Interfaces'
 
 export class MachineCrudService extends BaseCrudService implements IMachineCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -38,7 +38,7 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateMachines.xlsx'),
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateMachines.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {

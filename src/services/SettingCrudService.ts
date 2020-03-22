@@ -1,8 +1,8 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, getData, postData, xlsx2json } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, getData, postData, xlsx2json } from '../utils'
 import path from 'path'
-import { ISettingCrudService } from './Interfaces'
+import { ISettingCrudService } from '../Interfaces'
 
 export class SettingCrudService extends BaseCrudService implements ISettingCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -77,7 +77,7 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
   save2Excel(
     settings: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateSettings.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateSettings.xlsxを使う
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateSettings.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateSettings.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {

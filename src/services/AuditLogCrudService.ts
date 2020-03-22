@@ -1,8 +1,8 @@
-import { IOrchestratorApi } from './IOrchestratorApi'
-import { BaseCrudService } from '.'
-import { getArray, createAuditFilterStr } from './utils'
+import { IOrchestratorApi } from '../IOrchestratorApi'
+import { BaseCrudService } from '..'
+import { getArray, createAuditFilterStr } from '../utils'
 import path from 'path'
-import { IAuditLogCrudService } from './Interfaces'
+import { IAuditLogCrudService } from '../Interfaces'
 
 export class AuditLogCrudService extends BaseCrudService implements IAuditLogCrudService {
   constructor(parent_: IOrchestratorApi) {
@@ -45,7 +45,7 @@ export class AuditLogCrudService extends BaseCrudService implements IAuditLogCru
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templateAuditLog.xlsx'),
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateAuditLog.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void> {
