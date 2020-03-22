@@ -8,7 +8,7 @@ async function main() {
   try {
     // まずは認証
     await api.authenticate()
-    let instances: any[] = []
+    const instances: any[] = []
     let r: any
 
     await api.machine.upload('machines.xlsx')
@@ -75,7 +75,7 @@ async function main() {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await main()
   })()
 }
