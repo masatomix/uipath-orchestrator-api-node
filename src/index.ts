@@ -15,6 +15,7 @@ import {
   IJobCrudService,
   IQueueDefinitionCrudService,
   IQueueCrudService,
+  IAssetCrudService,
 } from './Interfaces'
 
 /**
@@ -320,6 +321,7 @@ class OrchestratorApi implements IOrchestratorApi {
   log: ILogCrudService = new LogCrudService(this)
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
+  asset: IAssetCrudService = new AssetCrudService(this)
 
   // ロボットグループ
   // ロール
@@ -367,6 +369,7 @@ import { AuditLogCrudService } from './services/AuditLogCrudService'
 import { SettingCrudService } from './services/SettingCrudService'
 import { QueueCrudService } from './services/QueueCrudService'
 import { UserCrudService } from './services/UserCrudService'
+import { AssetCrudService } from './services/AssetCrudService'
 
 const getConfig = () => {
   // 設定ファイルから読むパタン
@@ -387,13 +390,21 @@ const getConfig = () => {
 
 if (!module.parent) {
   async function main() {
-    const api = new OrchestratorApi(getConfig())
+    const api: IOrchestratorApi = new OrchestratorApi(getConfig())
 
     try {
       // まずは認証
       await api.authenticate()
 
-      // let instances: any[] = []
+      let instances: any[] = []
+
+      // instances = await api.asset.findAll({ $expand: 'RobotValues' })
+      instances = await api.asset.findAllEx()
+      console.table(instances)
+      // console.log(instances[0])
+      // api.asset.save2Excel(instances, 'assets.xlsx')
+      // await api.asset.upload('assets.xlsx')
+      await api.asset.uploadPerRobot('assets.xlsx', 'perRobot_assets.xlsx')
 
       // instances = await api.queueItem.findAll()
       // for (const instance of instances) {

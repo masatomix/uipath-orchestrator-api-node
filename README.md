@@ -173,7 +173,12 @@ console.log(robots)
 |  15 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
+また、
 
+- [OrchestratorデータをExcelファイルへダウンロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/saveSamples.ts)
+- [ExcelからOrchestratorへデータをアップロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/uploadSamples.ts)
+
+を追加しました。
 
 ## Preferences
 
@@ -456,6 +461,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.5.0 Roleテスト実装(かなりテストレベル)。Excelテンプレを修正(Excel書き出しを自前実装にしたのでエラーになるカラムがなくなったため)。ファイルがindex.tsのみだったのをサービス毎に分割。Upload機能暫定追加(Robot/User/Machine)
 - 0.4.5 各種APIにsave2ExcelというメソッドでExcelダウンロードできる機能を追加。まだダンプレベルで項目の精査中、レベル。対象は、machine,robot,release,process,job,user,queueDefinitions,setting,log,auditlog
 - 0.4.4 Orchestratorの[環境設定操作のAPI](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/setting) 追加。設定情報をExcelファイルでダウンロードする機能も。
 - 0.4.3 Organization Unit に対応。configのuserinfoに、「"organizationUnit": 1」 などと記述出来るようにした。

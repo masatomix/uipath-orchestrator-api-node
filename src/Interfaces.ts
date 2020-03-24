@@ -16,12 +16,25 @@ export interface ICrudService {
 
 export interface IRobotCrudService extends ICrudService {
   findByRobotName(element: string): any
-  upload(inputFullPath: string, sheetName?: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
 }
 // export interface IUtilService extends ICrudService {}
 export interface IUserCrudService extends ICrudService {
   findByUserName(userName: string): Promise<any>
-  upload(inputFullPath: string, sheetName?: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+}
+
+export interface IAssetCrudService extends ICrudService {
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+  uploadPerRobot(
+    inputFullPath: string,
+    perRobotInputFullPath: string,
+    sheetName?: string,
+    perRobotSheetName?: string,
+    allProperty?: boolean,
+  ): Promise<any>
+
+  findAllEx: (obj?: any, asArray?: boolean) => Promise<Array<any>>
 }
 export interface IRoleCrudService extends ICrudService {
   findDetail(...keys: string[]): (...methods: ('' | 'View' | 'Edit' | 'Create' | 'Delete')[]) => Promise<Array<any>>

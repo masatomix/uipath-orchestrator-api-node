@@ -472,8 +472,8 @@ export const internalSave2Excel = async (
   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
 ): Promise<void> => {
   logger.debug(`template path: ${templateFullPath}`)
-  console.log(instances[0])
-  console.table(instances)
+  // console.log(instances[0])
+  // console.table(instances)
 
   let headings: string[] = []
   let workbook: any
@@ -496,7 +496,9 @@ export const internalSave2Excel = async (
     const columnCount = headings.length
     const sheet = workbook.sheet(sheetName)
 
-    sheet.usedRange().clear() // Excel上のデータを削除して。
+    if(sheet.usedRange()){
+      sheet.usedRange().clear() // Excel上のデータを削除して。
+    }
     sheet.cell('A1').value(csvArrays)
 
     // データがあるところには罫線を引く(細いヤツ)
@@ -527,7 +529,7 @@ export const internalSave2Excel = async (
 // 自前実装
 function createCsvArrays(headings: string[], instances: any[]) {
   const csvArrays: any[][] = instances.map((instance: any): any[] => {
-    console.log(instance)
+    // console.log(instance)
     const csvArray = headings.reduce((box: any[], header: string): any[] => {
       // console.log(`${instance[header]}: ${instance[header] instanceof Object}`)
       if (instance[header] instanceof Object) {
