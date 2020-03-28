@@ -1,7 +1,6 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
-import { randomName } from '../sampleUtils'
+// import { randomName } from '../sampleUtils'
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -17,14 +16,14 @@ async function sample() {
     console.table(results)
   }
 
-
   for (const role of roles) {
-    const results = await api.getArray(`/odata/Roles/UiPath.Server.Configuration.OData.GetUserIdsForRole(key=${role.Id})`)
+    const results = await api.getArray(
+      `/odata/Roles/UiPath.Server.Configuration.OData.GetUserIdsForRole(key=${role.Id})`,
+    )
     console.table(results)
   }
-  
 
-  let r = await api.role.findDetail('Libraries', 'MLLogs')('','Delete')
+  let r = await api.role.findDetail('Libraries', 'MLLogs')('', 'Delete')
   console.table(r)
   r = await api.role.findDetail()('Delete')
   await api.role.findDetail()

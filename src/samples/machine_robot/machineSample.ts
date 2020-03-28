@@ -1,7 +1,9 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
+import { getLogger } from '../../logger'
 import { randomName } from '../sampleUtils'
+
+const logger = getLogger('main')
 
 // マシン名、ロボット名、そのWindowsアカウントとも一意になる任意の名称RobotのObjを作成するメソッド。
 export function createRobotData(testMachine: any) {

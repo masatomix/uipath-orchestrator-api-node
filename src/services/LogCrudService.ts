@@ -2,8 +2,10 @@ import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
 import { getArray, createFilterStr, NetworkAccessError } from '../utils'
 import path from 'path'
-import logger from '../logger'
+import { getLogger } from '../logger'
 import { ILogCrudService } from '../Interfaces'
+
+const logger = getLogger('main')
 
 export class LogCrudService extends BaseCrudService implements ILogCrudService {
   constructor(parent_: IOrchestratorApi) {

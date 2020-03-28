@@ -1,25 +1,21 @@
-import log4js from 'log4js'
+import Logger from 'bunyan'
 import config from 'config'
 
-// const log4jsConfig: Configuration = config.get('log4js')
-const log4jsConfig = (config as any).log4js
+export const getLogger = function(name: string): Logger {
+  const conf = config as any
+  if (conf['logging']) {
+    const settings: Array<any> = conf['logging']
+    const targets = settings.filter(setting => setting.name === name)
 
-
-if (log4jsConfig) {
-  log4js.configure(log4jsConfig)
-} else {
-  log4js.configure({
-    appenders: { main: { type: 'console' } },
-    categories: {
-      default: { appenders: ['main'], level: 'info' },
-      // http: { appenders: ['main'], level: 'debug' },
-    },
+    if (targets && targets.length > 0) {
+      const logger = Logger.createLogger(targets[0])
+      logger.info(`[ ${name} ] のログをココに出力します。`)
+      return logger
+    }
+  }
+  const nullLogger = Logger.createLogger({
+    name: name,
+    level: 'error',
   })
+  return nullLogger
 }
-
-export const httpLogger = log4js.getLogger('http')
-httpLogger.info('ココにHTTPのログを出力します。')
-
-const mainLogger = log4js.getLogger()
-mainLogger.info('ココにMainのログを出力します。')
-export default mainLogger

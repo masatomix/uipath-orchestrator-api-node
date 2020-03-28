@@ -3,7 +3,7 @@ import { BaseCrudService } from '..'
 import { postData } from '../utils'
 import { IQueueCrudService } from '../Interfaces'
 
-export class QueueCrudService extends BaseCrudService implements IQueueCrudService{
+export class QueueCrudService extends BaseCrudService implements IQueueCrudService {
   constructor(parent_: IOrchestratorApi) {
     super(parent_)
   }

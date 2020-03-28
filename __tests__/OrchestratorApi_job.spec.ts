@@ -1,7 +1,8 @@
 import OrchestratorApi from '../src/index'
-import logger from '../src/logger'
-
+import { getLogger } from '../src/logger'
 import config from 'config'
+
+const logger = getLogger('main')
 
 describe('OrchestratorApi_job', () => {
   jest.setTimeout(10000)

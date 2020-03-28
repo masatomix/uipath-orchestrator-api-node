@@ -1,7 +1,9 @@
 import OrchestratorApi from '../src/index'
 import { randomName } from '../src/samples/sampleUtils'
 import config from 'config'
-import logger from '../src/logger'
+import { getLogger } from '../src/logger'
+
+const logger = getLogger('main')
 
 describe('OrchestratorApi_user', () => {
   const api = new OrchestratorApi(config)
