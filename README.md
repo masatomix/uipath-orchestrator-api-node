@@ -464,7 +464,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
-- 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。
+- 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。Assetの操作を追加。
 - 0.5.0 Roleテスト実装(かなりテストレベル)。Excelテンプレを修正(Excel書き出しを自前実装にしたのでエラーになるカラムがなくなったため)。ファイルがindex.tsのみだったのをサービス毎に分割。Upload機能暫定追加(Robot/User/Machine)
 - 0.4.5 各種APIにsave2ExcelというメソッドでExcelダウンロードできる機能を追加。まだダンプレベルで項目の精査中、レベル。対象は、machine,robot,release,process,job,user,queueDefinitions,setting,log,auditlog
 - 0.4.4 Orchestratorの[環境設定操作のAPI](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/setting) 追加。設定情報をExcelファイルでダウンロードする機能も。
