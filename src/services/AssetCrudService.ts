@@ -3,7 +3,6 @@ import { BaseCrudService } from '..'
 import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
 import path from 'path'
 import { IAssetCrudService } from '../Interfaces'
-import { promises } from 'dns'
 
 export class AssetCrudService extends BaseCrudService implements IAssetCrudService {
   constructor(parent: IOrchestratorApi) {

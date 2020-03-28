@@ -1,11 +1,14 @@
 import request from 'request'
-import logger, { httpLogger } from './logger'
+import { getLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
 import { IOrchestratorApi } from './IOrchestratorApi'
 const XlsxPopulate = require('xlsx-populate')
 // import { Parser } from 'json2csv'
 // import url from 'url'
+
+const logger = getLogger('main')
+const httpLogger = getLogger('httpLogger')
 
 class BaseError extends Error {
   constructor(e?: string) {
@@ -142,7 +145,7 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
         reject(err)
         return
       }
-      httpLogger.debug('option:', options)
+      httpLogger.debug({ objects: options })
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -171,7 +174,7 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      httpLogger.debug('option:', options)
+      httpLogger.debug({ objects: options })
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -206,7 +209,7 @@ const createJSONPromise = (options: any): Promise<Array<any>> => {
         reject(err)
         return
       }
-      httpLogger.debug('option:', options)
+      httpLogger.debug({ objects: options })
       logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -238,7 +241,7 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
         reject(err)
         return
       }
-      httpLogger.debug('option:', option)
+      httpLogger.debug({ objects: option })
       logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
@@ -496,7 +499,7 @@ export const internalSave2Excel = async (
     const columnCount = headings.length
     const sheet = workbook.sheet(sheetName)
 
-    if(sheet.usedRange()){
+    if (sheet.usedRange()) {
       sheet.usedRange().clear() // Excel上のデータを削除して。
     }
     sheet.cell('A1').value(csvArrays)

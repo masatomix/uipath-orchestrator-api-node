@@ -1,6 +1,8 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
+import { getLogger } from '../../logger'
+
+const logger = getLogger('main')
 
 /**
  * こちらはOC画面上の「動的に割り当てる」でのジョブ登録サンプル。
