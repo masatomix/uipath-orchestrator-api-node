@@ -441,7 +441,7 @@ const api2 = new OrchestratorApi({
   "serverinfo": {
     "servername": "https://www.example.com/"
   },
-  // ココより下を追記 (下記は、debugは出力しない設定)
+  // ココより下を追記 (下記は、debug以上を出力する設定)
   "logging": [
     { "name": "main", "level": "debug" },
     { "name": "httpLogger", "level": "debug" }
