@@ -54,32 +54,6 @@ export class BaseCrudService implements ICrudService {
   }
 }
 
-// async function internalSave2Excel1(
-//   instances: any[],
-//   outputFullPath: string,
-//   templateFullPath: string,
-//   sheetName: string,
-//   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-// ): Promise<void> {
-//   logger.debug(`template path: ${templateFullPath}`)
-//   const workbook = new xPopWrapper(templateFullPath)
-//   await workbook.init()
-
-//   console.log(instances[0])
-//   console.table(instances)
-
-//   if (instances.length > 0) {
-//     workbook.update(sheetName, instances) // 更新
-//     if (applyStyles) {
-//       applyStyles(instances, workbook, sheetName)
-//     }
-//   }
-
-//   logger.debug(outputFullPath)
-//   // 書き込んだファイルを保存
-//   await workbook.commit(outputFullPath)
-// }
-
 /**
  * OrchestratorのAPIのWrapperクラス
  * (Mainのクラスです)
@@ -327,7 +301,6 @@ class OrchestratorApi implements IOrchestratorApi {
 
   // ロボットグループ
   // ロール
-  // アセット
   // タスク(Enterpriseには、ない)
   // フォルダー(OU)
   // Webhook
@@ -354,9 +327,6 @@ class OrchestratorApi implements IOrchestratorApi {
 }
 
 export default OrchestratorApi
-
-// 以下、確認のためのドライバ
-// import config from 'config'
 
 import { IOrchestratorApi } from './IOrchestratorApi'
 import { RobotCrudService } from './services/RobotCrudService'

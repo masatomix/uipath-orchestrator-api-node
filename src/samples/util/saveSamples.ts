@@ -41,6 +41,11 @@ async function main() {
     r = await xlsx2json('users.xlsx')
     console.table(r)
 
+    instances = await api.asset.findAllEx()
+    await api.asset.save2Excel(instances, 'assets.xlsx')
+    r = await xlsx2json('assets.xlsx')
+    console.table(r)
+
     instances = await api.setting.findAll()
     await api.setting.save2Excel(instances, 'settings.xlsx')
     r = await xlsx2json('settings.xlsx')
