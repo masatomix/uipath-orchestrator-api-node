@@ -1,7 +1,9 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
+import { getLogger } from '../../logger'
 // import os from 'os'
+
+const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)

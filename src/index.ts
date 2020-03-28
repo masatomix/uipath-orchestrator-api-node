@@ -1,5 +1,5 @@
 import request from 'request'
-import logger from './logger'
+import { getLogger } from './logger'
 import { getData, getArray, putData, postData, deleteData, addProxy, internalSave2Excel } from './utils'
 import {
   ICrudService,
@@ -15,7 +15,10 @@ import {
   IJobCrudService,
   IQueueDefinitionCrudService,
   IQueueCrudService,
+  IAssetCrudService,
 } from './Interfaces'
+
+const logger = getLogger('main')
 
 /**
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
@@ -320,6 +323,7 @@ class OrchestratorApi implements IOrchestratorApi {
   log: ILogCrudService = new LogCrudService(this)
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
+  asset: IAssetCrudService = new AssetCrudService(this)
 
   // ロボットグループ
   // ロール
@@ -352,7 +356,7 @@ class OrchestratorApi implements IOrchestratorApi {
 export default OrchestratorApi
 
 // 以下、確認のためのドライバ
-import config from 'config'
+// import config from 'config'
 
 import { IOrchestratorApi } from './IOrchestratorApi'
 import { RobotCrudService } from './services/RobotCrudService'
@@ -367,53 +371,62 @@ import { AuditLogCrudService } from './services/AuditLogCrudService'
 import { SettingCrudService } from './services/SettingCrudService'
 import { QueueCrudService } from './services/QueueCrudService'
 import { UserCrudService } from './services/UserCrudService'
+import { AssetCrudService } from './services/AssetCrudService'
 
-const getConfig = () => {
-  // 設定ファイルから読むパタン
-  return config
+// const getConfig = () => {
+//   // 設定ファイルから読むパタン
+//   return config
 
-  // Own Codingするパタン
-  // return {
-  //   userinfo: {
-  //     tenancyName: 'default',
-  //     usernameOrEmailAddress: 'aaa',
-  //     password: 'bbb',
-  //   },
-  //   serverinfo: {
-  //     servername: 'https://platform.uipath.com/',
-  //   },
-  // }
-}
+//   // Own Codingするパタン
+//   // return {
+//   //   userinfo: {
+//   //     tenancyName: 'default',
+//   //     usernameOrEmailAddress: 'aaa',
+//   //     password: 'bbb',
+//   //   },
+//   //   serverinfo: {
+//   //     servername: 'https://platform.uipath.com/',
+//   //   },
+//   // }
+// }
 
-if (!module.parent) {
-  async function main() {
-    const api = new OrchestratorApi(getConfig())
+// if (!module.parent) {
+//   async function main() {
+//     const api: IOrchestratorApi = new OrchestratorApi(getConfig())
 
-    try {
-      // まずは認証
-      await api.authenticate()
+//     try {
+//       // まずは認証
+//       await api.authenticate()
 
-      // let instances: any[] = []
+//       let instances: any[] = []
 
-      // instances = await api.queueItem.findAll()
-      // for (const instance of instances) {
-      //   console.log(instance)
-      // }
-      // console.log(instances.length)
+//       // instances = await api.asset.findAll({ $expand: 'RobotValues' })
+//       instances = await api.asset.findAllEx()
+//       console.table(instances)
+//       // console.log(instances[0])
+//       // api.asset.save2Excel(instances, 'assets.xlsx')
+//       // await api.asset.upload('assets.xlsx')
+//       await api.asset.uploadPerRobot('assets.xlsx', 'perRobot_assets.xlsx')
 
-      // const queueItemId = instances[0].Id
-      // const result = await api.queueItem.find(queueItemId)
-      // console.log(result)
+//       // instances = await api.queueItem.findAll()
+//       // for (const instance of instances) {
+//       //   console.log(instance)
+//       // }
+//       // console.log(instances.length)
 
-      // let queueDef = await api.queueDefinition.findByName('QueueTest')
-      // // console.table(queueDef)
+//       // const queueItemId = instances[0].Id
+//       // const result = await api.queueItem.find(queueItemId)
+//       // console.log(result)
 
-      // queueDef = await api.queueDefinition.find(1)
-      // console.table(queueDef)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+//       // let queueDef = await api.queueDefinition.findByName('QueueTest')
+//       // // console.table(queueDef)
 
-  main()
-}
+//       // queueDef = await api.queueDefinition.find(1)
+//       // console.table(queueDef)
+//     } catch (error) {
+//       console.log(error)
+//     }
+//   }
+
+//   main()
+// }

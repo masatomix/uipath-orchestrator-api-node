@@ -1,6 +1,8 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
+import { getLogger } from '../../logger'
+
+const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -9,7 +11,8 @@ async function sample() {
   await api.authenticate()
   try {
     const releases: any[] = await api.release.findAll()
-    logger.info(releases)
+    // logger.info(releases)
+    console.table(releases)
 
     const release: any = await api.release.findByProcessKey('MyAttendedFramework') // 画面の名前でも検索できる
     logger.info(release)

@@ -3,8 +3,10 @@ import OrchestratorApi from '../../index'
 import { createQueueDef, createQueueItem } from '../queue/createQueueSample'
 
 async function sample() {
-  const userConfig = config.get('OrchestratorApi_queue.userApi') // QueueDefinition などはロボットモードでは動かせない
-  const robotConfig = config.get('OrchestratorApi_queue.robotApi') // トランザクション操作は、ロボットモードで呼び出したい
+  // const userConfig = config.get('OrchestratorApi_queue.userApi') // QueueDefinition などはロボットモードでは動かせない
+  // const robotConfig = config.get('OrchestratorApi_queue.robotApi') // トランザクション操作は、ロボットモードで呼び出したい
+  const userConfig = (config as any).OrchestratorApi_queue.userApi // QueueDefinition などはロボットモードでは動かせない
+  const robotConfig = (config as any).OrchestratorApi_queue.robotApi // トランザクション操作は、ロボットモードで呼び出したい
 
   const api = new OrchestratorApi(userConfig)
   const robotApi = new OrchestratorApi(robotConfig)

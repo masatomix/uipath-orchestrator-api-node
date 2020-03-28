@@ -170,10 +170,16 @@ console.log(robots)
 |  12  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
 |  13  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
 |  14  | [setting](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/setting/)         |       〇      |    〇      |              |       〇      |              | キーで検索(findByKey) <br>ファイルからデータ作成(readSettingsFromFile)<br>データをExcel出力(save2Excel)                                                            |                |
-|  15 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+|  15  | [asset](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/asset/)         |       〇      |    〇      |     〇       |       〇      |     〇       |              |                |
+|  16 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
 
 
+また、
 
+- [OrchestratorデータをExcelファイルへダウンロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/saveSamples.ts)
+- [ExcelからOrchestratorへデータをアップロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/uploadSamples.ts)
+
+を追加しました。
 
 ## Preferences
 
@@ -428,20 +434,22 @@ const api2 = new OrchestratorApi({
 
 #### ライブラリのログ出力
 
-本ライブラリは[Log4js](https://log4js-node.github.io/log4js-node)を用いて、debugレベルのログをコンソールに出力しています。表示がじゃまだなーって場合は、local.jsonに
+本ライブラリは [Bunyan](https://github.com/trentm/node-bunyan) を用いてコンソールにログを出力しています。
+出力レベルはERRORレベル以上のため、詳細にログを見たい場合は``local.json``に
 
 ```json
   "serverinfo": {
     "servername": "https://www.example.com/"
   },
   // ココより下を追記 (下記は、debugは出力しない設定)
-  "log4js": {
-    "appenders": { "main": { "type": "console" } },
-    "categories": { "default": { "appenders": ["main"], "level": "info" } }
-  }
+  "logging": [
+    { "name": "main", "level": "debug" },
+    { "name": "httpLogger", "level": "debug" }
+  ]
+  // main/httpLogger は内部で使用しているLoggerの名前
 ```
 
-など設定して、適宜表示を制御してください([参考](https://log4js-node.github.io/log4js-node/layouts.html#pattern-format))。
+など設定して、適宜表示を制御してください。
 
 
 ## source and npm repository
@@ -456,6 +464,8 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。
+- 0.5.0 Roleテスト実装(かなりテストレベル)。Excelテンプレを修正(Excel書き出しを自前実装にしたのでエラーになるカラムがなくなったため)。ファイルがindex.tsのみだったのをサービス毎に分割。Upload機能暫定追加(Robot/User/Machine)
 - 0.4.5 各種APIにsave2ExcelというメソッドでExcelダウンロードできる機能を追加。まだダンプレベルで項目の精査中、レベル。対象は、machine,robot,release,process,job,user,queueDefinitions,setting,log,auditlog
 - 0.4.4 Orchestratorの[環境設定操作のAPI](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/setting) 追加。設定情報をExcelファイルでダウンロードする機能も。
 - 0.4.3 Organization Unit に対応。configのuserinfoに、「"organizationUnit": 1」 などと記述出来るようにした。

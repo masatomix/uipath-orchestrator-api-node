@@ -1,5 +1,4 @@
 import OrchestratorApi from '../src/index'
-import logger from '../src/logger'
 
 import config from 'config'
 
