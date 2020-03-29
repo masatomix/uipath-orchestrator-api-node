@@ -16,6 +16,7 @@ import {
   IQueueDefinitionCrudService,
   IQueueCrudService,
   IAssetCrudService,
+  IUtilService,
 } from './Interfaces'
 
 const logger = getLogger('main')
@@ -298,7 +299,7 @@ class OrchestratorApi implements IOrchestratorApi {
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
   asset: IAssetCrudService = new AssetCrudService(this)
-
+  util: IUtilService = new UtilService(this)
   // ロボットグループ
   // ロール
   // タスク(Enterpriseには、ない)
@@ -342,6 +343,7 @@ import { SettingCrudService } from './services/SettingCrudService'
 import { QueueCrudService } from './services/QueueCrudService'
 import { UserCrudService } from './services/UserCrudService'
 import { AssetCrudService } from './services/AssetCrudService'
+import { UtilService } from './services/UtilService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン

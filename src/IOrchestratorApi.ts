@@ -13,6 +13,7 @@ import {
   IAuditLogCrudService,
   ISettingCrudService,
   IAssetCrudService,
+  IUtilService,
 } from './Interfaces'
 
 /**
@@ -33,11 +34,11 @@ export interface IOrchestratorApi {
   queueDefinition: IQueueDefinitionCrudService
   queueItem: ICrudService
   queueOperation: IQueueCrudService
-  // asset: ICrudService
   log: ILogCrudService
   auditLog: IAuditLogCrudService
   setting: ISettingCrudService
   asset: IAssetCrudService
+  util: IUtilService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>
