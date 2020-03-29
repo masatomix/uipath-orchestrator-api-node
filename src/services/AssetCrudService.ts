@@ -79,20 +79,16 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
     // console.log(outputDir)
     // console.log(templateDir)
 
-    if (allRobotValues && allRobotValues.length > 0) {
-      return Promise.all([
-        super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles),
-        super.save2Excel(
-          allRobotValues,
-          path.join(outputDir, `perRobot_${outputFullName}`),
-          path.join(templateDir, `perRobot_${templateFullName}`),
-          sheetName,
-          applyStyles,
-        ),
-      ])
-    } else {
-      return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
-    }
+    return Promise.all([
+      super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles),
+      super.save2Excel(
+        allRobotValues,
+        path.join(outputDir, `perRobot_${outputFullName}`),
+        path.join(templateDir, `perRobot_${templateFullName}`),
+        sheetName,
+        applyStyles,
+      ),
+    ])
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
