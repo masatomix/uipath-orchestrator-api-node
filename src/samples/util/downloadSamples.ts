@@ -14,7 +14,7 @@ async function main() {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await main()
   })()
 }
