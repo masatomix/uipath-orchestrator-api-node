@@ -463,6 +463,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.6.2 ダウンロードメソッド ``api.util.excelDownload('./')`` を追加。Machine/Robot/User/Asset のテンプレートにREADMEシートを追加
 - 0.6.1 Assetの微調整。またDocument追加
 - 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。Assetの操作を追加。
 - 0.5.0 Roleテスト実装(かなりテストレベル)。Excelテンプレを修正(Excel書き出しを自前実装にしたのでエラーになるカラムがなくなったため)。ファイルがindex.tsのみだったのをサービス毎に分割。Upload機能暫定追加(Robot/User/Machine)

@@ -118,3 +118,7 @@ export interface ISettingCrudService extends ICrudService {
   findByKeyFromArray(apiResults: any[]): (...keys: string[]) => Array<any>
   readSettingsFromFile(fullPath: string, sheetName?: string): Promise<any[]>
 }
+
+export interface IUtilService {
+  excelDownload(outputFullPath: string): Promise<void>
+}
