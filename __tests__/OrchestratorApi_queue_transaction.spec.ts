@@ -1,17 +1,21 @@
 import OrchestratorApi from '../src/index'
+import { IOrchestratorApi } from '../src/IOrchestratorApi'
 
 import config from 'config'
+import { randomName, createRobotData } from '../src/samples/sampleUtils'
 
 describe('OrchestratorApi_queue_transaction', () => {
   jest.setTimeout(10000)
   const userConfig = (config as any).OrchestratorApi_queue.userApi
-  const robotConfig = (config as any).OrchestratorApi_queue.robotApi
+  const api: IOrchestratorApi = new OrchestratorApi(userConfig)
 
-  const api = new OrchestratorApi(userConfig)
-  const robotApi = new OrchestratorApi(robotConfig)
+  let robotApi: IOrchestratorApi
+  let machineIdForRobotApi: number
+  let robotIdForRobotApi: number
 
   beforeEach(async () => {
     await api.authenticate()
+    robotApi = await createRobotApi()
     await robotApi.authenticate()
   })
 
@@ -136,6 +140,32 @@ describe('OrchestratorApi_queue_transaction', () => {
     afterEach(async () => {
       const queueDef = await api.queueDefinition.findByName(testQueueDef.Name)
       await api.queueDefinition.delete(queueDef.Id)
+
+      await api.robot.delete(robotIdForRobotApi)
+      await api.machine.delete(machineIdForRobotApi)
     })
   })
+
+  async function createRobotApi(): Promise<any> {
+    const random = randomName()
+    const machineName = `Machine_${random}`
+    const testMachine = await api.machine.create({ Name: machineName }) // 登録する
+    const machineKey = testMachine.LicenseKey
+
+    // サンプル１．ロボットの登録
+    const expectedRobot = createRobotData(testMachine) // 投入データ作成
+    const resultRobot = await api.robot.create(expectedRobot)
+    const userName = resultRobot.Username
+
+    const serverinfo = (config as any).OrchestratorApi_queue.userApi.serverinfo
+    const robotInfo = {
+      machineKey,
+      machineName,
+      userName,
+    }
+
+    machineIdForRobotApi = testMachine.Id
+    robotIdForRobotApi = resultRobot.Id
+    return new OrchestratorApi({ serverinfo, robotInfo })
+  }
 })
