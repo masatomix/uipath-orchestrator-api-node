@@ -26,30 +26,37 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
     return async (...keys: string[]) => {
       // まずは条件で検索
       const apiResults: any[] = await this.findAll(queries)
-
-      // 案1
-      const tmpResults = keys // keyごとにFilterして
-        .map(key => apiResults.filter(apiResult => (apiResult.Id as string).startsWith(key)))
-        .reduce((accumulator, current) => {
-          accumulator.push(...current) // 配列同士を結合
-          return accumulator
-        }, [])
-      const resultSet = new Set(tmpResults) //ココで重複を除去
-
-      // 案2
-      // const resultSet = new Set()
-      // // わたされたkeyごとに、filterして、SetにAdd.
-      // for (const key of keys) {
-      //   apiResults
-      //     .filter(apiResult => (apiResult.Id as string).startsWith(key))
-      //     .map(filterResult => {
-      //       resultSet.add(filterResult) // ココで重複が除去
-      //     })
-      // }
-
-      // 最後は配列に戻して完成
-      return Array.from(resultSet)
+      return this._findByKeyFromArray(apiResults, ...keys)
     }
+  }
+
+  findByKeyFromArray(apiResults: any[]): (...keys: string[]) => Array<any> {
+    return (...keys: string[]) => {
+      return this._findByKeyFromArray(apiResults, ...keys)
+    }
+  }
+
+  private _findByKeyFromArray(apiResults: any[], ...keys: string[]): Array<any> {
+    // 案1
+    const tmpResults = keys // keyごとにFilterして
+      .map(key => apiResults.filter(apiResult => (apiResult.Id as string).startsWith(key)))
+      .reduce((accumulator, current) => {
+        accumulator.push(...current) // 配列同士を結合
+        return accumulator
+      }, [])
+    const resultSet = new Set(tmpResults) //ココで重複を除去
+    // 案2
+    // const resultSet = new Set()
+    // // わたされたkeyごとに、filterして、SetにAdd.
+    // for (const key of keys) {
+    //   apiResults
+    //     .filter(apiResult => (apiResult.Id as string).startsWith(key))
+    //     .map(filterResult => {
+    //       resultSet.add(filterResult) // ココで重複が除去
+    //     })
+    // }
+    // 最後は配列に戻して完成
+    return Array.from(resultSet)
   }
 
   update(settingObjs: any[]): Promise<any> {
@@ -64,12 +71,12 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
   readSettingsFromFile(fullPath: string, sheetName = 'Sheet1'): Promise<any[]> {
     return xlsx2json(fullPath, sheetName, instance => {
       const value = instance.Value ? instance.Value : ''
-      const scope = instance.Scope ? instance.Scope : ''
+      const scope = instance.Scope ? instance.Scope : null
       return {
         Id: instance.Id,
         Name: instance.Name,
         Value: String(value), // データによっては数値になっちゃったりするのでString化
-        Scope: String(scope),
+        Scope: scope,
       }
     })
   }
