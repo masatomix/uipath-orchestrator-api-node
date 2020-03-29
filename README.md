@@ -147,31 +147,30 @@ console.log(robots)
 
 ## Development status
 
-**対応状況**(2020/02/24時点)
+**対応状況**(2020/03/29時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
 
 
-
-| No. | リソース        | 検索(findAll) | 検索(find) | 作成(create) | 更新(update) | 削除(delete) | その他                                                                                                                   | 備考           |
-|:---:|-----------------|:-------------:|:----------:|:------------:|:------------:|:------------:|--------------------------------------------------------------------------------------------------------------------------|----------------|
-|  1  | [license](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/license/)         |       〇      |            |              |              |              |                                                                                                                          |                |
-|  2  | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)           |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  3  | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user/)            |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByUserName)                                                                                               |                |
-|  4  | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/)         |       〇      |     〇     |      〇      |      〇      |      〇      |                                                                                                                          |                |
-|  5  | [release](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/release/)        |       〇      |            |              |              |              |   プロセス画面上の「名前」で検索(findByProcessKey)                                                                 |                |
-|  6  | [process](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/process/)         |       〇      |            |              |              |              | Packageの検索(findPackage) <br>Packageの削除(deletePackage) <br>Packageのアップロード(uploadPackage)<br>Packageのダウンロード(downloadPackage)                                                            |                |
-|  7  | [job](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/job/)             |       〇     |     〇     |              |              |              |   ジョブの開始/終了(StartJobs/StopJob)                                                                                                      |                |
-|  8  | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/)        |       〇      |            |              |              |              |                                                                                                                          |                |
-|  9  | [log](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/log/) |       〇      |          |            |            |            | 条件で検索(findByFilter)                                                                                                   |                |
-|  10  | [auditlog](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/auditlog/) |       〇      |          |            |            |            | 条件で検索(findByFilter)                                                                                                   |                |
-|  11  | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) |       〇      |     〇     |      〇      |      〇      |      〇      | 名前で検索(findByName)                                                                                                   |                |
-|  12  | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/)       |       〇      |     〇     |      〇      |              |      〇      |                                                                                                                          | 削除は論理削除 |
-|  13  | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/)  |               |            |              |              |              | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |                |
-|  14  | [setting](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/setting/)         |       〇      |    〇      |              |       〇      |              | キーで検索(findByKey) <br>ファイルからデータ作成(readSettingsFromFile)<br>データをExcel出力(save2Excel)                                                            |                |
-|  15  | [asset](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/asset/)         |       〇      |    〇      |     〇       |       〇      |     〇       |              |                |
-|  16 | 汎用            |       〇      |     〇     |      〇      |      〇      |      〇      | getArray<br>getData<br>postData<br>putData<br>deleteData                                                                 |                |
+| No. | リソース | 検索<br>(findAll) | 検索<br>(find) | 作成<br>(create) | 更新<br>(update) | 削除<br>(delete) | 一括更新<br>(upload) | その他 | 備考 |
+|:---:|-----------------|:-----------------:|:--------------:|:----------------:|:----------------:|:----------------:|:----------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| 1 | [license](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/license/) | 〇 |  |  |  |  |  |  |  |
+| 2 | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |
+| 3 | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |
+| 4 | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 | 名前で検索(findByUserName) |  |
+| 5 | [release](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/release/) | 〇 |  |  |  |  |  | プロセス画面上の「名前」で検索(findByProcessKey) |  |
+| 6 | [process](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/process/) | 〇 |  |  |  |  |  | Packageの検索(findPackage)<br>Packageの削除(deletePackage)<br>Packageのアップロード(uploadPackage)<br>Packageのダウンロード(downloadPackage) |  |
+| 7 | [job](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/job/) | 〇 | 〇 |  |  |  |  | ジョブの開始/終了(StartJobs/StopJob) |  |
+| 8 | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/) | 〇 |  |  |  |  |  |  |  |
+| 9 | [log](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/log/) | 〇 |  |  |  |  |  | 条件で検索(findByFilter) |  |
+| 10 | [auditlog](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/auditlog/) | 〇 |  |  |  |  |  | 条件で検索(findByFilter) |  |
+| 11 | [queueDefinition](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) | 〇 | 〇 | 〇 | 〇 | 〇 |  | 名前で検索(findByName) |  |
+| 12 | [queueItem](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queue/) | 〇 | 〇 | 〇 |  | 〇 |  |  | 削除は論理削除 |
+| 13 | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/) |  |  |  |  |  |  | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |  |
+| 14 | [setting](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/setting/) | 〇 | 〇 |  | 〇 |  | 〇(update) | キーで検索(findByKey) <br>ファイルからデータ作成(readSettingsFromFile)<br>データをExcel出力(save2Excel) |  |
+| 15 | [asset](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/asset/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 | Robot毎Asset更新(uploadPerRobot)<br>Robot毎Asset検索(findAllEx) |  |
+| 16 | 汎用 | 〇 | 〇 | 〇 | 〇 | 〇 |  | getArray<br>getData<br>postData<br>putData<br>deleteData |  |
 
 
 また、
@@ -441,7 +440,7 @@ const api2 = new OrchestratorApi({
   "serverinfo": {
     "servername": "https://www.example.com/"
   },
-  // ココより下を追記 (下記は、debugは出力しない設定)
+  // ココより下を追記 (下記は、debug以上を出力する設定)
   "logging": [
     { "name": "main", "level": "debug" },
     { "name": "httpLogger", "level": "debug" }
@@ -464,6 +463,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.6.1 Assetの微調整。またDocument追加
 - 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。Assetの操作を追加。
 - 0.5.0 Roleテスト実装(かなりテストレベル)。Excelテンプレを修正(Excel書き出しを自前実装にしたのでエラーになるカラムがなくなったため)。ファイルがindex.tsのみだったのをサービス毎に分割。Upload機能暫定追加(Robot/User/Machine)
 - 0.4.5 各種APIにsave2ExcelというメソッドでExcelダウンロードできる機能を追加。まだダンプレベルで項目の精査中、レベル。対象は、machine,robot,release,process,job,user,queueDefinitions,setting,log,auditlog

@@ -34,12 +34,12 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
   //   return users[0]
   // }
 
-  update(user: any): Promise<any> {
-    return putData(this.parent.config, this.parent.accessToken, `/odata/Assets(${user.Id})`, user)
+  update(asset: any): Promise<any> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Assets(${asset.Id})`, asset)
   }
 
-  create(user: any): Promise<any> {
-    return postData(this.parent.config, this.parent.accessToken, '/odata/Assets', user)
+  create(asset: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Assets', asset)
   }
 
   delete(id: number): Promise<any> {
@@ -125,11 +125,21 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
     perRobotSheetName = 'Sheet1',
     allProperty = false,
   ): Promise<any> {
-    const instances = await xlsx2json(inputFullPath, sheetName)
+    const instances = await xlsx2json(inputFullPath, sheetName, instance => {
+      return Object.assign({}, instance, {
+        Value: String(instance.Value),
+        StringValue: String(instance.StringValue),
+      })
+    })
 
     let perRobotInstances: Array<any> = []
     if (perRobotInputFullPath !== '') {
-      perRobotInstances = await xlsx2json(perRobotInputFullPath, perRobotSheetName)
+      perRobotInstances = await xlsx2json(perRobotInputFullPath, perRobotSheetName, instance => {
+        return Object.assign({}, instance, {
+          Value: String(instance.Value),
+          StringValue: String(instance.StringValue),
+        })
+      })
     }
 
     const ps = instances.map(async instance => {
