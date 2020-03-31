@@ -14,6 +14,9 @@ import {
   ISettingCrudService,
   IAssetCrudService,
   IUtilService,
+  ITenantCrudService,
+  IHostLicenseCrudService,
+  IEnvironmentCrudService,
 } from './Interfaces'
 
 /**
@@ -39,6 +42,9 @@ export interface IOrchestratorApi {
   setting: ISettingCrudService
   asset: IAssetCrudService
   util: IUtilService
+  tenant: ITenantCrudService
+  hostLicense: IHostLicenseCrudService
+  environment: IEnvironmentCrudService
   // 以下、汎用的なメソッド
   getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
   getData: (apiPath: string) => Promise<any>

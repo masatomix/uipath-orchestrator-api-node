@@ -463,6 +463,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.6.4 ITenantCrudService,IHostLicenseCrudService,IEnvironmentCrudService,を追加。
 - 0.6.3 Jobサービスに、Relese/Robot列を加えた findAllEx メソッドを追加。OrchestratorApi をexportしないとjsから利用できなかった( require('xxx').default ってやらないとダメ) ので、exportを追加
 - 0.6.2 ダウンロードメソッド ``api.util.excelDownload('./')`` を追加。Machine/Robot/User/Asset のテンプレートにREADMEシートを追加
 - 0.6.1 Assetの微調整。またDocument追加

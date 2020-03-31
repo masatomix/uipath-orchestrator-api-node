@@ -18,10 +18,21 @@ export interface IRobotCrudService extends ICrudService {
   findByRobotName(element: string): any
   upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
 }
-// export interface IUtilService extends ICrudService {}
+
 export interface IUserCrudService extends ICrudService {
   findByUserName(userName: string): Promise<any>
   upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+}
+
+export interface ITenantCrudService extends ICrudService {
+  findByName(name: string): Promise<any>
+}
+
+export interface IHostLicenseCrudService extends ICrudService {
+  // findByName(name: string): Promise<any>
+}
+export interface IEnvironmentCrudService extends ICrudService {
+  // findByName(name: string): Promise<any>
 }
 
 export interface IAssetCrudService extends ICrudService {
