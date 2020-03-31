@@ -40,7 +40,7 @@ export class UtilService implements IUtilService {
 
     promises.push(
       this.api.job
-        .findAll()
+        .findAllEx()
         .then(instances => this.api.job.save2Excel(instances, path.join(outputFullDir, 'jobs.xlsx'))),
     )
 

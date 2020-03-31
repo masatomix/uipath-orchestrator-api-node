@@ -56,6 +56,7 @@ export interface IProcessCrudService extends ICrudService {
   downloadPackage(id: string, version: string): Promise<any>
 }
 export interface IJobCrudService extends ICrudService {
+  findAllEx: (obj?: any, asArray?: boolean) => Promise<Array<any>>
   startJobs(processKey: string, robotNames: string[], jobsCount?: number): Promise<any>
 
   stopJob(jobId: number, force?: boolean): Promise<any>

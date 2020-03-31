@@ -364,7 +364,7 @@ $
 $ cat index.js 
 
 const config = require('config')
-const OrchestratorApi = require('uipath-orchestrator-api-node')
+const { OrchestratorApi } = require('uipath-orchestrator-api-node')
 
 const oc = new OrchestratorApi(config)
 
