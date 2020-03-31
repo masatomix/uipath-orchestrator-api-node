@@ -175,7 +175,7 @@ console.log(robots)
 
 また、
 
-- [OrchestratorデータをExcelファイルへダウンロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/saveSamples.ts)
+- [OrchestratorデータをExcelファイルへダウンロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/downloadSamples.ts)。[(個別に落としたい場合はこちら)](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/saveSamples.ts)
 - [ExcelからOrchestratorへデータをアップロードするサンプル](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/util/uploadSamples.ts)
 
 を追加しました。
@@ -364,7 +364,7 @@ $
 $ cat index.js 
 
 const config = require('config')
-const OrchestratorApi = require('uipath-orchestrator-api-node')
+const { OrchestratorApi } = require('uipath-orchestrator-api-node')
 
 const oc = new OrchestratorApi(config)
 
@@ -463,6 +463,7 @@ const api2 = new OrchestratorApi({
 
 改訂履歴
 
+- 0.6.3 Jobサービスに、Relese/Robot列を加えた findAllEx メソッドを追加。OrchestratorApi をexportしないとjsから利用できなかった( require('xxx').default ってやらないとダメ) ので、exportを追加
 - 0.6.2 ダウンロードメソッド ``api.util.excelDownload('./')`` を追加。Machine/Robot/User/Asset のテンプレートにREADMEシートを追加
 - 0.6.1 Assetの微調整。またDocument追加
 - 0.6.0 Logライブラリ(log4js)が、Webと相性がわるいぽく、ライブラリを Bunyan へ変更。Assetの操作を追加。
