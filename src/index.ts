@@ -17,6 +17,9 @@ import {
   IQueueCrudService,
   IAssetCrudService,
   IUtilService,
+  ITenantCrudService,
+  IHostLicenseCrudService,
+  IEnvironmentCrudService,
 } from './Interfaces'
 
 const logger = getLogger('main')
@@ -242,6 +245,10 @@ export class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
+  tenant: ITenantCrudService = new TenantCrudService(this)
+  hostLicense: IHostLicenseCrudService = new HostLicenseCrudService(this)
+  environment: IEnvironmentCrudService = new EnvironmentCrudService(this)
+
   queueDefinition: IQueueDefinitionCrudService = new QueueDefinitionCrudService(this)
 
   queueItem: ICrudService = new (class extends BaseCrudService {
@@ -344,6 +351,9 @@ import { QueueCrudService } from './services/QueueCrudService'
 import { UserCrudService } from './services/UserCrudService'
 import { AssetCrudService } from './services/AssetCrudService'
 import { UtilService } from './services/UtilService'
+import { TenantCrudService } from './services/TenantCrudService'
+import { HostLicenseCrudService } from './services/HostLicenseCrudService'
+import { EnvironmentCrudService } from './services/EnvironmentCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン
