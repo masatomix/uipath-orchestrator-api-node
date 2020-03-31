@@ -59,7 +59,7 @@ export class BaseCrudService implements ICrudService {
  * OrchestratorのAPIのWrapperクラス
  * (Mainのクラスです)
  */
-class OrchestratorApi implements IOrchestratorApi {
+export class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
   isRobot: boolean = false

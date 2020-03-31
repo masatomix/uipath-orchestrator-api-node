@@ -13,6 +13,16 @@ export class JobCrudService extends BaseCrudService implements IJobCrudService {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/Jobs', queries, asArray)
   }
 
+  findAllEx(queries?: any, asArray: boolean = true): Promise<Array<any>> {
+    return getArray(
+      this.parent.config,
+      this.parent.accessToken,
+      '/odata/Jobs',
+      Object.assign({}, { $expand: 'Robot,Release' }, queries),
+      asArray,
+    )
+  }
+
   find(id: number): Promise<any> {
     return getData(this.parent.config, this.parent.accessToken, `/odata/Jobs(${id})`)
   }
