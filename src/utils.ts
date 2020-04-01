@@ -258,18 +258,17 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
 }
 
 const createOption = (
-  config_: any,
+  config: any,
   accessToken: string,
   apiPath: string,
   contentType: string = 'application/json',
 ): any => {
-  const servername = config_.serverinfo.servername
   const option = {
     // uri: url.resolve(servername, apiPath),
-    uri: servername + apiPath,
-    headers: headers(config_, accessToken, contentType),
+    uri: config.serverinfo.servername + apiPath,
+    headers: headers(config, accessToken, contentType),
   }
-  return addProxy(config_, option)
+  return addAdditionalOption(config, option)
 }
 
 export const createEnterpriseOption = (config: any): any => {
@@ -281,7 +280,7 @@ export const createEnterpriseOption = (config: any): any => {
     },
     form: config.userinfo,
   }
-  return addProxy(config, option_tmp)
+  return addAdditionalOption(config, option_tmp)
 }
 
 export const createCommunityOption = (config: any): any => {
@@ -296,7 +295,7 @@ export const createCommunityOption = (config: any): any => {
     },
     form: form,
   }
-  return addProxy(config, option_tmp)
+  return addAdditionalOption(config, option_tmp)
 }
 
 export const createRobotOption = (config: any): any => {
@@ -310,16 +309,19 @@ export const createRobotOption = (config: any): any => {
     },
     json: { UserName: config.robotInfo.userName },
   }
-  return addProxy(config, option_tmp)
+  return addAdditionalOption(config, option_tmp)
 }
 
-export const addProxy = (config_: any, option: any): any => {
-  if (config_.proxy) {
+const addAdditionalOption = (config: any, option: any): any => {
+  if (config.serverinfo.strictSSL) {
+    Object.assign(option, { strictSSL: config.serverinfo.strictSSL })
+  }
+  if (config.proxy) {
     // プロパティ proxy があって
-    if (config_.proxy.useProxy) {
+    if (config.proxy.useProxy) {
       // useProxy がtrue ならプロキシを設定する
       return Object.assign({}, option, {
-        proxy: config_.proxy.url,
+        proxy: config.proxy.url,
         strictSSL: false,
       })
     }
