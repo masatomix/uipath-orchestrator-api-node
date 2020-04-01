@@ -133,4 +133,11 @@ export interface ISettingCrudService extends ICrudService {
 
 export interface IUtilService {
   excelDownload(outputFullPath: string): Promise<void>
+  excelDownloadForHost(outputFullDir: string): Promise<void>
+
+  /**
+   * 指定したパスにあるExcelファイルを読み込んで、console.table を使ってコンソールにダンプします。
+   * @param fullPaths
+   */
+  excel2Console(...fullPaths: Array<string>): Promise<void>
 }

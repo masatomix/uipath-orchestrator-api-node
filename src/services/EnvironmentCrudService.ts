@@ -28,12 +28,12 @@ export class EnvironmentCrudService extends BaseCrudService implements IEnvironm
   //   return defs[0]
   // }
 
-  create(hostLicense: any): Promise<any> {
-    return postData(this.parent.config, this.parent.accessToken, '/odata/Environments', hostLicense)
+  create(environment: any): Promise<any> {
+    return postData(this.parent.config, this.parent.accessToken, '/odata/Environments', environment)
   }
 
-  update(hostLicense: any): Promise<any> {
-    return putData(this.parent.config, this.parent.accessToken, `/odata/Environments(${hostLicense.Id})`, hostLicense)
+  update(environment: any): Promise<any> {
+    return putData(this.parent.config, this.parent.accessToken, `/odata/Environments(${environment.Id})`, environment)
   }
 
   delete(id: number): Promise<any> {
