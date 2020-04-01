@@ -125,14 +125,15 @@ export class UtilService implements IUtilService {
 
   /**
    * 指定したパスにあるExcelファイルを読み込んで、console.table を使ってコンソールにダンプします。
-   * @param fullPaths 
+   * @param fullPaths
    */
   async excel2Console(...fullPaths: Array<string>): Promise<void> {
     const promises: Array<Promise<void>> = []
     for (const fullPath of fullPaths) {
       promises.push(
         xlsx2json(fullPath).then(instances => {
-          console.log(`${path.resolve(fullPath)} :`)
+          console.log(`path : ${path.resolve(fullPath)}`)
+          console.log(`count: ${instances.length}`)
           console.table(instances)
         }),
       )
