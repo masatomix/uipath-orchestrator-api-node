@@ -272,12 +272,53 @@ const createOption = (
   return addProxy(config_, option)
 }
 
+export const createEnterpriseOption = (config: any): any => {
+  const option_tmp = {
+    uri: config.serverinfo.servername + '/api/Account/Authenticate',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    form: config.userinfo,
+  }
+  return addProxy(config, option_tmp)
+}
+
+export const createCommunityOption = (config: any): any => {
+  const form = Object.assign(config.serverinfo, {
+    grant_type: 'refresh_token',
+  })
+  const option_tmp = {
+    uri: 'https://account.uipath.com/oauth/token',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    form: form,
+  }
+  return addProxy(config, option_tmp)
+}
+
+export const createRobotOption = (config: any): any => {
+  const option_tmp = {
+    uri: config.serverinfo.servername + '/api/robotsservice/BeginSession',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'X-ROBOT-LICENSE': config.robotInfo.machineKey,
+      'X-ROBOT-MACHINE-ENCODED': Buffer.from(config.robotInfo.machineName).toString('base64'),
+      Accept: 'application/json',
+    },
+    json: { UserName: config.robotInfo.userName },
+  }
+  return addProxy(config, option_tmp)
+}
+
 export const addProxy = (config_: any, option: any): any => {
   if (config_.proxy) {
     // プロパティ proxy があって
     if (config_.proxy.useProxy) {
       // useProxy がtrue ならプロキシを設定する
-      return Object.assign(option, {
+      return Object.assign({}, option, {
         proxy: config_.proxy.url,
         strictSSL: false,
       })
