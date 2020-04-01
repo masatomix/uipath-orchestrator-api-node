@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { IUtilService } from '../Interfaces'
 import path from 'path'
+import { xlsx2json } from '../utils'
 
 export class UtilService implements IUtilService {
   constructor(public api: IOrchestratorApi) {}
@@ -18,6 +19,12 @@ export class UtilService implements IUtilService {
       this.api.robot
         .findAll()
         .then(instances => this.api.robot.save2Excel(instances, path.join(outputFullDir, 'robots.xlsx'))),
+    )
+
+    promises.push(
+      this.api.environment
+        .findAll()
+        .then(instances => this.api.environment.save2Excel(instances, path.join(outputFullDir, 'environments.xlsx'))),
     )
 
     promises.push(
@@ -95,6 +102,42 @@ export class UtilService implements IUtilService {
     // instances = await this.api.queueDefinition.findAll()
     // await this.api.queueDefinition.save2Excel(instances, path.join(outputFullDir, 'queueDefinitions.xlsx'))
 
+    return new Promise((resolve, reject) => resolve())
+  }
+
+  async excelDownloadForHost(outputFullDir: string): Promise<void> {
+    const promises: Array<Promise<void>> = []
+
+    promises.push(
+      this.api.hostLicense
+        .findAll()
+        .then(instances => this.api.hostLicense.save2Excel(instances, path.join(outputFullDir, 'hostLicenses.xlsx'))),
+    )
+    promises.push(
+      this.api.tenant
+        .findAll()
+        .then(instances => this.api.tenant.save2Excel(instances, path.join(outputFullDir, 'tenants.xlsx'))),
+    )
+
+    await Promise.all(promises)
+    return new Promise((resolve, reject) => resolve())
+  }
+
+  /**
+   * 指定したパスにあるExcelファイルを読み込んで、console.table を使ってコンソールにダンプします。
+   * @param fullPaths 
+   */
+  async excel2Console(...fullPaths: Array<string>): Promise<void> {
+    const promises: Array<Promise<void>> = []
+    for (const fullPath of fullPaths) {
+      promises.push(
+        xlsx2json(fullPath).then(instances => {
+          console.log(`${path.resolve(fullPath)} :`)
+          console.table(instances)
+        }),
+      )
+    }
+    await Promise.all(promises)
     return new Promise((resolve, reject) => resolve())
   }
 }
