@@ -4,8 +4,8 @@ import { postData } from '../utils'
 import { IQueueCrudService } from '../Interfaces'
 
 export class QueueCrudService extends BaseCrudService implements IQueueCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   getQueueAndStartTransaction(queueName: string): Promise<any> {
     return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.StartTransaction', {

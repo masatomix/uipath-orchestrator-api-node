@@ -5,8 +5,8 @@ import path from 'path'
 import { IMachineCrudService } from '../Interfaces'
 
 export class MachineCrudService extends BaseCrudService implements IMachineCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)

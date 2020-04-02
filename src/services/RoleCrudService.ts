@@ -4,8 +4,8 @@ import { getArray, getData, putData, postData, deleteData } from '../utils'
 import { IRoleCrudService } from '../Interfaces'
 
 export class RoleCrudService extends BaseCrudService implements IRoleCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/Roles', queries, asArray)

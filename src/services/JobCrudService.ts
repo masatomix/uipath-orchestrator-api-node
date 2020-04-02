@@ -5,8 +5,8 @@ import path from 'path'
 import { IJobCrudService } from '../Interfaces'
 
 export class JobCrudService extends BaseCrudService implements IJobCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
 
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
