@@ -1,9 +1,6 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
 import { downloadFile } from '../sampleUtils'
-
-const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -47,10 +44,10 @@ async function sample() {
     // │    1    │  false   │ null  │ '1.0.7115.18328' │ 'Attended_FrameWork:1.0.7115.18328' │ 'Attended Robot REFramework' │ '2020-02-25T10:47:25.4001001Z' │      false      │    null    │     null     │ 'pbkino' │ 'Attended_FrameWork' │ { Input: null, Output: null } │
     // └─────────┴──────────┴───────┴──────────────────┴─────────────────────────────────────┴──────────────────────────────┴────────────────────────────────┴─────────────────┴────────────┴──────────────┴──────────┴──────────────────────┴───────────────────────────────┘
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   } finally {
     await api.process.deletePackage(processId)
-    // await api.process.deletePackage(processId, '1.0.6')
+    // await api.process.deletePackage(processId, '1.0.7120.2411')
   }
 }
 

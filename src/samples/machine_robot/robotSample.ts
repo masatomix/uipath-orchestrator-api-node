@@ -1,9 +1,6 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
 import { randomName, createRobotData } from '../sampleUtils'
-
-const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -15,13 +12,13 @@ async function sample() {
     const random = randomName()
     const machineName = `Machine_${random}`
     const testMachine = await api.machine.create({ Name: machineName }) // 登録する
-    logger.info(testMachine)
+    console.log(testMachine)
 
     // サンプル１．ロボットの登録
     const expectedRobot = createRobotData(testMachine) // 登録データを作成
-    logger.info(expectedRobot)
+    console.log(expectedRobot)
     const resultRobot = await api.robot.create(expectedRobot) // 登録
-    logger.info(resultRobot)
+    console.log(resultRobot)
 
     // サンプル２．ロボットを条件指定で検索・取得する
     const machinename = expectedRobot.MachineName
@@ -39,10 +36,10 @@ async function sample() {
       // サンプル２. ロボットをPK指定で取得する
       const robotId: number = instance.Id
       const robot = await api.robot.find(robotId)
-      logger.info(robot)
+      console.log(robot)
     }
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   }
 }
 

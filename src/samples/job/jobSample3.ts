@@ -1,8 +1,5 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
-
-const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -11,7 +8,7 @@ async function sample() {
   const processKey: string = await createProcessKey(api)
 
   const jobs: any = await api.job.startJobs(processKey, [], 3)
-  logger.info(jobs.value)
+  console.log(jobs.value)
 
   await Promise.all(
     jobs.value.map((job: any) => {

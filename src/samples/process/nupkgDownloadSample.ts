@@ -1,8 +1,5 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
-
-const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -32,7 +29,7 @@ async function sample() {
       samplePackages.map(samplePackage => api.process.downloadPackage(samplePackage.Id, samplePackage.Version)),
     )
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   }
 }
 
