@@ -5,8 +5,8 @@ import path from 'path'
 import { ISettingCrudService } from '../Interfaces'
 
 export class SettingCrudService extends BaseCrudService implements ISettingCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
 
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {

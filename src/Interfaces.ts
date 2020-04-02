@@ -76,6 +76,10 @@ export interface IQueueDefinitionCrudService extends ICrudService {
   findByName(name: string): Promise<any>
 }
 
+export interface IQueueItemCrudService extends ICrudService {
+  // findByName(name: string): Promise<any>
+}
+
 export interface IQueueCrudService extends ICrudService {
   getQueueAndStartTransaction(queueName: string): Promise<any>
   setTransactionResult(queueItemId: number, statusObj: any): Promise<void>

@@ -5,8 +5,8 @@ import path from 'path'
 import { IProcessCrudService } from '../Interfaces'
 
 export class ProcessCrudService extends BaseCrudService implements IProcessCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   /**
    * アクティブなバージョンに対しての検索。つまりプロセス一覧。

@@ -5,8 +5,8 @@ import path from 'path'
 import { IQueueDefinitionCrudService } from '../Interfaces'
 
 export class QueueDefinitionCrudService extends BaseCrudService implements IQueueDefinitionCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
 
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {

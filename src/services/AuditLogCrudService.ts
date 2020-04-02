@@ -5,8 +5,8 @@ import path from 'path'
 import { IAuditLogCrudService } from '../Interfaces'
 
 export class AuditLogCrudService extends BaseCrudService implements IAuditLogCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
 
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {

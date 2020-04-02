@@ -5,8 +5,8 @@ import path from 'path'
 import { IReleaseCrudService } from '../Interfaces'
 
 export class ReleaseCrudService extends BaseCrudService implements IReleaseCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/Releases', queries, asArray)

@@ -5,8 +5,8 @@ import path from 'path'
 import { IUserCrudService } from '../Interfaces'
 
 export class UserCrudService extends BaseCrudService implements IUserCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
     return getArray(this.parent.config, this.parent.accessToken, '/odata/Users', queries, asArray)
