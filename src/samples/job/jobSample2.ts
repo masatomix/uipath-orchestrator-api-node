@@ -1,8 +1,5 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
-
-const logger = getLogger('main')
 
 /**
  * こちらはOC画面上の「動的に割り当てる」でのジョブ登録サンプル。
@@ -17,7 +14,7 @@ async function sample() {
 
   // パラメタはプロセス名と、3回実行する、という回数
   const result: any = await api.job.startJobs(processKey, [], 3)
-  logger.info(result.value)
+  console.log(result.value)
 }
 
 // async function createRobotNames(api_: OrchestratorApi): Promise<string[]> {

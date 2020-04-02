@@ -34,7 +34,9 @@ $ npx ts-node src/samples/license/licenseSample.ts
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
+import { getLogger } from '../../logger'
+
+const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -51,7 +53,7 @@ async function sample() {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }

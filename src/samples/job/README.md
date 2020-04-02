@@ -16,7 +16,6 @@ $ npx ts-node src/samples/job/jobSample1.ts
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 
 /**
  * OC画面上の「特定のロボット」でのジョブ登録サンプル。
@@ -31,7 +30,7 @@ async function sample() {
 
   // パラメタはプロセス名と、ロボット名
   const result: any = await api.job.startJobs(processKey, robotNames)
-  logger.info(result.value)
+  console.log(result.value)
 }
 
 async function createRobotNames(api_: OrchestratorApi): Promise<string[]> {
@@ -52,7 +51,7 @@ async function createProcessKey(api_: OrchestratorApi): Promise<string> {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
@@ -76,7 +75,6 @@ $ npx ts-node src/samples/job/jobSample2.ts
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 
 /**
  * こちらはOC画面上の「動的に割り当てる」でのジョブ登録サンプル。
@@ -91,7 +89,7 @@ async function sample() {
 
   // パラメタはプロセス名と、3回実行する、という回数
   const result: any = await api.job.startJobs(processKey, [], 3)
-  logger.info(result.value)
+  console.log(result.value)
 }
 
 // async function createRobotNames(api_: OrchestratorApi): Promise<string[]> {
@@ -112,7 +110,7 @@ async function createProcessKey(api_: OrchestratorApi): Promise<string> {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
@@ -212,7 +210,6 @@ $ npx ts-node src/samples/job/jobSample3.ts
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -221,7 +218,7 @@ async function sample() {
   const processKey: string = await createProcessKey(api)
 
   const jobs: any = await api.job.startJobs(processKey, [], 3)
-  logger.info(jobs.value)
+  console.log(jobs.value)
 
   await Promise.all(
     jobs.value.map((job: any) => {
@@ -241,7 +238,7 @@ async function createProcessKey(api_: OrchestratorApi): Promise<string> {
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }

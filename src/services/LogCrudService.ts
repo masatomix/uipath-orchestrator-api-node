@@ -8,8 +8,8 @@ import { ILogCrudService } from '../Interfaces'
 const logger = getLogger('main')
 
 export class LogCrudService extends BaseCrudService implements ILogCrudService {
-  constructor(parent_: IOrchestratorApi) {
-    super(parent_)
+  constructor(parent: IOrchestratorApi) {
+    super(parent)
   }
 
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {

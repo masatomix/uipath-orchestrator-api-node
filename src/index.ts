@@ -1,6 +1,16 @@
 import request from 'request'
 import { getLogger } from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy, internalSave2Excel } from './utils'
+import {
+  getData,
+  getArray,
+  putData,
+  postData,
+  deleteData,
+  internalSave2Excel,
+  createRobotOption,
+  createEnterpriseOption,
+  createCommunityOption,
+} from './utils'
 import {
   ICrudService,
   IRobotCrudService,
@@ -20,6 +30,7 @@ import {
   ITenantCrudService,
   IHostLicenseCrudService,
   IEnvironmentCrudService,
+  IQueueItemCrudService,
 } from './Interfaces'
 
 const logger = getLogger('main')
@@ -28,10 +39,7 @@ const logger = getLogger('main')
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
  */
 export class BaseCrudService implements ICrudService {
-  protected parent: IOrchestratorApi
-  constructor(parent_: IOrchestratorApi) {
-    this.parent = parent_
-  }
+  constructor(public parent: IOrchestratorApi) {}
   findAll(obj?: any, asArray: boolean = true): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
@@ -66,11 +74,9 @@ export class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
   isRobot: boolean = false
-  config: any
   accessToken: string = ''
 
-  constructor(config_: any) {
-    this.config = config_
+  constructor(public config: any) {
     // Enterpriseだったら、trueにする
     if (!this.config.serverinfo.client_id) {
       // serverinfo.client_idプロパティがなければEnterprise
@@ -91,8 +97,7 @@ export class OrchestratorApi implements IOrchestratorApi {
    * Orchestrator API の認証システムに対して、認証を実施しアクセストークンを取得する。
    */
   authenticate(): Promise<any> {
-    const servername = this.config.serverinfo.servername
-    logger.debug(servername)
+    logger.debug(this.config.serverinfo.servername)
 
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
@@ -103,17 +108,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.debug(this.config.robotInfo.machineName)
       logger.debug(this.config.robotInfo.userName)
 
-      const auth_options_tmp = {
-        uri: servername + '/api/robotsservice/BeginSession',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'X-ROBOT-LICENSE': this.config.robotInfo.machineKey,
-          'X-ROBOT-MACHINE-ENCODED': Buffer.from(this.config.robotInfo.machineName).toString('base64'),
-          Accept: 'application/json',
-        },
-        json: { UserName: this.config.robotInfo.userName },
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createRobotOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {
@@ -139,15 +134,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.debug(this.config.userinfo.usernameOrEmailAddress)
       logger.debug(this.config.userinfo.password)
 
-      const auth_options_tmp = {
-        uri: servername + '/api/Account/Authenticate',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Accept: 'application/json',
-        },
-        form: this.config.userinfo,
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createEnterpriseOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {
@@ -170,18 +157,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       })
     } else {
       logger.info('Community版として処理開始')
-      const form = Object.assign(this.config.serverinfo, {
-        grant_type: 'refresh_token',
-      })
-      const auth_options_tmp = {
-        uri: 'https://account.uipath.com/oauth/token',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        form: form,
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createCommunityOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {
@@ -210,8 +186,8 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   license: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
+    constructor(parent: IOrchestratorApi) {
+      super(parent)
     }
     find(): Promise<any> {
       return getData(
@@ -237,8 +213,8 @@ export class OrchestratorApi implements IOrchestratorApi {
   job: IJobCrudService = new JobCrudService(this)
 
   schedule: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
+    constructor(parent: IOrchestratorApi) {
+      super(parent)
     }
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/ProcessSchedules', queries, asArray)
@@ -248,67 +224,15 @@ export class OrchestratorApi implements IOrchestratorApi {
   tenant: ITenantCrudService = new TenantCrudService(this)
   hostLicense: IHostLicenseCrudService = new HostLicenseCrudService(this)
   environment: IEnvironmentCrudService = new EnvironmentCrudService(this)
-
   queueDefinition: IQueueDefinitionCrudService = new QueueDefinitionCrudService(this)
-
-  queueItem: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    // QueueItemを一覧する
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries, asArray)
-    }
-
-    // PK指定で取得する
-    find(queueItemId: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
-    }
-
-    create(queue: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.AddQueueItem', queue)
-    }
-
-    // PK指定で、削除済みにする。
-    delete(queueItemId: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
-    }
-  })(this)
-
+  queueItem: IQueueItemCrudService = new QueueItemCrudService(this)
   queueOperation: IQueueCrudService = new QueueCrudService(this)
-
-  // Todo:
-  // asset: ICrudService = new (class extends BaseCrudService {
-  //   constructor(parent_: OrchestratorApi) {
-  //     super(parent_)
-  //   }
-  //   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-  //     return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
-  //   }
-
-  //   find(id: number): Promise<any> {
-  //     return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-  //   }
-
-  //   create(machine: any): Promise<any> {
-  //     return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
-  //   }
-
-  //   update(machine: any): Promise<void> {
-  //     return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
-  //   }
-  //   delete(id: number): Promise<any> {
-  //     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-  //   }
-  // })(this)
-
   log: ILogCrudService = new LogCrudService(this)
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
   asset: IAssetCrudService = new AssetCrudService(this)
   util: IUtilService = new UtilService(this)
-  // ロボットグループ
-  // ロール
+
   // タスク(Enterpriseには、ない)
   // フォルダー(OU)
   // Webhook
@@ -354,6 +278,7 @@ import { UtilService } from './services/UtilService'
 import { TenantCrudService } from './services/TenantCrudService'
 import { HostLicenseCrudService } from './services/HostLicenseCrudService'
 import { EnvironmentCrudService } from './services/EnvironmentCrudService'
+import { QueueItemCrudService } from './services/QueueItemCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン

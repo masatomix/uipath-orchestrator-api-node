@@ -41,7 +41,6 @@ findPackage:
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 import { downloadFile } from '../sampleUtils'
 
 async function sample() {
@@ -74,7 +73,7 @@ async function sample() {
     console.table(results)
 
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   } finally {
     // await api.process.deletePackage(processId) //全部削除
     // await api.process.deletePackage(processId, '1.0.7120.2411') //バージョン指定で削除
@@ -86,6 +85,7 @@ if (!module.parent) {
     await sample()
   })()
 }
+
 ```
 
 ``finally`` 節でアップロードしたnupkgを削除するコードを記載しています(コメントアウトしてますが)。
@@ -118,7 +118,6 @@ findAll(findPackageと同じフォーマット):
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -138,7 +137,7 @@ async function sample() {
         samplePackage => api.process.downloadPackage(samplePackage.Id, samplePackage.Version)
       ))
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   }
 }
 
@@ -147,6 +146,7 @@ if (!module.parent) {
     await sample()
   })()
 }
+
 ```
 
 ## Orchestrator API との対応表

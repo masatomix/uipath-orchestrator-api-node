@@ -24,7 +24,7 @@ $ npx ts-node src/samples/release/releaseSample.ts
     "Id": 12,
     "Arguments": { "Input": null, "Output": null },
     "ProcessSettings": null
-  } ...
+  } ... 
 ]
 ```
 
@@ -41,7 +41,6 @@ $ npx ts-node src/samples/release/releaseSample.ts
 ```typescript
 import config from 'config'
 import OrchestratorApi from '../../index'
-import logger from '../../logger'
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -50,22 +49,21 @@ async function sample() {
   await api.authenticate()
   try {
     const releases: any[] = await api.release.findAll()
-    logger.info(releases)
+    console.log(releases)
 
     const release: any = await api.release.findByProcessKey('MyAttendedFramework') // 画面の名前でも検索できる
-    logger.info(release)
+    console.log(release)
   } catch (error) {
-    logger.error(error)
+    console.error(error)
   }
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
 ```
-
 
 
 ## Orchestrator API との対応表
