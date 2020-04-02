@@ -1,6 +1,16 @@
 import request from 'request'
 import { getLogger } from './logger'
-import { getData, getArray, putData, postData, deleteData, addProxy, internalSave2Excel } from './utils'
+import {
+  getData,
+  getArray,
+  putData,
+  postData,
+  deleteData,
+  internalSave2Excel,
+  createRobotOption,
+  createEnterpriseOption,
+  createCommunityOption,
+} from './utils'
 import {
   ICrudService,
   IRobotCrudService,
@@ -103,17 +113,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.debug(this.config.robotInfo.machineName)
       logger.debug(this.config.robotInfo.userName)
 
-      const auth_options_tmp = {
-        uri: servername + '/api/robotsservice/BeginSession',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'X-ROBOT-LICENSE': this.config.robotInfo.machineKey,
-          'X-ROBOT-MACHINE-ENCODED': Buffer.from(this.config.robotInfo.machineName).toString('base64'),
-          Accept: 'application/json',
-        },
-        json: { UserName: this.config.robotInfo.userName },
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createRobotOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {
@@ -139,15 +139,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.debug(this.config.userinfo.usernameOrEmailAddress)
       logger.debug(this.config.userinfo.password)
 
-      const auth_options_tmp = {
-        uri: servername + '/api/Account/Authenticate',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Accept: 'application/json',
-        },
-        form: this.config.userinfo,
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createEnterpriseOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {
@@ -170,18 +162,7 @@ export class OrchestratorApi implements IOrchestratorApi {
       })
     } else {
       logger.info('Community版として処理開始')
-      const form = Object.assign(this.config.serverinfo, {
-        grant_type: 'refresh_token',
-      })
-      const auth_options_tmp = {
-        uri: 'https://account.uipath.com/oauth/token',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        form: form,
-      }
-      const auth_options = addProxy(this.config, auth_options_tmp)
+      const auth_options = createCommunityOption(this.config)
 
       const me = this
       promise = new Promise((resolve, reject) => {

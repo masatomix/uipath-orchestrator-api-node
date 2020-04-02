@@ -258,27 +258,70 @@ const createDownloadPromise = (option: any, id: string, version: string): Promis
 }
 
 const createOption = (
-  config_: any,
+  config: any,
   accessToken: string,
   apiPath: string,
   contentType: string = 'application/json',
 ): any => {
-  const servername = config_.serverinfo.servername
   const option = {
     // uri: url.resolve(servername, apiPath),
-    uri: servername + apiPath,
-    headers: headers(config_, accessToken, contentType),
+    uri: config.serverinfo.servername + apiPath,
+    headers: headers(config, accessToken, contentType),
   }
-  return addProxy(config_, option)
+  return addAdditionalOption(config, option)
 }
 
-export const addProxy = (config_: any, option: any): any => {
-  if (config_.proxy) {
+export const createEnterpriseOption = (config: any): any => {
+  const option_tmp = {
+    uri: config.serverinfo.servername + '/api/Account/Authenticate',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    form: config.userinfo,
+  }
+  return addAdditionalOption(config, option_tmp)
+}
+
+export const createCommunityOption = (config: any): any => {
+  const form = Object.assign(config.serverinfo, {
+    grant_type: 'refresh_token',
+  })
+  const option_tmp = {
+    uri: 'https://account.uipath.com/oauth/token',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    form: form,
+  }
+  return addAdditionalOption(config, option_tmp)
+}
+
+export const createRobotOption = (config: any): any => {
+  const option_tmp = {
+    uri: config.serverinfo.servername + '/api/robotsservice/BeginSession',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'X-ROBOT-LICENSE': config.robotInfo.machineKey,
+      'X-ROBOT-MACHINE-ENCODED': Buffer.from(config.robotInfo.machineName).toString('base64'),
+      Accept: 'application/json',
+    },
+    json: { UserName: config.robotInfo.userName },
+  }
+  return addAdditionalOption(config, option_tmp)
+}
+
+const addAdditionalOption = (config: any, option: any): any => {
+  if (config.serverinfo.strictSSL) {
+    Object.assign(option, { strictSSL: config.serverinfo.strictSSL })
+  }
+  if (config.proxy) {
     // プロパティ proxy があって
-    if (config_.proxy.useProxy) {
+    if (config.proxy.useProxy) {
       // useProxy がtrue ならプロキシを設定する
-      return Object.assign(option, {
-        proxy: config_.proxy.url,
+      return Object.assign({}, option, {
+        proxy: config.proxy.url,
         strictSSL: false,
       })
     }
