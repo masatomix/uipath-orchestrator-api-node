@@ -30,6 +30,7 @@ import {
   ITenantCrudService,
   IHostLicenseCrudService,
   IEnvironmentCrudService,
+  IQueueItemCrudService,
 } from './Interfaces'
 
 const logger = getLogger('main')
@@ -38,10 +39,7 @@ const logger = getLogger('main')
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
  */
 export class BaseCrudService implements ICrudService {
-  protected parent: IOrchestratorApi
-  constructor(parent_: IOrchestratorApi) {
-    this.parent = parent_
-  }
+  constructor(public parent: IOrchestratorApi) {}
   findAll(obj?: any, asArray: boolean = true): Promise<Array<any>> {
     throw Error('Not implemented yet.')
   }
@@ -76,11 +74,9 @@ export class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
   isRobot: boolean = false
-  config: any
   accessToken: string = ''
 
-  constructor(config_: any) {
-    this.config = config_
+  constructor(public config: any) {
     // Enterpriseだったら、trueにする
     if (!this.config.serverinfo.client_id) {
       // serverinfo.client_idプロパティがなければEnterprise
@@ -101,8 +97,7 @@ export class OrchestratorApi implements IOrchestratorApi {
    * Orchestrator API の認証システムに対して、認証を実施しアクセストークンを取得する。
    */
   authenticate(): Promise<any> {
-    const servername = this.config.serverinfo.servername
-    logger.debug(servername)
+    logger.debug(this.config.serverinfo.servername)
 
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
@@ -191,8 +186,8 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   license: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
+    constructor(parent: IOrchestratorApi) {
+      super(parent)
     }
     find(): Promise<any> {
       return getData(
@@ -218,8 +213,8 @@ export class OrchestratorApi implements IOrchestratorApi {
   job: IJobCrudService = new JobCrudService(this)
 
   schedule: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
+    constructor(parent: IOrchestratorApi) {
+      super(parent)
     }
     findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
       return getArray(this.parent.config, this.parent.accessToken, '/odata/ProcessSchedules', queries, asArray)
@@ -229,67 +224,15 @@ export class OrchestratorApi implements IOrchestratorApi {
   tenant: ITenantCrudService = new TenantCrudService(this)
   hostLicense: IHostLicenseCrudService = new HostLicenseCrudService(this)
   environment: IEnvironmentCrudService = new EnvironmentCrudService(this)
-
   queueDefinition: IQueueDefinitionCrudService = new QueueDefinitionCrudService(this)
-
-  queueItem: ICrudService = new (class extends BaseCrudService {
-    constructor(parent_: OrchestratorApi) {
-      super(parent_)
-    }
-    // QueueItemを一覧する
-    findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-      return getArray(this.parent.config, this.parent.accessToken, '/odata/QueueItems', queries, asArray)
-    }
-
-    // PK指定で取得する
-    find(queueItemId: number): Promise<any> {
-      return getData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
-    }
-
-    create(queue: any): Promise<any> {
-      return postData(this.parent.config, this.parent.accessToken, '/odata/Queues/UiPathODataSvc.AddQueueItem', queue)
-    }
-
-    // PK指定で、削除済みにする。
-    delete(queueItemId: number): Promise<any> {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/QueueItems(${queueItemId})`)
-    }
-  })(this)
-
+  queueItem: IQueueItemCrudService = new QueueItemCrudService(this)
   queueOperation: IQueueCrudService = new QueueCrudService(this)
-
-  // Todo:
-  // asset: ICrudService = new (class extends BaseCrudService {
-  //   constructor(parent_: OrchestratorApi) {
-  //     super(parent_)
-  //   }
-  //   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-  //     return getArray(this.parent.config, this.parent.accessToken, '/odata/Machines', queries, asArray)
-  //   }
-
-  //   find(id: number): Promise<any> {
-  //     return getData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-  //   }
-
-  //   create(machine: any): Promise<any> {
-  //     return postData(this.parent.config, this.parent.accessToken, '/odata/Machines', machine)
-  //   }
-
-  //   update(machine: any): Promise<void> {
-  //     return putData(this.parent.config, this.parent.accessToken, `/odata/Machines(${machine.Id})`, machine)
-  //   }
-  //   delete(id: number): Promise<any> {
-  //     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
-  //   }
-  // })(this)
-
   log: ILogCrudService = new LogCrudService(this)
   auditLog: IAuditLogCrudService = new AuditLogCrudService(this)
   setting: ISettingCrudService = new SettingCrudService(this)
   asset: IAssetCrudService = new AssetCrudService(this)
   util: IUtilService = new UtilService(this)
-  // ロボットグループ
-  // ロール
+
   // タスク(Enterpriseには、ない)
   // フォルダー(OU)
   // Webhook
@@ -335,6 +278,7 @@ import { UtilService } from './services/UtilService'
 import { TenantCrudService } from './services/TenantCrudService'
 import { HostLicenseCrudService } from './services/HostLicenseCrudService'
 import { EnvironmentCrudService } from './services/EnvironmentCrudService'
+import { QueueItemCrudService } from './services/QueueItemCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン
