@@ -1,9 +1,6 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
 import { randomName } from '../sampleUtils'
-
-const logger = getLogger('main')
 
 async function sample() {
   const api = new OrchestratorApi(config)
@@ -27,11 +24,11 @@ async function sample() {
       // サンプル ユーザ登録
       let testUser = await api.user.create(user)
       testUserId = testUser.Id
-      logger.info(testUser)
+      console.log(testUser)
 
       // サンプル ユーザ検索
       testUser = await api.user.find(testUserId)
-      logger.info(testUser)
+      console.log(testUser)
 
       const expectedName: string = '名前(更新成功)'
       testUser.Name = expectedName
@@ -39,15 +36,15 @@ async function sample() {
       // サンプル ユーザの更新
       testUser = await api.user.update(testUser)
       // ちなみに、updateは戻り値はundefined
-      logger.info('---')
-      logger.info(testUser)
-      logger.info('---')
+      console.log('---')
+      console.log(testUser)
+      console.log('---')
 
       // そのユーザが検索できることを確認
       testUser = await api.user.find(testUserId)
-      logger.info(testUser)
+      console.log(testUser)
     } catch (error) {
-      logger.error(error)
+      console.error(error)
     } finally {
       // サンプル ユーザ削除
       await api.user.delete(testUserId)

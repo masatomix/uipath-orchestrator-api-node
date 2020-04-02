@@ -1,8 +1,6 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
 
-const logger = getLogger('main')
 
 /**
  * OC画面上の「特定のロボット」でのジョブ登録サンプル。
@@ -17,7 +15,7 @@ async function sample() {
 
   // パラメタはプロセス名と、ロボット名
   const result: any = await api.job.startJobs(processKey, robotNames)
-  logger.info(result.value)
+  console.log(result.value)
 }
 
 async function createRobotNames(api_: OrchestratorApi): Promise<string[]> {

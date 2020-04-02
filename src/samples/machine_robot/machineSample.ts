@@ -1,21 +1,7 @@
 import config from 'config'
 import OrchestratorApi from '../../index'
-import { getLogger } from '../../logger'
 import { randomName } from '../sampleUtils'
 
-const logger = getLogger('main')
-
-// マシン名、ロボット名、そのWindowsアカウントとも一意になる任意の名称RobotのObjを作成するメソッド。
-export function createRobotData(testMachine: any) {
-  const random = randomName()
-  return {
-    MachineName: testMachine.Name, // 取得したマシン名
-    LicenseKey: testMachine.LicenseKey, // 取得したライセンスキー
-    Name: `${randomName('test_')}_${random}`, // ランダム値
-    Username: `xx\\xxxx_${random}`, // ランダム値
-    Type: 'Unattended', //未指定だとNonProduction
-  }
-}
 async function sample() {
   const api = new OrchestratorApi(config)
 
@@ -26,13 +12,13 @@ async function sample() {
     const random = randomName()
     const machineName = `Machine_${random}`
     const testMachine = await api.machine.create({ Name: machineName }) // 登録する
-    logger.info(testMachine)
+    console.log(testMachine)
 
     // サンプル１．ロボットの登録
     const expectedRobot = createRobotData(testMachine) // 登録データを作成
-    logger.info(expectedRobot)
+    console.log(expectedRobot)
     const resultRobot = await api.robot.create(expectedRobot) // 登録
-    logger.info(resultRobot)
+    console.log(resultRobot)
 
     const theMachine = await api.machine.findByMachineName(machineName)
     console.log(theMachine)
@@ -60,7 +46,19 @@ async function sample() {
       console.table(results2)
     }
   } catch (error) {
-    logger.error(error)
+    console.error(error)
+  }
+}
+
+// マシン名、ロボット名、そのWindowsアカウントとも一意になる任意の名称RobotのObjを作成するメソッド。
+export function createRobotData(testMachine: any) {
+  const random = randomName()
+  return {
+    MachineName: testMachine.Name, // 取得したマシン名
+    LicenseKey: testMachine.LicenseKey, // 取得したライセンスキー
+    Name: `${randomName('test_')}_${random}`, // ランダム値
+    Username: `xx\\xxxx_${random}`, // ランダム値
+    Type: 'Unattended', //未指定だとNonProduction
   }
 }
 

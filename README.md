@@ -159,8 +159,8 @@ console.log(robots)
 | 2 | [machine](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |
 | 3 | [robot](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/machine_robot/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |
 | 4 | [user](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/user/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 | 名前で検索(findByUserName) |  |
-| 5 | [release](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/release/) | 〇 |  |  |  |  |  | プロセス画面上の「名前」で検索(findByProcessKey) |  |
-| 6 | [process](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/process/) | 〇 |  |  |  |  |  | Packageの検索(findPackage)<br>Packageの削除(deletePackage)<br>Packageのアップロード(uploadPackage)<br>Packageのダウンロード(downloadPackage) |  |
+| 5 | [process](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/process/) | 〇 |  |  |  |  |  | Packageの検索(findPackage)<br>Packageの削除(deletePackage)<br>Packageのアップロード(uploadPackage)<br>Packageのダウンロード(downloadPackage) |  |
+| 6 | [release](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/release/) | 〇 |  |  |  |  |  | プロセス画面上の「名前」で検索(findByProcessKey) |  |
 | 7 | [job](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/job/) | 〇 | 〇 |  |  |  |  | ジョブの開始/終了(StartJobs/StopJob) |  |
 | 8 | [schedule](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/schedule/) | 〇 |  |  |  |  |  |  |  |
 | 9 | [log](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/log/) | 〇 |  |  |  |  |  | 条件で検索(findByFilter) |  |
