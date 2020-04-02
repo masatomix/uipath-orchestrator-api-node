@@ -170,7 +170,12 @@ console.log(robots)
 | 13 | [queueOperation](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/queueOperation/) |  |  |  |  |  |  | TransactionのスタートでqueueItemを取得(getQueueAndStartTransaction)<br>Transactionのステータス変更(setTransactionResult) |  |
 | 14 | [setting](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/setting/) | 〇 | 〇 |  | 〇 |  | 〇(update) | キーで検索(findByKey) <br>ファイルからデータ作成(readSettingsFromFile)<br>データをExcel出力(save2Excel) |  |
 | 15 | [asset](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/asset/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 | Robot毎Asset更新(uploadPerRobot)<br>Robot毎Asset検索(findAllEx) |  |
-| 16 | 汎用 | 〇 | 〇 | 〇 | 〇 | 〇 |  | getArray<br>getData<br>postData<br>putData<br>deleteData |  |
+| 16 | environment | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 17 | role | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 18 | tenants | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 19 | hostLicense | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 20 | util |  |  |  |  |  |  | 一括ダウンロード(excelDownload)<br>ExcelデータPrint(excel2Console) |  |
+| 21 | 汎用 | 〇 | 〇 | 〇 | 〇 | 〇 |  | getArray<br>getData<br>postData<br>putData<br>deleteData |  |
 
 
 また、
@@ -462,6 +467,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.6.6 自己署名証明書などのサーバだと、リクエスト時に証明書検証エラーになるため、設定ファイルに回避するパラメタを記載可能にした[(参考)](https://github.com/masatomix/uipath-orchestrator-api-node/commit/f7335251940de389fbb646d1f3afa58cd0305fff)。あと多少のリファクタリングと、ドキュメント整備。
 - 0.6.5 util に excel 一括ダウンロード機能(hostテナント向け)メソッドを追加。またExcelがない環境むけにExcelファイルをConsoleへダンプする機能を追加。
 - 0.6.4 ITenantCrudService,IHostLicenseCrudService,IEnvironmentCrudService,を追加。
 - 0.6.3 Jobサービスに、Relese/Robot列を加えた findAllEx メソッドを追加。OrchestratorApi をexportしないとjsから利用できなかった( require('xxx').default ってやらないとダメ) ので、exportを追加
