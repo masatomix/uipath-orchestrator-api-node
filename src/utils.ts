@@ -4,8 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import { IOrchestratorApi } from './IOrchestratorApi'
 const XlsxPopulate = require('xlsx-populate')
-// import { Parser } from 'json2csv'
-// import url from 'url'
 
 const logger = getLogger('main')
 const httpLogger = getLogger('httpLogger')
@@ -25,19 +23,19 @@ export class NetworkAccessError extends BaseError {
   }
 }
 
-export const getData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath)
+export const getData = (config: any, accessToken: string, apiPath: string): Promise<any> => {
+  const option = createOption(config, accessToken, apiPath)
   return createStrPromise(Object.assign(option, { method: 'GET' }))
 }
 
 export const getArray = (
-  config_: any,
+  config: any,
   accessToken: string,
   apiPath: string,
   queries?: any,
   isOdata: boolean = true,
 ): Promise<Array<any>> => {
-  let optionTmp = createOption(config_, accessToken, apiPath)
+  let optionTmp = createOption(config, accessToken, apiPath)
   optionTmp = Object.assign(optionTmp, { method: 'GET' })
 
   let option = optionTmp
@@ -47,8 +45,8 @@ export const getArray = (
   return createArrayPromise(option, isOdata)
 }
 
-export const postData = (config_: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath)
+export const postData = (config: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
+  const option = createOption(config, accessToken, apiPath)
   return createJSONPromise(
     Object.assign(option, {
       method: 'POST',
@@ -58,13 +56,13 @@ export const postData = (config_: any, accessToken: string, apiPath: string, obj
 }
 
 export const uploadData = async (
-  config_: any,
+  config: any,
   accessToken: string,
   apiPath: string,
   fullPath: string,
   isOdata: boolean = true,
 ): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath, 'multipart/form-data')
+  const option = createOption(config, accessToken, apiPath, 'multipart/form-data')
 
   const p: Promise<any> = new Promise((resolve, reject) => {
     fs.readFile(fullPath, (err, data_) => {
@@ -95,13 +93,13 @@ export const uploadData = async (
 }
 
 export const downloadData = (
-  config_: any,
+  config: any,
   accessToken: string,
   apiPath: string,
   id: string,
   version: string,
 ): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath)
+  const option = createOption(config, accessToken, apiPath)
   option.headers['Accept'] = 'application/octet-stream'
   return createDownloadPromise(
     Object.assign({}, option, {
@@ -113,8 +111,8 @@ export const downloadData = (
   )
 }
 
-export const putData = (config_: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath)
+export const putData = (config: any, accessToken: string, apiPath: string, obj: any): Promise<any> => {
+  const option = createOption(config, accessToken, apiPath)
   return createJSONPromise(
     Object.assign(option, {
       method: 'PUT',
@@ -123,8 +121,8 @@ export const putData = (config_: any, accessToken: string, apiPath: string, obj:
   )
 }
 
-export const deleteData = (config_: any, accessToken: string, apiPath: string): Promise<any> => {
-  const option = createOption(config_, accessToken, apiPath)
+export const deleteData = (config: any, accessToken: string, apiPath: string): Promise<any> => {
+  const option = createOption(config, accessToken, apiPath)
   return createJSONPromise(
     Object.assign(option, {
       method: 'DELETE',
@@ -134,19 +132,19 @@ export const deleteData = (config_: any, accessToken: string, apiPath: string): 
 
 /**
  * 「APIのReturn値のvalueが配列であると見なしてvalueを配列で返すPromise」を返す
- * @param options
+ * @param option
  * @param isOdata  stat系APIは、OData形式ではなく、どうもただの配列で返ってくるので、valueプロパティを返すかそのまま返すかの判定フラグに使う
  */
-const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>> => {
+const createArrayPromise = (option: any, isOdata: boolean): Promise<Array<any>> => {
   // promiseを返す処理は毎回おなじ。Request処理して、コールバックで値を設定するPromiseを作って返すところを共通化
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(options, function(err: any, response: any, body: string) {
+    request(option, function(err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
       }
-      httpLogger.debug({ objects: options })
-      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      httpLogger.debug({ objects: option })
+      logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
@@ -165,17 +163,17 @@ const createArrayPromise = (options: any, isOdata: boolean): Promise<Array<any>>
 
 /**
  * 「APIのReturn値をそのまま返すPromise」を返す
- * @param options
+ * @param option
  */
-const createStrPromise = (options: any): Promise<Array<any>> => {
+const createStrPromise = (option: any): Promise<Array<any>> => {
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(options, function(err: any, response: any, body: string) {
+    request(option, function(err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
       }
-      httpLogger.debug({ objects: options })
-      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      httpLogger.debug({ objects: option })
+      logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
@@ -200,17 +198,17 @@ const createStrPromise = (options: any): Promise<Array<any>> => {
 
 /**
  * 「APIのReturn値をそのまま返すPromise」を返す
- * @param options
+ * @param option
  */
-const createJSONPromise = (options: any): Promise<Array<any>> => {
+const createJSONPromise = (option: any): Promise<Array<any>> => {
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(options, function(err: any, response: any, body: any) {
+    request(option, function(err: any, response: any, body: any) {
       if (err) {
         reject(err)
         return
       }
-      httpLogger.debug({ objects: options })
-      logger.info(`method: ${options.method}, statuCode: ${response.statusCode}`)
+      httpLogger.debug({ objects: option })
+      logger.info(`method: ${option.method}, statuCode: ${response.statusCode}`)
       if (response.statusCode >= 400) {
         logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
@@ -329,24 +327,24 @@ const addAdditionalOption = (config: any, option: any): any => {
   return option
 }
 
-const headers = (config_: any, accessToken: string, contentType: string): any => {
-  const tenant_logical_name = config_.serverinfo.tenant_logical_name
+const headers = (config: any, accessToken: string, contentType: string): any => {
+  const tenant_logical_name = config.serverinfo.tenant_logical_name
   let ret = {}
-  if (config_.robotInfo) {
+  if (config.robotInfo) {
     ret = {
       Authorization: 'UiRobot ' + accessToken,
       'content-type': contentType,
     }
-    if (config_.robotInfo.organizationUnit) {
-      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config_.robotInfo.organizationUnit })
+    if (config.robotInfo.organizationUnit) {
+      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.robotInfo.organizationUnit })
     }
   } else {
     ret = {
       Authorization: 'Bearer ' + accessToken,
       'content-type': contentType,
     }
-    if (config_.userinfo.organizationUnit) {
-      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config_.userinfo.organizationUnit })
+    if (config.userinfo.organizationUnit) {
+      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
     }
   }
   if (tenant_logical_name) {
