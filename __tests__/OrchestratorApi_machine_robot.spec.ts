@@ -54,7 +54,7 @@ describe('OrchestratorApi_machine_robot', () => {
         assertEqualsRobotWithOutkey(robot, instance)
       }
     } catch (error) {
-      logger.error(error)
+      logger.error({ objects: error })
       fail(error)
     } finally {
     }
@@ -90,7 +90,7 @@ describe('OrchestratorApi_machine_robot', () => {
 
       assertEqualsRobotWithOutkey(testRobot, resultRobot)
     } catch (error) {
-      logger.error(error)
+      logger.error({ objects: error })
       fail(error)
     } finally {
     }

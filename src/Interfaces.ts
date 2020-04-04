@@ -11,12 +11,12 @@ export interface ICrudService {
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<void>
-  // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+  // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
 export interface IRobotCrudService extends ICrudService {
-  findByRobotName(element: string): any
-  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+  findByRobotName(name: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
 export interface IUserCrudService extends ICrudService {
@@ -52,7 +52,7 @@ export interface IRoleCrudService extends ICrudService {
 }
 export interface IMachineCrudService extends ICrudService {
   findByMachineName(machineName: string): Promise<any>
-  upload(inputFullPath: string, sheetName?: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 export interface IReleaseCrudService extends ICrudService {
   findByProcessKey(processKey: string): Promise<any>

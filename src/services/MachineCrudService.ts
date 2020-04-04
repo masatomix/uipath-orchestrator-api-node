@@ -45,7 +45,7 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 
-  async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
+  async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any[]> {
     const machines = await xlsx2json(inputFullPath, sheetName)
     const promises = machines.map(machine => {
       if (allProperty) {
@@ -53,6 +53,8 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
       } else {
         return this.create({
           Name: machine.Name,
+          Description: machine.Description,
+          Type: machine.Type,
         })
       }
     })
