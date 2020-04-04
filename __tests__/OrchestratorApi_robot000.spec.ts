@@ -20,6 +20,7 @@ describe('OrchestratorApi_robot000', () => {
   })
 
   it('Normal Case.', async () => {
+    jest.setTimeout(10000)
     try {
       // Step0. 登録
       const state1 = await api.robot.findAll()
