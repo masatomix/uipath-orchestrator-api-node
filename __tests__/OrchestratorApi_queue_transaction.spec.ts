@@ -3,6 +3,9 @@ import { IOrchestratorApi } from '../src/IOrchestratorApi'
 
 import config from 'config'
 import { randomName, createRobotData } from '../src/samples/sampleUtils'
+import { getLogger } from '../src/logger'
+
+const logger = getLogger('main')
 
 describe('OrchestratorApi_queue_transaction', () => {
   jest.setTimeout(10000)
@@ -132,6 +135,7 @@ describe('OrchestratorApi_queue_transaction', () => {
         const findResult2 = await api.queueItem.find(result2.Id)
         expect(findResult2.Id).toBe(result2.Id)
       } catch (error) {
+        logger.error({ objects: error })
         fail(error)
       } finally {
       }
