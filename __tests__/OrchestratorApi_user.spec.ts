@@ -53,7 +53,7 @@ describe('OrchestratorApi_user', () => {
         const actualUser4 = await api.user.find(findUser.Id)
         assertEqualsUser2(findUser, actualUser4)
       } catch (error) {
-        logger.error(error)
+        logger.error({ objects: error })
         fail(error)
       } finally {
         // ユーザ削除

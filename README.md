@@ -467,6 +467,14 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.0 
+    - uploadの戻り値変更 ``Promise<any>`` -> ``Promise<any[]>``
+    - Robot の ``findByRobotName(name: string)`` の戻り値を変更 ``any`` -> ``Promise<any>``
+    - save2Excelの戻り値を変更 ``Promise<void>`` -> ``Promise<string>`` (フルパス)
+    - ライブラリ操作機能を追加
+    - setting に ``getWebSettings`` メソッドを追加。
+    - utilのダウンロード対象に libraryを追加
+    - Testケースのエラーログ出力を微調整
 - 0.6.6 自己署名証明書などのサーバだと、リクエスト時に証明書検証エラーになるため、設定ファイルに回避するパラメタを記載可能にした[(参考)](https://github.com/masatomix/uipath-orchestrator-api-node/commit/f7335251940de389fbb646d1f3afa58cd0305fff)。あと多少のリファクタリングと、ドキュメント整備。
 - 0.6.5 util に excel 一括ダウンロード機能(hostテナント向け)メソッドを追加。またExcelがない環境むけにExcelファイルをConsoleへダンプする機能を追加。
 - 0.6.4 ITenantCrudService,IHostLicenseCrudService,IEnvironmentCrudService,を追加。

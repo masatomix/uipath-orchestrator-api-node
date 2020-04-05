@@ -4,7 +4,7 @@ import { getArray, deleteData, uploadData, downloadData } from '../utils'
 import path from 'path'
 import { IProcessCrudService } from '../Interfaces'
 
-export class ProcessCrudService extends BaseCrudService implements IProcessCrudService {
+export class LibraryCrudService extends BaseCrudService implements IProcessCrudService {
   constructor(parent: IOrchestratorApi) {
     super(parent)
   }
@@ -14,14 +14,14 @@ export class ProcessCrudService extends BaseCrudService implements IProcessCrudS
    * @param asArray
    */
   findAll(queries?: any, asArray: boolean = true): Promise<Array<any>> {
-    return getArray(this.parent.config, this.parent.accessToken, '/odata/Processes', queries, asArray)
+    return getArray(this.parent.config, this.parent.accessToken, '/odata/Libraries', queries, asArray)
   }
 
   uploadPackage(fullPath: string, asArray: boolean = true): Promise<Array<any>> {
     return uploadData(
       this.parent.config,
       this.parent.accessToken,
-      '/odata/Processes/UiPath.Server.Configuration.OData.UploadPackage()',
+      '/odata/Libraries/UiPath.Server.Configuration.OData.UploadPackage()',
       fullPath,
       asArray,
     )
@@ -29,35 +29,35 @@ export class ProcessCrudService extends BaseCrudService implements IProcessCrudS
 
   /**
    * 画面上の名前を指定して、非アクティブなモノもふくめて検索する。
-   * @param processId
+   * @param packageId
    * @param asArray
    */
-  findPackage(processId: string, asArray: boolean = true): Promise<Array<any>> {
+  findPackage(packageId: string, asArray: boolean = true): Promise<Array<any>> {
     return getArray(
       this.parent.config,
       this.parent.accessToken,
-      `/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='${processId}')`,
+      `/odata/Libraries/UiPath.Server.Configuration.OData.GetVersions(packageId='${packageId}')`,
       {},
       asArray,
     )
   }
 
-  deletePackage(processId: string, version?: string): Promise<any> {
+  deletePackage(packageId: string, version?: string): Promise<any> {
     if (version) {
-      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}:${version}')`)
+      return deleteData(this.parent.config, this.parent.accessToken, `/odata/Libraries('${packageId}:${version}')`)
     }
-    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Processes('${processId}')`)
+    return deleteData(this.parent.config, this.parent.accessToken, `/odata/Libraries('${packageId}')`)
   }
 
   /**
    *
-   * @param key Sample:1.0.2 など、[processId:version]
+   * @param key Sample:1.0.2 など、[packageId:version]
    */
   downloadPackage(id: string, version: string): Promise<any> {
     return downloadData(
       this.parent.config,
       this.parent.accessToken,
-      `/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
+      `/odata/Libraries/UiPath.Server.Configuration.OData.DownloadPackage(key='${id}:${version}')`,
       id,
       version,
     )
@@ -65,7 +65,7 @@ export class ProcessCrudService extends BaseCrudService implements IProcessCrudS
   save2Excel(
     instances: any[],
     outputFullPath: string,
-    templateFullPath: string = path.join(__dirname, 'templates', 'templateProcesses.xlsx'),
+    templateFullPath: string = path.join(__dirname, 'templates', 'templateLibraries.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {

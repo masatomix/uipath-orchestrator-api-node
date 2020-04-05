@@ -10,13 +10,13 @@ export interface ICrudService {
     templateFullPath?: string,
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void>
-  // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+  ): Promise<string>
+  // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
 export interface IRobotCrudService extends ICrudService {
-  findByRobotName(element: string): any
-  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any>
+  findByRobotName(name: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
 export interface IUserCrudService extends ICrudService {
@@ -52,7 +52,7 @@ export interface IRoleCrudService extends ICrudService {
 }
 export interface IMachineCrudService extends ICrudService {
   findByMachineName(machineName: string): Promise<any>
-  upload(inputFullPath: string, sheetName?: string): Promise<any>
+  upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 export interface IReleaseCrudService extends ICrudService {
   findByProcessKey(processKey: string): Promise<any>
@@ -133,11 +133,12 @@ export interface ISettingCrudService extends ICrudService {
   findByKey(queries?: any): (...keys: string[]) => Promise<Array<any>>
   findByKeyFromArray(apiResults: any[]): (...keys: string[]) => Array<any>
   readSettingsFromFile(fullPath: string, sheetName?: string): Promise<any[]>
+  getWebSettings(): Promise<Array<any>>
 }
 
 export interface IUtilService {
-  excelDownload(outputFullPath: string): Promise<void>
-  excelDownloadForHost(outputFullDir: string): Promise<void>
+  excelDownload(outputFullDir: string): Promise<string[]>
+  excelDownloadForHost(outputFullDir: string): Promise<string[]>
 
   /**
    * 指定したパスにあるExcelファイルを読み込んで、console.table を使ってコンソールにダンプします。

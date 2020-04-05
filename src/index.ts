@@ -61,7 +61,7 @@ export class BaseCrudService implements ICrudService {
     templateFullPath: string = '',
     sheetName: string = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
@@ -210,6 +210,8 @@ export class OrchestratorApi implements IOrchestratorApi {
 
   process: IProcessCrudService = new ProcessCrudService(this)
 
+  library: IProcessCrudService = new LibraryCrudService(this)
+
   job: IJobCrudService = new JobCrudService(this)
 
   schedule: ICrudService = new (class extends BaseCrudService {
@@ -279,6 +281,7 @@ import { TenantCrudService } from './services/TenantCrudService'
 import { HostLicenseCrudService } from './services/HostLicenseCrudService'
 import { EnvironmentCrudService } from './services/EnvironmentCrudService'
 import { QueueItemCrudService } from './services/QueueItemCrudService'
+import { LibraryCrudService } from './services/LibraryCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン

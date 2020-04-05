@@ -81,13 +81,25 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
     })
   }
 
+  async getWebSettings(): Promise<Array<any>> {
+    const keyValues = await this.parent.getData('/odata/Settings/UiPath.Server.Configuration.OData.GetWebSettings')
+    const keys: Array<string> = keyValues.Keys
+    const values: Array<any> = keyValues.Values
+    return keys.map((key, index) => {
+      return {
+        Id: key,
+        Value: values[index],
+      }
+    })
+  }
+
   save2Excel(
     settings: any[],
     outputFullPath: string,
     templateFullPath: string = path.join(__dirname, 'templates', 'templateSettings.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateSettings.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (settings_: any[], workbook: any, sheetName_: string) => {
@@ -100,7 +112,4 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
         }
     return super.save2Excel(settings, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
-
-
-  
 }
