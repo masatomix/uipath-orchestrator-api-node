@@ -46,7 +46,7 @@ export class HostLicenseCrudService extends BaseCrudService implements IHostLice
     templateFullPath: string = path.join(__dirname, 'templates', 'templateHostLicenses.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }

@@ -99,7 +99,7 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
     templateFullPath: string = path.join(__dirname, 'templates', 'templateSettings.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateSettings.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (settings_: any[], workbook: any, sheetName_: string) => {

@@ -514,7 +514,7 @@ export const internalSave2Excel = async (
   templateFullPath: string,
   sheetName: string,
   applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-): Promise<void> => {
+): Promise<string> => {
   logger.debug(`template path: ${templateFullPath}`)
   // console.log(instances[0])
   // console.table(instances)
@@ -568,6 +568,18 @@ export const internalSave2Excel = async (
 
   logger.debug(outputFullPath)
   await workbook.toFileAsync(outputFullPath)
+
+  return toFullPath(outputFullPath)
+}
+
+const toFullPath = (str: string) => {
+  let ret = ''
+  if (path.isAbsolute(str)) {
+    ret = str
+  } else {
+    ret = path.join(path.resolve(''), str)
+  }
+  return ret
 }
 
 // 自前実装

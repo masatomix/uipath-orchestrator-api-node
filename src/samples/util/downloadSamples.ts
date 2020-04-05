@@ -4,30 +4,24 @@ import path from 'path'
 
 async function main() {
   const api = new OrchestratorApi(config)
+  const hostApi = new OrchestratorApi((config as any).hostLicense)
 
   try {
     // まずは認証
     await api.authenticate()
-    await api.util.excelDownload('./')
+    await hostApi.authenticate()
+    const promise = api.util.excelDownload('./')
+    const promiseForHost = hostApi.util.excelDownloadForHost('./')
 
-    const files = [
-      'assets.xlsx',
-      // 'hostLicenses.xlsx',
-      'machines.xlsx',
-      'processes.xlsx',
-      'releases.xlsx',
-      'libraries.xlsx',
-      'settings.xlsx',
-      'users.xlsx',
-      'environments.xlsx',
-      'jobs.xlsx',
-      'perRobot_assets.xlsx',
-      'queueDefinitions.xlsx',
-      'robots.xlsx',
-      // 'tenants.xlsx',
-    ].map((file) => path.join('./', file))
-    // console.log(files)
-    api.util.excel2Console(...files)
+    promise.then((fullPaths) => {
+      // console.log(fullPaths)
+      api.util.excel2Console(...fullPaths)
+    })
+
+    promiseForHost.then((fullPaths) => {
+      // console.log(fullPaths)
+      api.util.excel2Console(...fullPaths)
+    })
   } catch (error) {
     console.log(error)
   }

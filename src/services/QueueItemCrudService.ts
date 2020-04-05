@@ -35,7 +35,7 @@ export class QueueItemCrudService extends BaseCrudService implements IQueueItemC
     templateFullPath: string = path.join(__dirname, 'templates', 'templateQueueItem.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }

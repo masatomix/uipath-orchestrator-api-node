@@ -115,7 +115,7 @@ export class LogCrudService extends BaseCrudService implements ILogCrudService {
     templateFullPath: string = path.join(__dirname, 'templates', 'templateLogs.xlsx'), // テンプレファイルは、指定されたファイルか、このソースがあるディレクトリ上のtemplateLogs.xlsxを使う
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (logs_: any[], workbook: any, sheetName_: string) => {

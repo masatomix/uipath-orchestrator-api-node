@@ -6,8 +6,8 @@ import { xlsx2json } from '../utils'
 export class UtilService implements IUtilService {
   constructor(public api: IOrchestratorApi) {}
 
-  async excelDownload(outputFullDir: string): Promise<void> {
-    const promises: Array<Promise<void>> = []
+  excelDownload(outputFullDir: string): Promise<string[]> {
+    const promises: Array<Promise<string>> = []
 
     promises.push(
       this.api.machine
@@ -77,7 +77,7 @@ export class UtilService implements IUtilService {
         ),
     )
 
-    await Promise.all(promises)
+    return Promise.all(promises)
 
     // ////////////
     // let instances: Array<any>
@@ -108,11 +108,10 @@ export class UtilService implements IUtilService {
     // instances = await this.api.queueDefinition.findAll()
     // await this.api.queueDefinition.save2Excel(instances, path.join(outputFullDir, 'queueDefinitions.xlsx'))
 
-    return new Promise((resolve, reject) => resolve())
   }
 
-  async excelDownloadForHost(outputFullDir: string): Promise<void> {
-    const promises: Array<Promise<void>> = []
+  excelDownloadForHost(outputFullDir: string): Promise<string[]>{
+    const promises: Array<Promise<string>> = []
 
     promises.push(
       this.api.hostLicense
@@ -125,8 +124,7 @@ export class UtilService implements IUtilService {
         .then(instances => this.api.tenant.save2Excel(instances, path.join(outputFullDir, 'tenants.xlsx'))),
     )
 
-    await Promise.all(promises)
-    return new Promise((resolve, reject) => resolve())
+    return Promise.all(promises)
   }
 
   /**

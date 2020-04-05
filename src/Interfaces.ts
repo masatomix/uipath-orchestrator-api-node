@@ -10,7 +10,7 @@ export interface ICrudService {
     templateFullPath?: string,
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void>
+  ): Promise<string>
   // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
@@ -137,8 +137,8 @@ export interface ISettingCrudService extends ICrudService {
 }
 
 export interface IUtilService {
-  excelDownload(outputFullPath: string): Promise<void>
-  excelDownloadForHost(outputFullDir: string): Promise<void>
+  excelDownload(outputFullDir: string): Promise<string[]>
+  excelDownloadForHost(outputFullDir: string): Promise<string[]>
 
   /**
    * 指定したパスにあるExcelファイルを読み込んで、console.table を使ってコンソールにダンプします。

@@ -52,7 +52,7 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
     templateFullPath: string = path.join(__dirname, 'templates', 'templateAssets.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<any> {
+  ): Promise<string> {
     const allRobotValues = instances.reduce((accumulator, current) => {
       // RobotValuesの列が来ないときもある。あるときだけ取得。
       if (current.RobotValues) {
@@ -79,7 +79,7 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
     // console.log(outputDir)
     // console.log(templateDir)
 
-    return Promise.all([
+    const promises: Promise<string[]> = Promise.all([
       super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles),
       super.save2Excel(
         allRobotValues,
@@ -89,6 +89,10 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
         applyStyles,
       ),
     ])
+
+    return new Promise<string>((allResolve, reject) => {
+      promises.then((results: string[]) => allResolve(results[0]))
+    })
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
