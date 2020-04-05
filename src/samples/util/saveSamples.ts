@@ -31,6 +31,11 @@ async function main() {
     r = await xlsx2json('processes.xlsx')
     console.table(r)
 
+    instances = await api.library.findAll()
+    await api.library.save2Excel(instances, 'libraries.xlsx')
+    r = await xlsx2json('libraries.xlsx')
+    console.table(r)
+
     instances = await api.job.findAllEx()
     await api.job.save2Excel(instances, 'jobs.xlsx')
     r = await xlsx2json('jobs.xlsx')
