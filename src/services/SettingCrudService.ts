@@ -81,6 +81,18 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
     })
   }
 
+  async getWebSettings(): Promise<Array<any>> {
+    const keyValues = await this.parent.getData('/odata/Settings/UiPath.Server.Configuration.OData.GetWebSettings')
+    const keys: Array<string> = keyValues.Keys
+    const values: Array<any> = keyValues.Values
+    return keys.map((key, index) => {
+      return {
+        Id: key,
+        Value: values[index],
+      }
+    })
+  }
+
   save2Excel(
     settings: any[],
     outputFullPath: string,
@@ -100,7 +112,4 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
         }
     return super.save2Excel(settings, outputFullPath, templateFullPath, sheetName, applyStyles_)
   }
-
-
-  
 }

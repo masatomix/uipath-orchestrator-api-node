@@ -33,6 +33,7 @@ export interface IOrchestratorApi {
   machine: IMachineCrudService
   release: IReleaseCrudService
   process: IProcessCrudService
+  library: IProcessCrudService
   job: IJobCrudService
   schedule: ICrudService
   queueDefinition: IQueueDefinitionCrudService

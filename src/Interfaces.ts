@@ -133,6 +133,7 @@ export interface ISettingCrudService extends ICrudService {
   findByKey(queries?: any): (...keys: string[]) => Promise<Array<any>>
   findByKeyFromArray(apiResults: any[]): (...keys: string[]) => Array<any>
   readSettingsFromFile(fullPath: string, sheetName?: string): Promise<any[]>
+  getWebSettings(): Promise<Array<any>>
 }
 
 export interface IUtilService {
