@@ -48,7 +48,7 @@ export class AuditLogCrudService extends BaseCrudService implements IAuditLogCru
     templateFullPath: string = path.join(__dirname, 'templates', 'templateAuditLog.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     const applyStyles_ = applyStyles
       ? applyStyles
       : (instances_: any[], workbook: any, sheetName_: string) => {

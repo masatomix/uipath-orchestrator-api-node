@@ -51,7 +51,7 @@ export class QueueDefinitionCrudService extends BaseCrudService implements IQueu
     templateFullPath: string = path.join(__dirname, 'templates', 'templateQueueDefinitions.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }

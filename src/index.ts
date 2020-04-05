@@ -61,7 +61,7 @@ export class BaseCrudService implements ICrudService {
     templateFullPath: string = '',
     sheetName: string = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 }
