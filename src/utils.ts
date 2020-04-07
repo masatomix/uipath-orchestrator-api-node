@@ -219,7 +219,10 @@ const createJSONPromise = (option: any): Promise<Array<any>> => {
         resolve()
         return
       }
-      if (body.errorCode || body.errorCode === 0) {
+      // POSTでなげて204(当然Body部が空文字)が返ってきたとき、bodyがundefinedになった   ←この件の対応をいれた if(body...)
+      // DELETEでなげて204(戻り電文はPOSTと同じ空) が返ったときは、bodyは''になった
+      // つまり同じ空電文でも、POST/DELETEで、requestライブラリのbodyの値は異なるということだ
+      if (body && (body.errorCode || body.errorCode === 0)) {
         // エラーがあった場合
         //errorCodeが数値のゼロの時があった
         reject(body)
