@@ -138,7 +138,7 @@ export const deleteData = (config: any, accessToken: string, apiPath: string): P
 const createArrayPromise = (option: any, isOdata: boolean): Promise<Array<any>> => {
   // promiseを返す処理は毎回おなじ。Request処理して、コールバックで値を設定するPromiseを作って返すところを共通化
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(option, function(err: any, response: any, body: string) {
+    request(option, function (err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
@@ -167,7 +167,7 @@ const createArrayPromise = (option: any, isOdata: boolean): Promise<Array<any>> 
  */
 const createStrPromise = (option: any): Promise<Array<any>> => {
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(option, function(err: any, response: any, body: string) {
+    request(option, function (err: any, response: any, body: string) {
       if (err) {
         reject(err)
         return
@@ -202,7 +202,7 @@ const createStrPromise = (option: any): Promise<Array<any>> => {
  */
 const createJSONPromise = (option: any): Promise<Array<any>> => {
   const promise: Promise<any> = new Promise((resolve, reject) => {
-    request(option, function(err: any, response: any, body: any) {
+    request(option, function (err: any, response: any, body: any) {
       if (err) {
         reject(err)
         return
@@ -448,7 +448,7 @@ export const dateFromSn = (serialNumber: number): Date => {
   return XlsxPopulate.numberToDate(serialNumber)
 }
 
-export const toBoolean = function(boolStr: string | boolean): boolean {
+export const toBoolean = function (boolStr: string | boolean): boolean {
   if (typeof boolStr === 'boolean') {
     return boolStr
   }
@@ -457,19 +457,12 @@ export const toBoolean = function(boolStr: string | boolean): boolean {
 
 // XlsxPopulate
 export const getHeaders = (workbook: any, sheetName: string): string[] => {
-  return workbook
-    .sheet(sheetName)
-    .usedRange()
-    .value()
-    .shift()
+  return workbook.sheet(sheetName).usedRange().value().shift()
 }
 
 // XlsxPopulate
 export const getValuesArray = (workbook: any, sheetName: string): any[][] => {
-  const valuesArray: any[][] = workbook
-    .sheet(sheetName)
-    .usedRange()
-    .value()
+  const valuesArray: any[][] = workbook.sheet(sheetName).usedRange().value()
   valuesArray.shift() // 先頭除去
   return valuesArray
 }
@@ -499,7 +492,7 @@ export const xlsx2json = async (
   })
 
   if (format_func) {
-    return instances.map(instance => format_func(instance))
+    return instances.map((instance) => format_func(instance))
   }
   return instances
 }
