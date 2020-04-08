@@ -72,6 +72,14 @@ export interface IJobCrudService extends ICrudService {
 
   stopJob(jobId: number, force?: boolean): Promise<any>
 }
+export interface IFolderCrudService extends ICrudService {
+  findByDisplayName(name: string): Promise<any>
+  assignUsers(folderId: number, userIds: Array<number>): Promise<any>
+  removeUser(folderId: number, userId: number): Promise<any>
+  getUsers(folderId: number, asArray?: boolean): Promise<Array<any>>
+  getFolders(userName: string): Promise<any>
+}
+
 export interface IQueueDefinitionCrudService extends ICrudService {
   findByName(name: string): Promise<any>
 }

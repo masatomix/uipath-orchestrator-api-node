@@ -18,6 +18,7 @@ import {
   IHostLicenseCrudService,
   IEnvironmentCrudService,
   IQueueItemCrudService,
+  IFolderCrudService,
 } from './Interfaces'
 
 /**
@@ -36,6 +37,7 @@ export interface IOrchestratorApi {
   library: IProcessCrudService
   job: IJobCrudService
   schedule: ICrudService
+  folder: IFolderCrudService
   queueDefinition: IQueueDefinitionCrudService
   queueItem: IQueueItemCrudService
   queueOperation: IQueueCrudService

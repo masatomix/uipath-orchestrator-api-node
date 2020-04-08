@@ -31,6 +31,7 @@ import {
   IHostLicenseCrudService,
   IEnvironmentCrudService,
   IQueueItemCrudService,
+  IFolderCrudService,
 } from './Interfaces'
 
 const logger = getLogger('main')
@@ -112,7 +113,7 @@ export class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function(err: any, response: any, body: any) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -138,7 +139,7 @@ export class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function(err: any, response: any, body: any) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -161,7 +162,7 @@ export class OrchestratorApi implements IOrchestratorApi {
 
       const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function(err: any, response: any, body: any) {
+        request.post(auth_options, function (err: any, response: any, body: any) {
           if (err) {
             reject(err)
             return
@@ -223,6 +224,7 @@ export class OrchestratorApi implements IOrchestratorApi {
     }
   })(this)
 
+  folder: IFolderCrudService = new FolderCrudService(this)
   tenant: ITenantCrudService = new TenantCrudService(this)
   hostLicense: IHostLicenseCrudService = new HostLicenseCrudService(this)
   environment: IEnvironmentCrudService = new EnvironmentCrudService(this)
@@ -282,6 +284,7 @@ import { HostLicenseCrudService } from './services/HostLicenseCrudService'
 import { EnvironmentCrudService } from './services/EnvironmentCrudService'
 import { QueueItemCrudService } from './services/QueueItemCrudService'
 import { LibraryCrudService } from './services/LibraryCrudService'
+import { FolderCrudService } from './services/FolderCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン
