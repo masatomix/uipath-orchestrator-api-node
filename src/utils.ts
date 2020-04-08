@@ -314,8 +314,9 @@ export const createRobotOption = (config: any): any => {
 }
 
 const addAdditionalOption = (config: any, option: any): any => {
-  if (config.serverinfo.strictSSL) {
+  if ('strictSSL' in config.serverinfo) {
     Object.assign(option, { strictSSL: config.serverinfo.strictSSL })
+    // process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
   }
   if (config.proxy) {
     // プロパティ proxy があって
