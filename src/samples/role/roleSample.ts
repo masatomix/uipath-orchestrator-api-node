@@ -30,12 +30,12 @@ async function sample() {
   // await api.role.findDetail()
   // console.table(r)
 
-  let r = await api.role.findDetail()('')
+  const r = await api.role.findDetail()('')
   console.table(r)
 }
 
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
