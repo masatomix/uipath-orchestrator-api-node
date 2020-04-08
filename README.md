@@ -147,7 +147,7 @@ console.log(robots)
 
 ## Development status
 
-**対応状況**(2020/03/29時点)
+**対応状況**(2020/04/08時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
@@ -467,6 +467,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.1 Folderサービス追加,POSTで204が返ってくるとエラーになっていたのを修正
 - 0.7.0 
     - uploadの戻り値変更 ``Promise<any>`` -> ``Promise<any[]>``
     - Robot の ``findByRobotName(name: string)`` の戻り値を変更 ``any`` -> ``Promise<any>``
