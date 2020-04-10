@@ -50,7 +50,8 @@ const createAndAssignAndDeleteSample = async (api: IOrchestratorApi) => {
     console.error(error)
   } finally {
     const userDelete = true
-    cleanAll(api, [folderId], userDelete) // フォルダを削除する便利メソッド。
+    api.folder.removeFolders([folderId], userDelete)
+    // cleanAll(api, [folderId], userDelete) // フォルダを削除する便利メソッド。
   }
 }
 
@@ -70,7 +71,8 @@ const assignAndPrint = async (api: IOrchestratorApi) => {
     console.error(error)
   } finally {
     const userDelete = true
-    cleanAll(api, folderIds, userDelete)
+    api.folder.removeFolders(folderIds, userDelete)
+    // cleanAll(api, folderIds, userDelete)
   }
 }
 
@@ -116,7 +118,7 @@ const createTestUser = (api: IOrchestratorApi): Promise<any> => {
 }
 
 if (!module.parent) {
-  (async () => {
+  ;(async () => {
     await sample()
   })()
 }

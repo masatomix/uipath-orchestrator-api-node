@@ -77,22 +77,10 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
       `/odata/Folders/UiPath.Server.Configuration.OData.GetAllRolesForUser(username='${userName}',skip=0,take=30)`,
     )
   }
-  
-  // const cleanAll = async (api: IOrchestratorApi, folderIds: Array<number>, userDelete: boolean = false) => {
-  //   // さっきassignしたユーザ、フォルダの削除
-  //   for (const folderId of folderIds) {
-  //     // このフォルダを閲覧出来るユーザを検索
-  //     const users = await api.folder.getUsers(folderId) // adminも含まれる
 
-  //     for (const user of users) {
-  //       await api.folder.removeUser(folderId, user.Id)
-  //       if (userDelete && user.UserEntity.UserName !== 'admin') {
-  //         await api.user.delete(user.Id) //さっきつくったユーザも削除
-  //       }
-  //     }
-  //     await api.folder.delete(folderId) // folderも削除
-  //   }
-  // }
+  removeFolders(folderIds: Array<number>, userDelete: boolean = false): Promise<any> {
+    return cleanAll(this.parent, folderIds, userDelete)
+  }
 
   save2Excel(
     instances: any[],
@@ -102,5 +90,20 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
     return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+  }
+}
+
+const cleanAll = async (api: IOrchestratorApi, folderIds: Array<number>, userDelete: boolean = false): Promise<any> => {
+  for (const folderId of folderIds) {
+    // このフォルダを閲覧出来るユーザを検索
+    const users = await api.folder.getUsers(folderId) // adminも含まれる
+
+    for (const user of users) {
+      await api.folder.removeUser(folderId, user.Id)
+      if (userDelete && user.UserEntity.UserName !== 'admin') {
+        await api.user.delete(user.Id) //さっきつくったユーザも削除
+      }
+    }
+    return api.folder.delete(folderId) // folderも削除
   }
 }

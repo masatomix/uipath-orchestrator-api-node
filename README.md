@@ -147,7 +147,7 @@ console.log(robots)
 
 ## Development status
 
-**対応状況**(2020/04/08時点)
+**対応状況**(2020/04/10時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
@@ -172,10 +172,11 @@ console.log(robots)
 | 15 | [asset](https://github.com/masatomix/uipath-orchestrator-api-node/blob/develop/src/samples/asset/) | 〇 | 〇 | 〇 | 〇 | 〇 | 〇 | Robot毎Asset更新(uploadPerRobot)<br>Robot毎Asset検索(findAllEx) |  |
 | 16 | environment | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
 | 17 | role | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
-| 18 | tenants | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
-| 19 | hostLicense | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
-| 20 | util |  |  |  |  |  |  | 一括ダウンロード(excelDownload)<br>ExcelデータPrint(excel2Console) |  |
-| 21 | 汎用 | 〇 | 〇 | 〇 | 〇 | 〇 |  | getArray<br>getData<br>postData<br>putData<br>deleteData |  |
+| 18 | [folder](https://github.com/masatomix/uipath-orchestrator-api-node/tree/develop/src/samples/folder) | 〇 | 〇 | 〇 | 〇 | 〇 |  | 名前で検索(findByDisplayName)<br>ユーザ割当(assignUsers/removeUser)<br>フォルダを参照可能なユーザ検索(getUsers)<br>ユーザが参照可能なフォルダ検索(getFolders)<br>フォルダ一括削除(removeFolders) |  |
+| 19 | tenants | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 20 | hostLicense | 〇 | 〇 | 〇 | 〇 | 〇 |  |  |  |
+| 21 | util |  |  |  |  |  |  | 一括ダウンロード(excelDownload)<br>ExcelデータPrint(excel2Console) |  |
+| 22 | 汎用 | 〇 | 〇 | 〇 | 〇 | 〇 |  | getArray<br>getData<br>postData<br>putData<br>deleteData |  |
 
 
 また、
