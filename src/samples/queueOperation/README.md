@@ -80,7 +80,7 @@ Ref: 7197 はアプリ例外により、二回再ランしていることがわ�
 
 ```json
 {
-  "@odata.context": "https://orch.example1.xyz/odata/$metadata#Queues/$entity",
+  "@odata.context": "https://xxx/odata/$metadata#Queues/$entity",
   "QueueDefinitionId": 615,
   "OutputData": null,
   "AnalyticsData": null,
