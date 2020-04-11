@@ -468,6 +468,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.3 ExcelDownloadにフォルダを追加
 - 0.7.2 strictSSLの設定、効いてなかったのを修正
 - 0.7.1 Folderサービス追加,POSTで204が返ってくるとエラーになっていたのを修正
 - 0.7.0 
