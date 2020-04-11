@@ -76,7 +76,7 @@ export interface IFolderCrudService extends ICrudService {
   findByDisplayName(name: string): Promise<any>
   assignUsers(folderId: number, userIds: Array<number>): Promise<any>
   removeUser(folderId: number, userId: number): Promise<any>
-  removeFolders(folderIds: Array<number>, userDelete?: boolean): Promise<any>
+  removeFolders(folderIds: Array<number>, userDelete?: boolean): Promise<void>
   getUsers(folderId: number, asArray?: boolean): Promise<Array<any>>
   getFolders(userName: string): Promise<any>
 }

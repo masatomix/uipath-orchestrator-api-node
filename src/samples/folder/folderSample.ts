@@ -16,6 +16,9 @@ async function sample() {
   // サンプル3: ユーザを作成、Folderをふたつ作成、それらにアサインして、
   // ユーザがみられるフォルダを表示、さいごにフォルダを削除
   await assignAndPrint(api)
+
+  // ゴミ溜まった場合の削除メソッド
+  // await deleteFolders(api)
 }
 
 const searchSample = async (api: IOrchestratorApi) => {
@@ -50,8 +53,7 @@ const createAndAssignAndDeleteSample = async (api: IOrchestratorApi) => {
     console.error(error)
   } finally {
     const userDelete = true
-    api.folder.removeFolders([folderId], userDelete)
-    // cleanAll(api, [folderId], userDelete) // フォルダを削除する便利メソッド。
+    api.folder.removeFolders([folderId], userDelete) // フォルダを削除する便利メソッド。
   }
 }
 
@@ -71,24 +73,7 @@ const assignAndPrint = async (api: IOrchestratorApi) => {
     console.error(error)
   } finally {
     const userDelete = true
-    api.folder.removeFolders(folderIds, userDelete)
-    // cleanAll(api, folderIds, userDelete)
-  }
-}
-
-const cleanAll = async (api: IOrchestratorApi, folderIds: Array<number>, userDelete: boolean = false) => {
-  // さっきassignしたユーザ、フォルダの削除
-  for (const folderId of folderIds) {
-    // このフォルダを閲覧出来るユーザを検索
-    const users = await api.folder.getUsers(folderId) // adminも含まれる
-
-    for (const user of users) {
-      await api.folder.removeUser(folderId, user.Id)
-      if (userDelete && user.UserEntity.UserName !== 'admin') {
-        await api.user.delete(user.Id) //さっきつくったユーザも削除
-      }
-    }
-    await api.folder.delete(folderId) // folderも削除
+    api.folder.removeFolders(folderIds, userDelete) // フォルダを削除する便利メソッド。
   }
 }
 
@@ -117,8 +102,23 @@ const createTestUser = (api: IOrchestratorApi): Promise<any> => {
   return api.user.create(user)
 }
 
+const deleteFolders = async (api: IOrchestratorApi) => {
+  try {
+    const folders: any[] = await api.folder.findAll()
+    const fFolders = folders.filter((folder) => folder.Description === 'テスト')
+    console.table(fFolders)
+
+    await api.folder.removeFolders(fFolders.map((folder) => folder.Id))
+
+    const afterFolders: any[] = await api.folder.findAll()
+    console.table(afterFolders)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 if (!module.parent) {
-  ;(async () => {
+  (async () => {
     await sample()
   })()
 }
