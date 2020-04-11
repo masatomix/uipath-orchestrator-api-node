@@ -13,14 +13,10 @@ async function main() {
     const promise = api.util.excelDownload('./')
     const promiseForHost = hostApi.util.excelDownloadForHost('./')
 
-    promise.then((fullPaths) => {
-      // console.log(fullPaths)
-      api.util.excel2Console(...fullPaths)
-    })
-
-    promiseForHost.then((fullPaths) => {
-      // console.log(fullPaths)
-      api.util.excel2Console(...fullPaths)
+    await Promise.all([promiseForHost, promise]).then((fullPathsArray: Array<string[]>) => {
+      for (const fullPaths of fullPathsArray) {
+        api.util.excel2Console(...fullPaths)
+      }
     })
   } catch (error) {
     console.log(error)
@@ -28,7 +24,7 @@ async function main() {
 }
 
 if (!module.parent) {
-  (async () => {
+  ;(async () => {
     await main()
   })()
 }
