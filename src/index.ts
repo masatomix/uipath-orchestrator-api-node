@@ -1,4 +1,4 @@
-import request from 'request'
+import request, { Response } from 'request'
 import { getLogger } from './logger'
 import {
   getData,
@@ -110,10 +110,8 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.debug(this.config.robotInfo.userName)
 
       const auth_options = createRobotOption(this.config)
-
-      const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, (err: any, _response: Response, body: any): void => {
           if (err) {
             reject(err)
             return
@@ -124,7 +122,7 @@ export class OrchestratorApi implements IOrchestratorApi {
             return
           }
           const access_token = obj.robotKey
-          me.accessToken = access_token
+          this.accessToken = access_token
           logger.debug(access_token)
           resolve(obj)
         })
@@ -137,9 +135,8 @@ export class OrchestratorApi implements IOrchestratorApi {
 
       const auth_options = createEnterpriseOption(this.config)
 
-      const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, (err: any, _response: Response, body: any): void => {
           if (err) {
             reject(err)
             return
@@ -151,7 +148,7 @@ export class OrchestratorApi implements IOrchestratorApi {
           }
 
           const access_token = obj.result
-          me.accessToken = access_token
+          this.accessToken = access_token
           logger.debug(access_token)
           resolve(obj)
         })
@@ -160,9 +157,8 @@ export class OrchestratorApi implements IOrchestratorApi {
       logger.info('Community版として処理開始')
       const auth_options = createCommunityOption(this.config)
 
-      const me = this
       promise = new Promise((resolve, reject) => {
-        request.post(auth_options, function (err: any, response: any, body: any) {
+        request.post(auth_options, (err: any, _response: Response, body: any): void => {
           if (err) {
             reject(err)
             return
@@ -177,7 +173,7 @@ export class OrchestratorApi implements IOrchestratorApi {
           logger.debug(obj)
 
           const access_token = obj.access_token
-          me.accessToken = access_token
+          this.accessToken = access_token
           logger.debug(access_token)
           resolve(obj)
         })

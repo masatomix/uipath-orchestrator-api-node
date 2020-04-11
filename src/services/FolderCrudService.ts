@@ -77,30 +77,58 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
       `/odata/Folders/UiPath.Server.Configuration.OData.GetAllRolesForUser(username='${userName}',skip=0,take=30)`,
     )
   }
-  
-  // const cleanAll = async (api: IOrchestratorApi, folderIds: Array<number>, userDelete: boolean = false) => {
-  //   // さっきassignしたユーザ、フォルダの削除
-  //   for (const folderId of folderIds) {
-  //     // このフォルダを閲覧出来るユーザを検索
-  //     const users = await api.folder.getUsers(folderId) // adminも含まれる
 
-  //     for (const user of users) {
-  //       await api.folder.removeUser(folderId, user.Id)
-  //       if (userDelete && user.UserEntity.UserName !== 'admin') {
-  //         await api.user.delete(user.Id) //さっきつくったユーザも削除
-  //       }
-  //     }
-  //     await api.folder.delete(folderId) // folderも削除
-  //   }
-  // }
+  removeFolders(folderIds: Array<number>, userDelete: boolean = false): Promise<void> {
+    return cleanAll(this.parent, folderIds, userDelete)
+  }
 
-  save2Excel(
+  async save2Excel(
     instances: any[],
     outputFullPath: string,
     templateFullPath: string = path.join(__dirname, 'templates', 'templateFolders.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+    const foldersInfo = await this.parent.folder.getFolders(this.parent.config.userinfo.usernameOrEmailAddress)
+    const folders = foldersInfo.PageItems.map((item: any) => item.Folder)
+
+    const outputFullName = path.basename(outputFullPath)
+    const templateFullName = path.basename(templateFullPath)
+    const outputDir = path.dirname(outputFullPath)
+    const templateDir = path.dirname(templateFullPath)
+
+    const promises: Promise<string[]> = Promise.all([
+      super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles),
+      super.save2Excel(
+        folders,
+        path.join(outputDir, `perUser_${outputFullName}`),
+        path.join(templateDir, `perUser_${templateFullName}`),
+        sheetName,
+        applyStyles,
+      ),
+    ])
+
+    return new Promise<string>((allResolve, reject) => {
+      promises.then((results: string[]) => allResolve(results[0]))
+    })
+  }
+}
+
+const cleanAll = async (
+  api: IOrchestratorApi,
+  folderIds: Array<number>,
+  userDelete: boolean = false,
+): Promise<void> => {
+  for (const folderId of folderIds) {
+    // このフォルダを閲覧出来るユーザを検索
+    const users = await api.folder.getUsers(folderId) // adminも含まれる
+
+    for (const user of users) {
+      await api.folder.removeUser(folderId, user.Id)
+      if (userDelete && user.UserEntity.UserName !== 'admin') {
+        await api.user.delete(user.Id) //さっきつくったユーザも削除
+      }
+    }
+    await api.folder.delete(folderId) // folderも削除
   }
 }

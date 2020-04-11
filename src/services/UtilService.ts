@@ -12,69 +12,75 @@ export class UtilService implements IUtilService {
     promises.push(
       this.api.machine
         .findAll()
-        .then(instances => this.api.machine.save2Excel(instances, path.join(outputFullDir, 'machines.xlsx'))),
+        .then((instances) => this.api.machine.save2Excel(instances, path.join(outputFullDir, 'machines.xlsx'))),
     )
 
     promises.push(
       this.api.robot
         .findAll()
-        .then(instances => this.api.robot.save2Excel(instances, path.join(outputFullDir, 'robots.xlsx'))),
+        .then((instances) => this.api.robot.save2Excel(instances, path.join(outputFullDir, 'robots.xlsx'))),
     )
 
     promises.push(
       this.api.environment
         .findAll()
-        .then(instances => this.api.environment.save2Excel(instances, path.join(outputFullDir, 'environments.xlsx'))),
+        .then((instances) => this.api.environment.save2Excel(instances, path.join(outputFullDir, 'environments.xlsx'))),
     )
 
     promises.push(
       this.api.user
         .findAll()
-        .then(instances => this.api.user.save2Excel(instances, path.join(outputFullDir, 'users.xlsx'))),
+        .then((instances) => this.api.user.save2Excel(instances, path.join(outputFullDir, 'users.xlsx'))),
     )
 
     promises.push(
       this.api.release
         .findAll()
-        .then(instances => this.api.release.save2Excel(instances, path.join(outputFullDir, 'releases.xlsx'))),
+        .then((instances) => this.api.release.save2Excel(instances, path.join(outputFullDir, 'releases.xlsx'))),
     )
 
     promises.push(
       this.api.process
         .findAll()
-        .then(instances => this.api.process.save2Excel(instances, path.join(outputFullDir, 'processes.xlsx'))),
+        .then((instances) => this.api.process.save2Excel(instances, path.join(outputFullDir, 'processes.xlsx'))),
     )
 
     promises.push(
       this.api.library
         .findAll()
-        .then(instances => this.api.library.save2Excel(instances, path.join(outputFullDir, 'libraries.xlsx'))),
+        .then((instances) => this.api.library.save2Excel(instances, path.join(outputFullDir, 'libraries.xlsx'))),
     )
 
     promises.push(
       this.api.job
         .findAllEx()
-        .then(instances => this.api.job.save2Excel(instances, path.join(outputFullDir, 'jobs.xlsx'))),
+        .then((instances) => this.api.job.save2Excel(instances, path.join(outputFullDir, 'jobs.xlsx'))),
     )
 
     promises.push(
       this.api.asset
         .findAllEx()
-        .then(instances => this.api.asset.save2Excel(instances, path.join(outputFullDir, 'assets.xlsx'))),
+        .then((instances) => this.api.asset.save2Excel(instances, path.join(outputFullDir, 'assets.xlsx'))),
     )
 
     promises.push(
       this.api.setting
         .findAll()
-        .then(instances => this.api.setting.save2Excel(instances, path.join(outputFullDir, 'settings.xlsx'))),
+        .then((instances) => this.api.setting.save2Excel(instances, path.join(outputFullDir, 'settings.xlsx'))),
     )
 
     promises.push(
       this.api.queueDefinition
         .findAll()
-        .then(instances =>
+        .then((instances) =>
           this.api.queueDefinition.save2Excel(instances, path.join(outputFullDir, 'queueDefinitions.xlsx')),
         ),
+    )
+
+    promises.push(
+      this.api.folder
+        .findAll()
+        .then((instances) => this.api.folder.save2Excel(instances, path.join(outputFullDir, 'folders.xlsx'))),
     )
 
     return Promise.all(promises)
@@ -107,21 +113,20 @@ export class UtilService implements IUtilService {
 
     // instances = await this.api.queueDefinition.findAll()
     // await this.api.queueDefinition.save2Excel(instances, path.join(outputFullDir, 'queueDefinitions.xlsx'))
-
   }
 
-  excelDownloadForHost(outputFullDir: string): Promise<string[]>{
+  excelDownloadForHost(outputFullDir: string): Promise<string[]> {
     const promises: Array<Promise<string>> = []
 
     promises.push(
       this.api.hostLicense
         .findAll()
-        .then(instances => this.api.hostLicense.save2Excel(instances, path.join(outputFullDir, 'hostLicenses.xlsx'))),
+        .then((instances) => this.api.hostLicense.save2Excel(instances, path.join(outputFullDir, 'hostLicenses.xlsx'))),
     )
     promises.push(
       this.api.tenant
         .findAll()
-        .then(instances => this.api.tenant.save2Excel(instances, path.join(outputFullDir, 'tenants.xlsx'))),
+        .then((instances) => this.api.tenant.save2Excel(instances, path.join(outputFullDir, 'tenants.xlsx'))),
     )
 
     return Promise.all(promises)
@@ -135,7 +140,7 @@ export class UtilService implements IUtilService {
     const promises: Array<Promise<void>> = []
     for (const fullPath of fullPaths) {
       promises.push(
-        xlsx2json(fullPath).then(instances => {
+        xlsx2json(fullPath).then((instances) => {
           console.log(`path : ${path.resolve(fullPath)}`)
           console.log(`count: ${instances.length}`)
           console.table(instances)
