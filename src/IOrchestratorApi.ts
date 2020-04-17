@@ -60,5 +60,6 @@ export interface IOrchestratorApi {
   isCommunity: boolean
   isRobot: boolean
   config: any
+  organizationUnitId: number
   accessToken: any
 }
