@@ -351,6 +351,12 @@ const headers = (config: any, accessToken: string, contentType: string): any => 
       ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
     }
   }
+
+  // しかし、organizationUnitIdFromAPI があればそれ優先
+  if ('organizationUnitIdFromAPI' in config) {
+    ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.organizationUnitIdFromAPI })
+  }
+
   if (tenant_logical_name) {
     return Object.assign(ret, {
       'X-UiPath-TenantName': tenant_logical_name,

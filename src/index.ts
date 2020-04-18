@@ -77,6 +77,15 @@ export class OrchestratorApi implements IOrchestratorApi {
   isRobot: boolean = false
   accessToken: string = ''
 
+  get organizationUnitId() {
+    return this.config.organizationUnitIdFromAPI
+  }
+
+  set organizationUnitId(organizationUnitId: number) {
+    logger.info(`Folder Idを[${organizationUnitId}]に切り替えます`)
+    this.config = Object.assign({}, this.config, { organizationUnitIdFromAPI: organizationUnitId })
+  }
+
   constructor(public config: any) {
     // Enterpriseだったら、trueにする
     if (!this.config.serverinfo.client_id) {
