@@ -35,19 +35,25 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
   delete(id: number): Promise<any> {
     return deleteData(this.parent.config, this.parent.accessToken, `/odata/Machines(${id})`)
   }
-  save2Excel(
+  async save2Excel(
     instances: any[],
     outputFullPath: string,
     templateFullPath: string = path.join(__dirname, 'templates', 'templateMachines.xlsx'),
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-    return super.save2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+
+    const savedInstancesP = instances.map(async (instance) => {
+      const machine = await this.parent.machine.find(instance.Id)
+      return Object.assign({}, instance, { LicenseKey: machine.LicenseKey })
+    })
+    const savedInstances = await Promise.all(savedInstancesP)
+    return super.save2Excel(savedInstances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any[]> {
     const machines = await xlsx2json(inputFullPath, sheetName)
-    const promises = machines.map(machine => {
+    const promises = machines.map((machine) => {
       if (allProperty) {
         return this.create(machine)
       } else {
