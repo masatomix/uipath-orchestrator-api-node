@@ -89,9 +89,13 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-    const foldersInfo = await this.parent.folder.getFolders(this.parent.config.userinfo.usernameOrEmailAddress)
-    const folders = foldersInfo.PageItems.map((item: any) => item.Folder)
+    // 全ユーザの情報(ただしTypeがRobotは覗く)を取得し、ユーザ毎に参照可能なフォルダを取得する。
+    const allUsers = await this.parent.user.findAll()
+    const userNames = allUsers.filter((user) => user.Type === 'User').map((user) => user.UserName)
+    const folders = await this._getUserFolders(userNames)
+    // console.table(folders)
 
+    // その後Excelへ出力。
     const outputFullName = path.basename(outputFullPath)
     const templateFullName = path.basename(templateFullPath)
     const outputDir = path.dirname(outputFullPath)
@@ -111,6 +115,17 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
     return new Promise<string>((allResolve, reject) => {
       promises.then((results: string[]) => allResolve(results[0]))
     })
+  }
+
+  async _getUserFolders(userNames: Array<string>) {
+    const allFolders: any[] = []
+    for (const userName of userNames) {
+      const foldersInfo = await this.parent.folder.getFolders(userName)
+      const folders: any[] = foldersInfo.PageItems.map((item: any) => item.Folder)
+      const foldersWithUser = folders.map((folder) => Object.assign({}, folder, { UserName: userName }))
+      allFolders.push(...foldersWithUser)
+    }
+    return allFolders
   }
 }
 
