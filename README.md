@@ -468,6 +468,11 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.4 いくつかの機能追加
+    - OrganizationUnitIdを切り替える機能を追加(``api.organizationUnitId=2``など)。
+    - ``api.util.excelDownload``は、操作アカウントが参照可能なフォルダの情報を出力するように変更。
+    - ``api.machine.findAll``は通常ライセンスキーが入らないが、Excel出力時は入れるように処理追加。
+    - ユーザ・フォルダ関連情報の出力については、TypeがUserであるすべてのユーザ・フォルダ関連を出力するよう変更
 - 0.7.3 ExcelDownloadにフォルダを追加
 - 0.7.2 strictSSLの設定、効いてなかったのを修正
 - 0.7.1 Folderサービス追加,POSTで204が返ってくるとエラーになっていたのを修正
