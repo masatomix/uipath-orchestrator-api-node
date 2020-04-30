@@ -468,6 +468,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.5 Excel出力で、Windows認証されたユーザTypeも出力するよう処理を追加。
 - 0.7.4 いくつかの機能追加
     - OrganizationUnitIdを切り替える機能を追加(``api.organizationUnitId=2``など)。
     - ``api.util.excelDownload``は、操作アカウントが参照可能なフォルダの情報を出力するように変更。
