@@ -91,7 +91,9 @@ export class FolderCrudService extends BaseCrudService implements IFolderCrudSer
   ): Promise<string> {
     // 全ユーザの情報(ただしTypeがRobotは覗く)を取得し、ユーザ毎に参照可能なフォルダを取得する。
     const allUsers = await this.parent.user.findAll()
-    const userNames = allUsers.filter((user) => user.Type === 'User').map((user) => user.UserName)
+    const userNames = allUsers
+      .filter((user) => user.Type === 'User' || user.Type === 'DirectoryUser'|| user.Type === 'DirectoryGroup')
+      .map((user) => user.UserName)
     const folders = await this._getUserFolders(userNames)
     // console.table(folders)
 
