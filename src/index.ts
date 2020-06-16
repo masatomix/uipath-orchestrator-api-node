@@ -63,7 +63,10 @@ export class BaseCrudService implements ICrudService {
     sheetName: string = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-    return json2excel(instances, outputFullPath, templateFullPath, sheetName, () => {}, applyStyles)
+    const converters = {
+      // RobotVersions: (value: any) => value[0].Count,
+    }
+    return json2excel(instances, outputFullPath, templateFullPath, sheetName, converters, applyStyles)
   }
 }
 
