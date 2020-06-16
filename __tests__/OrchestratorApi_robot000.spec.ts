@@ -7,6 +7,7 @@ import path from 'path'
 const logger = getLogger('main')
 
 describe('OrchestratorApi_robot000', () => {
+  jest.setTimeout(30000)
   const api = new OrchestratorApi(config)
 
   let expecteds: Array<any> = []
