@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { excel2json } from 'excel-csv-read-write'
 import path from 'path'
 import { IRobotCrudService } from '../Interfaces'
 
@@ -48,7 +49,7 @@ export class RobotCrudService extends BaseCrudService implements IRobotCrudServi
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
-    const robots = await xlsx2json(inputFullPath, sheetName)
+    const robots = await excel2json(inputFullPath, sheetName)
     const promises = robots.map(async robot => {
       if (allProperty) {
         return this.create(robot)

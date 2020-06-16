@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, postData, xlsx2json } from '../utils'
+import { getArray, getData, postData } from '../utils'
+import { excel2json } from 'excel-csv-read-write'
 import path from 'path'
 import { ISettingCrudService } from '../Interfaces'
 
@@ -69,7 +70,7 @@ export class SettingCrudService extends BaseCrudService implements ISettingCrudS
   }
 
   readSettingsFromFile(fullPath: string, sheetName = 'Sheet1'): Promise<any[]> {
-    return xlsx2json(fullPath, sheetName, instance => {
+    return excel2json(fullPath, sheetName, (instance) => {
       const value = instance.Value ? instance.Value : ''
       const scope = instance.Scope ? instance.Scope : null
       return {
