@@ -10,3 +10,4 @@ tslint.json
 __tests__
 dist/samples/
 .DS_Store
+*.tgz
