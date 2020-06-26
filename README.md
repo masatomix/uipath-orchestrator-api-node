@@ -147,7 +147,7 @@ console.log(robots)
 
 ## Development status
 
-**対応状況**(2020/04/10時点)
+**対応状況**(2020/06/26時点)
 
 各APIへの対応状況です。専用のメソッドを用意しているモノに「〇」をつけています。用意していない場合も汎用のメソッドを呼び出す事で、基本的にどのAPIも呼び出すことが可能だと思います。
 専用メソッドの実装は気まぐれでやってるので、割と歯抜けでスイマセン。。
@@ -468,6 +468,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.6 Excelファイルの入出力を別のライブラリとして切り出したので、それをdependするように変更
 - 0.7.5 Excel出力で、Windows認証されたユーザTypeも出力するよう処理を追加。
 - 0.7.4 いくつかの機能追加
     - OrganizationUnitIdを切り替える機能を追加(``api.organizationUnitId=2``など)。
