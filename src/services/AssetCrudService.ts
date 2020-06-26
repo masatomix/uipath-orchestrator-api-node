@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { excel2json } from 'excel-csv-read-write'
 import path from 'path'
 import { IAssetCrudService } from '../Interfaces'
 
@@ -125,7 +126,7 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
     perRobotSheetName = 'Sheet1',
     allProperty = false,
   ): Promise<any> {
-    const instances = await xlsx2json(inputFullPath, sheetName, instance => {
+    const instances = await excel2json(inputFullPath, sheetName, (instance) => {
       return Object.assign({}, instance, {
         Value: String(instance.Value),
         StringValue: String(instance.StringValue),
@@ -134,7 +135,7 @@ export class AssetCrudService extends BaseCrudService implements IAssetCrudServi
 
     let perRobotInstances: Array<any> = []
     if (perRobotInputFullPath !== '') {
-      perRobotInstances = await xlsx2json(perRobotInputFullPath, perRobotSheetName, instance => {
+      perRobotInstances = await excel2json(perRobotInputFullPath, perRobotSheetName, (instance) => {
         return Object.assign({}, instance, {
           Value: String(instance.Value),
           StringValue: String(instance.StringValue),

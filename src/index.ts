@@ -6,7 +6,6 @@ import {
   putData,
   postData,
   deleteData,
-  internalSave2Excel,
   createRobotOption,
   createEnterpriseOption,
   createCommunityOption,
@@ -33,6 +32,7 @@ import {
   IQueueItemCrudService,
   IFolderCrudService,
 } from './Interfaces'
+import { json2excel } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
 
@@ -63,7 +63,10 @@ export class BaseCrudService implements ICrudService {
     sheetName: string = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-    return internalSave2Excel(instances, outputFullPath, templateFullPath, sheetName, applyStyles)
+    const converters = {
+      // RobotVersions: (value: any) => value[0].Count,
+    }
+    return json2excel(instances, outputFullPath, templateFullPath, sheetName, converters, applyStyles)
   }
 }
 

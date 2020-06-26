@@ -1,10 +1,10 @@
 import OrchestratorApi from '../src/index'
 import { getLogger } from '../src/logger'
-import { xlsx2json } from '../src/utils'
 import { randomName } from '../src/samples/sampleUtils'
 import config from 'config'
 import path from 'path'
 import { IOrchestratorApi } from '../src/IOrchestratorApi'
+import { excel2json } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
 
@@ -16,7 +16,7 @@ describe('OrchestratorApi_folder000', () => {
   beforeEach(async () => {
     await api.authenticate()
     const dataPath = path.join(__dirname, 'testData', 'folders000.xlsx')
-    expecteds = await xlsx2json(dataPath)
+    expecteds = await excel2json(dataPath)
     console.table(expecteds)
   })
 

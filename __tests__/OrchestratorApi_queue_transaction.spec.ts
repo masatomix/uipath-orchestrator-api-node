@@ -8,7 +8,7 @@ import { getLogger } from '../src/logger'
 const logger = getLogger('main')
 
 describe('OrchestratorApi_queue_transaction', () => {
-  jest.setTimeout(10000)
+  jest.setTimeout(30000)
   const userConfig = (config as any).OrchestratorApi_queue.userApi
   const api: IOrchestratorApi = new OrchestratorApi(userConfig)
 
