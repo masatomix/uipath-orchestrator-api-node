@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { excel2json } from 'excel-csv-read-write'
 import path from 'path'
 import { IUserCrudService } from '../Interfaces'
 
@@ -48,7 +49,7 @@ export class UserCrudService extends BaseCrudService implements IUserCrudService
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any> {
-    const users = await xlsx2json(inputFullPath, sheetName)
+    const users = await excel2json(inputFullPath, sheetName)
     const promises = users.map(user => {
       if (allProperty) {
         return this.create(user)

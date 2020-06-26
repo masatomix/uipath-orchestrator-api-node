@@ -1,6 +1,6 @@
 import OrchestratorApi from '../src/index'
 import { getLogger } from '../src/logger'
-import { xlsx2json } from '../src/utils'
+import { excel2json } from 'excel-csv-read-write'
 import config from 'config'
 import path from 'path'
 
@@ -14,7 +14,7 @@ describe('OrchestratorApi_machine000', () => {
   beforeEach(async () => {
     await api.authenticate()
     const dataPath = path.join(__dirname, 'testData', 'machines000.xlsx')
-    expecteds = await xlsx2json(dataPath)
+    expecteds = await excel2json(dataPath)
   })
 
   it('Normal Case.', async () => {

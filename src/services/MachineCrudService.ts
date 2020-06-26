@@ -1,6 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
+import { excel2json, json2excel } from 'excel-csv-read-write'
 import path from 'path'
 import { IMachineCrudService } from '../Interfaces'
 
@@ -42,17 +43,22 @@ export class MachineCrudService extends BaseCrudService implements IMachineCrudS
     sheetName = 'Sheet1',
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string> {
-
     const savedInstancesP = instances.map(async (instance) => {
       const machine = await this.parent.machine.find(instance.Id)
       return Object.assign({}, instance, { LicenseKey: machine.LicenseKey })
     })
     const savedInstances = await Promise.all(savedInstancesP)
-    return super.save2Excel(savedInstances, outputFullPath, templateFullPath, sheetName, applyStyles)
+
+    const converters = {
+      // RobotVersions: (value: any) => value[0].Count,
+      // RobotVersions: (value: any) => value[0].Version,
+    }
+    return json2excel(savedInstances, outputFullPath, templateFullPath, sheetName, converters, applyStyles)
+    // return super.save2Excel(savedInstances, outputFullPath, templateFullPath, sheetName, applyStyles)
   }
 
   async upload(inputFullPath: string, sheetName = 'Sheet1', allProperty = false): Promise<any[]> {
-    const machines = await xlsx2json(inputFullPath, sheetName)
+    const machines = await excel2json(inputFullPath, sheetName)
     const promises = machines.map((machine) => {
       if (allProperty) {
         return this.create(machine)

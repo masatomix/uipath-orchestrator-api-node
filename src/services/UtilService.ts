@@ -1,7 +1,7 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { IUtilService } from '../Interfaces'
 import path from 'path'
-import { xlsx2json } from '../utils'
+import { excel2json } from 'excel-csv-read-write'
 
 export class UtilService implements IUtilService {
   constructor(public api: IOrchestratorApi) {}
@@ -147,7 +147,7 @@ export class UtilService implements IUtilService {
     const promises: Array<Promise<void>> = []
     for (const fullPath of fullPaths) {
       promises.push(
-        xlsx2json(fullPath).then((instances) => {
+        excel2json(fullPath).then((instances) => {
           console.log(`path : ${path.resolve(fullPath)}`)
           console.log(`count: ${instances.length}`)
           console.table(instances)

@@ -1,6 +1,6 @@
 import { IOrchestratorApi } from '../IOrchestratorApi'
 import { BaseCrudService } from '..'
-import { getArray, getData, putData, postData, deleteData, xlsx2json } from '../utils'
+import { getArray, getData, putData, postData, deleteData } from '../utils'
 import path from 'path'
 import { IHostLicenseCrudService } from '../Interfaces'
 

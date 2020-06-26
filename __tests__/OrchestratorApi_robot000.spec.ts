@@ -1,12 +1,13 @@
 import OrchestratorApi from '../src/index'
 import { getLogger } from '../src/logger'
-import { xlsx2json } from '../src/utils'
+import { excel2json } from 'excel-csv-read-write'
 import config from 'config'
 import path from 'path'
 
 const logger = getLogger('main')
 
 describe('OrchestratorApi_robot000', () => {
+  jest.setTimeout(30000)
   const api = new OrchestratorApi(config)
 
   let expecteds: Array<any> = []
@@ -16,7 +17,7 @@ describe('OrchestratorApi_robot000', () => {
 
     await api.machine.upload(path.join(__dirname, 'testData', 'machines001.xlsx'))
     const dataPath = path.join(__dirname, 'testData', 'robots000.xlsx')
-    expecteds = await xlsx2json(dataPath)
+    expecteds = await excel2json(dataPath)
   })
 
   it('Normal Case.', async () => {
@@ -111,7 +112,7 @@ describe('OrchestratorApi_robot000', () => {
     }
     {
       const dataPath = path.join(__dirname, 'testData', 'machines001.xlsx')
-      const machines = await xlsx2json(dataPath)
+      const machines = await excel2json(dataPath)
 
       const deletePromises = machines
         .map(expected => api.machine.findByMachineName(expected.Name)) // 検索してPromise取得
