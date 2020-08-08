@@ -346,8 +346,10 @@ const headers = (config: any, accessToken: string, contentType: string): any => 
       Authorization: 'Bearer ' + accessToken,
       'content-type': contentType,
     }
-    if (config.userinfo.organizationUnit) {
-      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
+    if ('userinfo' in config) {
+      if (config.userinfo.organizationUnit) {
+        ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
+      }
     }
   }
 
