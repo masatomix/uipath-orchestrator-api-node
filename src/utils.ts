@@ -275,10 +275,12 @@ export const createEnterpriseOption = (config: any): any => {
   const option_tmp = {
     uri: config.serverinfo.servername + '/api/Account/Authenticate',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    form: config.userinfo,
+    // form: config.userinfo,
+    json: config.userinfo,
   }
   return addAdditionalOption(config, option_tmp)
 }
@@ -293,7 +295,7 @@ export const createCommunityOption = (config: any): any => {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    form: form,
+    json: form,
   }
   return addAdditionalOption(config, option_tmp)
 }
@@ -346,8 +348,10 @@ const headers = (config: any, accessToken: string, contentType: string): any => 
       Authorization: 'Bearer ' + accessToken,
       'content-type': contentType,
     }
-    if (config.userinfo.organizationUnit) {
-      ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
+    if ('userinfo' in config) {
+      if (config.userinfo.organizationUnit) {
+        ret = Object.assign({}, ret, { 'X-UIPATH-OrganizationUnitId': config.userinfo.organizationUnit })
+      }
     }
   }
 
