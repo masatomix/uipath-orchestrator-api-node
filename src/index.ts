@@ -90,6 +90,10 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   constructor(public config: any) {
+    if (config.token) {
+      this.accessToken = config.token.accessToken
+      return
+    }
     // Enterpriseだったら、trueにする
     if (!this.config.serverinfo.client_id) {
       // serverinfo.client_idプロパティがなければEnterprise
@@ -115,7 +119,12 @@ export class OrchestratorApi implements IOrchestratorApi {
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
-    if (this.isRobot) {
+    if (this.config.token) {
+      logger.info('Tokenモードとして処理開始')
+      promise = new Promise((resolve, reject) => {
+        resolve()
+      })
+    } else if (this.isRobot) {
       logger.info('Robotモードとして処理開始')
       logger.debug(this.config.robotInfo.machineKey)
       logger.debug(this.config.robotInfo.machineName)
