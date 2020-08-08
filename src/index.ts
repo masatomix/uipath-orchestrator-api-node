@@ -162,7 +162,8 @@ export class OrchestratorApi implements IOrchestratorApi {
             reject(err)
             return
           }
-          const obj = JSON.parse(body)
+          // const obj = JSON.parse(body)
+          const obj = body
           if (!obj.success) {
             reject(obj)
             return
@@ -184,7 +185,8 @@ export class OrchestratorApi implements IOrchestratorApi {
             reject(err)
             return
           }
-          const obj = JSON.parse(body)
+          // const obj = JSON.parse(body)
+          const obj = body
 
           if (!obj.access_token) {
             reject(obj)
