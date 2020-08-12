@@ -11,6 +11,11 @@ export interface ICrudService {
     sheetName?: string,
     applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
   ): Promise<string>
+  save2ExcelBlob(
+    instances: any[],
+    sheetName?: string,
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<Blob>
   // upload(inputFullPath: string, sheetName?: string, allProperty?: boolean): Promise<any[]>
 }
 
