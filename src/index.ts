@@ -32,7 +32,7 @@ import {
   IQueueItemCrudService,
   IFolderCrudService,
 } from './Interfaces'
-import { json2excel } from 'excel-csv-read-write'
+import { json2excel, json2excelBlob } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
 
@@ -67,6 +67,16 @@ export class BaseCrudService implements ICrudService {
       // RobotVersions: (value: any) => value[0].Count,
     }
     return json2excel(instances, outputFullPath, templateFullPath, sheetName, converters, applyStyles)
+  }
+  save2ExcelBlob(
+    instances: any[],
+    sheetName: string = 'Sheet1',
+    applyStyles?: (instances: any[], workbook: any, sheetName: string) => void,
+  ): Promise<Blob> {
+    const converters = {
+      // RobotVersions: (value: any) => value[0].Count,
+    }
+    return json2excelBlob(instances, sheetName, converters, applyStyles)
   }
 }
 
