@@ -31,6 +31,7 @@ import {
   IEnvironmentCrudService,
   IQueueItemCrudService,
   IFolderCrudService,
+  ILicenseCrudService,
 } from './Interfaces'
 import { json2excel, json2excelBlob } from 'excel-csv-read-write'
 
@@ -215,18 +216,7 @@ export class OrchestratorApi implements IOrchestratorApi {
     return promise
   }
 
-  license: ICrudService = new (class extends BaseCrudService {
-    constructor(parent: IOrchestratorApi) {
-      super(parent)
-    }
-    find(): Promise<any> {
-      return getData(
-        this.parent.config,
-        this.parent.accessToken,
-        '/odata/Settings/UiPath.Server.Configuration.OData.GetLicense',
-      )
-    }
-  })(this)
+  license: ILicenseCrudService = new LicenseCrudService(this)
 
   robot: IRobotCrudService = new RobotCrudService(this)
 
@@ -314,6 +304,7 @@ import { EnvironmentCrudService } from './services/EnvironmentCrudService'
 import { QueueItemCrudService } from './services/QueueItemCrudService'
 import { LibraryCrudService } from './services/LibraryCrudService'
 import { FolderCrudService } from './services/FolderCrudService'
+import { LicenseCrudService } from './services/LicenseCrudService'
 
 // const getConfig = () => {
 //   // 設定ファイルから読むパタン
