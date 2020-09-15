@@ -468,6 +468,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.7.9 ライセンスの利用状況を取得するメソッド``license.getRuntimeLicenses``,``license.getNamedUserLicenses``を追加
 - 0.7.8 Excel出力時に直接ファイルでなく、バイナリデータを取得するメソッド``save2ExcelBlob``を追加
 - 0.7.7 configに Tokenを書けるように機能追加。Content-Typeを ``application/x-www-form-urlencoded`` でなく ``application/json`` に集約。configにuserinfoが存在しない場合、organizationUnit情報をとろうとして異常終了していたのを修正。 
 - 0.7.6 Excelファイルの入出力を別のライブラリとして切り出したので、それをdependするように変更

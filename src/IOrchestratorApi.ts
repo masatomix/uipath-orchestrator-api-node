@@ -19,6 +19,7 @@ import {
   IEnvironmentCrudService,
   IQueueItemCrudService,
   IFolderCrudService,
+  ILicenseCrudService,
 } from './Interfaces'
 
 /**
@@ -27,7 +28,7 @@ import {
  */
 export interface IOrchestratorApi {
   authenticate: () => Promise<any>
-  license: ICrudService
+  license: ILicenseCrudService
   robot: IRobotCrudService
   user: IUserCrudService
   role: IRoleCrudService
