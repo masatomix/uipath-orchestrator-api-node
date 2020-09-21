@@ -1,5 +1,5 @@
 import OrchestratorApi from '../src/index'
-import { IOrchestratorApi } from '../src/IOrchestratorApi'
+import { IOrchestratorApi } from '../src/'
 
 import config from 'config'
 import { randomName, createRobotData } from '../src/samples/sampleUtils'

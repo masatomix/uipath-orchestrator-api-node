@@ -37,6 +37,57 @@ import { json2excel, json2excelBlob } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
 
+export interface LicenseRuntimeDto {
+  Key: string
+  MachineId: number
+  MachineName: string
+  Runtimes: number
+  RobotsCount: number
+  ExecutingCount: number
+  IsOnline: boolean
+  IsLicensed: boolean
+  Enabled: boolean
+}
+
+export interface LicenseNamedUserDto {
+  Key: string
+  UserName: string
+  LastLoginDate: Date
+  MachinesCount: number
+  IsLicensed: boolean
+  IsExternalLicensed: boolean
+  ActiveRobotId: number
+  MachineNames: string[]
+  ActiveMachineNames: string[]
+}
+
+export interface LicenseDto {
+  HostLicenseId: number
+  Id: number
+  ExpireDate: number
+  GracePeriodEndDate: number
+  GracePeriod: number
+  AttendedConcurrent: boolean
+  DevelopmentConcurrent: boolean
+  StudioXConcurrent: boolean
+  LicensedFeatures: string[]
+  IsRegistered: boolean
+  IsExpired: boolean
+  CreationTime: Date
+  Code: string
+  Allowed: LicenseFields
+  Used: LicenseFields
+}
+
+export interface LicenseFields {
+  Unattended: number
+  Attended: number
+  NonProduction: number
+  Development: number
+  StudioX: number
+}
+
+
 /**
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
  */
@@ -79,6 +130,49 @@ export class BaseCrudService implements ICrudService {
     }
     return json2excelBlob(instances, sheetName, converters, applyStyles)
   }
+}
+
+/**
+ * Orchestrator API Wrapper
+ * cf. https://docs.uipath.com/orchestrator/v2019/reference
+ */
+export interface IOrchestratorApi {
+  authenticate: () => Promise<any>
+  license: ILicenseCrudService
+  robot: IRobotCrudService
+  user: IUserCrudService
+  role: IRoleCrudService
+  machine: IMachineCrudService
+  release: IReleaseCrudService
+  process: IProcessCrudService
+  library: IProcessCrudService
+  job: IJobCrudService
+  schedule: ICrudService
+  folder: IFolderCrudService
+  queueDefinition: IQueueDefinitionCrudService
+  queueItem: IQueueItemCrudService
+  queueOperation: IQueueCrudService
+  log: ILogCrudService
+  auditLog: IAuditLogCrudService
+  setting: ISettingCrudService
+  asset: IAssetCrudService
+  util: IUtilService
+  tenant: ITenantCrudService
+  hostLicense: IHostLicenseCrudService
+  environment: IEnvironmentCrudService
+  // 以下、汎用的なメソッド
+  getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
+  getData: (apiPath: string) => Promise<any>
+  postData: (apiPath: string, obj: any) => Promise<any>
+  putData: (apiPath: string, obj: any) => Promise<void>
+  deleteData: (apiPath: string) => Promise<any>
+
+  isEnterprise: boolean
+  isCommunity: boolean
+  isRobot: boolean
+  config: any
+  organizationUnitId: number
+  accessToken: any
 }
 
 /**
@@ -283,7 +377,6 @@ export class OrchestratorApi implements IOrchestratorApi {
 
 export default OrchestratorApi
 
-import { IOrchestratorApi } from './IOrchestratorApi'
 import { RobotCrudService } from './services/RobotCrudService'
 import { RoleCrudService } from './services/RoleCrudService'
 import { MachineCrudService } from './services/MachineCrudService'

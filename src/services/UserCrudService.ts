@@ -1,5 +1,4 @@
-import { IOrchestratorApi } from '../IOrchestratorApi'
-import { BaseCrudService } from '..'
+import { BaseCrudService, IOrchestratorApi } from '..'
 import { getArray, getData, putData, postData, deleteData } from '../utils'
 import { excel2json } from 'excel-csv-read-write'
 import path from 'path'

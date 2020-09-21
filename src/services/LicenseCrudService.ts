@@ -1,8 +1,7 @@
-import { IOrchestratorApi } from '../IOrchestratorApi'
-import { BaseCrudService } from '..'
+import { BaseCrudService, IOrchestratorApi, LicenseNamedUserDto, LicenseRuntimeDto, } from '..'
 import { getArray, getData, putData, postData, deleteData } from '../utils'
 import path from 'path'
-import { ILicenseCrudService, NamedUserLicense, RuntimeLicense } from '../Interfaces'
+import { ILicenseCrudService } from '../Interfaces'
 
 export class LicenseCrudService extends BaseCrudService implements ILicenseCrudService {
   constructor(parent: IOrchestratorApi) {
@@ -17,7 +16,7 @@ export class LicenseCrudService extends BaseCrudService implements ILicenseCrudS
     )
   }
 
-  getRuntimeLicenses(robotType: string, queries?: any, asArray: boolean = true): Promise<RuntimeLicense[]> {
+  getRuntimeLicenses(robotType: string, queries?: any, asArray: boolean = true): Promise<LicenseRuntimeDto[]> {
     return getArray(
       this.parent.config,
       this.parent.accessToken,
@@ -26,7 +25,7 @@ export class LicenseCrudService extends BaseCrudService implements ILicenseCrudS
       asArray,
     )
   }
-  getNamedUserLicenses(robotType: string, queries?: any, asArray: boolean = true): Promise<NamedUserLicense[]> {
+  getNamedUserLicenses(robotType: string, queries?: any, asArray: boolean = true): Promise<LicenseNamedUserDto[]> {
     return getArray(
       this.parent.config,
       this.parent.accessToken,
