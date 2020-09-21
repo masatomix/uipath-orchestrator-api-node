@@ -1,3 +1,5 @@
+import { LicenseDto, NamedUserLicense, RuntimeLicense } from ".";
+
 export interface ICrudService {
   findAll: (obj?: any, asArray?: boolean) => Promise<Array<any>>
   find: (obj?: any) => Promise<any> // licenseなどはパラメタ不要だったりするのでOption
@@ -161,63 +163,6 @@ export interface IUtilService {
   excel2Console(...fullPaths: Array<string>): Promise<void>
 }
 
-export interface RuntimeLicense {
-  Key: string
-  MachineId: number
-  MachineName: string
-  Runtimes: number
-  RobotsCount: number
-  ExecutingCount: number
-  IsOnline: boolean
-  IsLicensed: boolean
-  Enabled: boolean
-}
-
-export interface NamedUserLicense {
-  Key: string
-  UserName: string
-  LastLoginDate: Date
-  MachinesCount: number
-  IsLicensed: boolean
-  IsExternalLicensed: boolean
-  ActiveRobotId: number
-  MachineNames: string[]
-  ActiveMachineNames: string[]
-}
-
-export interface LicenseDto {
-  '@odata.context': string
-  HostLicenseId: number
-  Id: number
-  ExpireDate: number
-  GracePeriodEndDate: number
-  GracePeriod: null
-  AttendedConcurrent: boolean
-  DevelopmentConcurrent: boolean
-  StudioXConcurrent: boolean
-  LicensedFeatures: string[]
-  IsRegistered: boolean
-  IsExpired: boolean
-  CreationTime: Date
-  Code: null
-  Allowed: Allowed
-  Used: Used
-}
-
-export interface Allowed {
-  Unattended: number
-  Attended: number
-  NonProduction: number
-  Development: number
-  StudioX: number
-}
-export interface Used {
-  Unattended: number
-  Attended: number
-  NonProduction: number
-  Development: number
-  StudioX: number
-}
 
 export interface ILicenseCrudService extends ICrudService {
   find(): Promise<LicenseDto>
