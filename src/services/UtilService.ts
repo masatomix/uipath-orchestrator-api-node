@@ -1,4 +1,4 @@
-import { IOrchestratorApi } from '../IOrchestratorApi'
+import { IOrchestratorApi } from '..'
 import { IUtilService } from '../Interfaces'
 import path from 'path'
 import { excel2json } from 'excel-csv-read-write'

@@ -115,9 +115,8 @@ $ npx ts-node ./src/samples/folder/folderSample.ts
 
 ```typescript
 import config from 'config'
-import OrchestratorApi from '../../index'
+import OrchestratorApi, { IOrchestratorApi } from '../../index'
 import { randomName } from '../sampleUtils'
-import { IOrchestratorApi } from '../../IOrchestratorApi'
 
 async function sample() {
   const api = new OrchestratorApi(config)

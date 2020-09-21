@@ -1,5 +1,4 @@
-import { IOrchestratorApi } from '../IOrchestratorApi'
-import { BaseCrudService } from '..'
+import { BaseCrudService, IOrchestratorApi } from '..'
 import { getArray } from '../utils'
 import path from 'path'
 import { IReleaseCrudService } from '../Interfaces'
