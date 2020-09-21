@@ -35,14 +35,14 @@ async function isExecutable(processKey: string, robotName: string, organizationU
 }
 
 // 以下サンプル
-const organizationUnitId = 3
-const processKey = 'Hello2'
-const robotName = 'WINDOWS_ROBO'
+const sampleOrganizationUnitId = 3
+const sampleProcessKey = 'Hello2'
+const sampleRobotName = 'WINDOWS_ROBO'
 
 if (!module.parent) {
-  ;(async () => {
-    const result: boolean = await isExecutable(processKey, robotName, organizationUnitId)
-    console.log(`${robotName} は ${processKey} を実行可能？ ${result}`)
+  (async () => {
+    const result: boolean = await isExecutable(sampleProcessKey, sampleRobotName, sampleOrganizationUnitId)
+    console.log(`${sampleRobotName} は ${sampleProcessKey} を実行可能？ ${result}`)
   })()
 }
 
