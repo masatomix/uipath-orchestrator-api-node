@@ -36,7 +36,8 @@ import {
 import { json2excel, json2excelBlob } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
-export interface RuntimeLicense {
+
+export interface LicenseRuntimeDto {
   Key: string
   MachineId: number
   MachineName: string
@@ -48,7 +49,7 @@ export interface RuntimeLicense {
   Enabled: boolean
 }
 
-export interface NamedUserLicense {
+export interface LicenseNamedUserDto {
   Key: string
   UserName: string
   LastLoginDate: Date
@@ -61,12 +62,11 @@ export interface NamedUserLicense {
 }
 
 export interface LicenseDto {
-  '@odata.context': string
   HostLicenseId: number
   Id: number
   ExpireDate: number
   GracePeriodEndDate: number
-  GracePeriod: null
+  GracePeriod: number
   AttendedConcurrent: boolean
   DevelopmentConcurrent: boolean
   StudioXConcurrent: boolean
@@ -74,12 +74,12 @@ export interface LicenseDto {
   IsRegistered: boolean
   IsExpired: boolean
   CreationTime: Date
-  Code: null
-  Allowed: Allowed
-  Used: Used
+  Code: string
+  Allowed: LicenseFields
+  Used: LicenseFields
 }
 
-export interface Allowed {
+export interface LicenseFields {
   Unattended: number
   Attended: number
   NonProduction: number
@@ -87,13 +87,6 @@ export interface Allowed {
   StudioX: number
 }
 
-export interface Used {
-  Unattended: number
-  Attended: number
-  NonProduction: number
-  Development: number
-  StudioX: number
-}
 
 /**
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)

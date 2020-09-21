@@ -1,4 +1,4 @@
-import { LicenseDto, NamedUserLicense, RuntimeLicense } from ".";
+import { LicenseDto, LicenseNamedUserDto, LicenseRuntimeDto } from '.'
 
 export interface ICrudService {
   findAll: (obj?: any, asArray?: boolean) => Promise<Array<any>>
@@ -166,6 +166,6 @@ export interface IUtilService {
 
 export interface ILicenseCrudService extends ICrudService {
   find(): Promise<LicenseDto>
-  getRuntimeLicenses(robotType: string): Promise<Array<RuntimeLicense>>
-  getNamedUserLicenses(robotType: string): Promise<Array<NamedUserLicense>>
+  getRuntimeLicenses(robotType: string): Promise<Array<LicenseRuntimeDto>>
+  getNamedUserLicenses(robotType: string): Promise<Array<LicenseNamedUserDto>>
 }
