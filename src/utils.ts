@@ -2,7 +2,7 @@ import request from 'request'
 import { getLogger } from './logger'
 import fs from 'fs'
 import path from 'path'
-import { IOrchestratorApi } from './IOrchestratorApi'
+import { IOrchestratorApi } from '.'
 
 const logger = getLogger('main')
 const httpLogger = getLogger('httpLogger')

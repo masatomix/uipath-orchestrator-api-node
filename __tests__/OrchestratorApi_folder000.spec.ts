@@ -3,7 +3,7 @@ import { getLogger } from '../src/logger'
 import { randomName } from '../src/samples/sampleUtils'
 import config from 'config'
 import path from 'path'
-import { IOrchestratorApi } from '../src/IOrchestratorApi'
+import { IOrchestratorApi } from '../src/'
 import { excel2json } from 'excel-csv-read-write'
 
 const logger = getLogger('main')

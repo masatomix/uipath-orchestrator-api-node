@@ -1,5 +1,4 @@
-import { IOrchestratorApi } from '../IOrchestratorApi'
-import { BaseCrudService } from '..'
+import { BaseCrudService, IOrchestratorApi } from '..'
 import { getArray, getData, putData, postData, deleteData } from '../utils'
 import path from 'path'
 import { IQueueItemCrudService } from '../Interfaces'

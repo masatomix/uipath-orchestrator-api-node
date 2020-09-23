@@ -37,6 +37,56 @@ import { json2excel, json2excelBlob } from 'excel-csv-read-write'
 
 const logger = getLogger('main')
 
+export interface LicenseRuntimeDto {
+  Key: string
+  MachineId: number
+  MachineName: string
+  Runtimes: number
+  RobotsCount: number
+  ExecutingCount: number
+  IsOnline: boolean
+  IsLicensed: boolean
+  Enabled: boolean
+}
+
+export interface LicenseNamedUserDto {
+  Key: string
+  UserName: string
+  LastLoginDate: Date
+  MachinesCount: number
+  IsLicensed: boolean
+  IsExternalLicensed: boolean
+  ActiveRobotId: number
+  MachineNames: string[]
+  ActiveMachineNames: string[]
+}
+
+export interface LicenseDto {
+  HostLicenseId: number
+  Id: number
+  ExpireDate: number
+  GracePeriodEndDate: number
+  GracePeriod: number
+  AttendedConcurrent: boolean
+  DevelopmentConcurrent: boolean
+  StudioXConcurrent: boolean
+  LicensedFeatures: string[]
+  IsRegistered: boolean
+  IsExpired: boolean
+  CreationTime: Date
+  Code: string
+  Allowed: LicenseFields
+  Used: LicenseFields
+}
+
+export interface LicenseFields {
+  Unattended: number
+  Attended: number
+  NonProduction: number
+  Development: number
+  StudioX: number
+}
+
 /**
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
  */
@@ -82,6 +132,49 @@ export class BaseCrudService implements ICrudService {
 }
 
 /**
+ * Orchestrator API Wrapper
+ * cf. https://docs.uipath.com/orchestrator/v2019/reference
+ */
+export interface IOrchestratorApi {
+  authenticate: () => Promise<any>
+  license: ILicenseCrudService
+  robot: IRobotCrudService
+  user: IUserCrudService
+  role: IRoleCrudService
+  machine: IMachineCrudService
+  release: IReleaseCrudService
+  process: IProcessCrudService
+  library: IProcessCrudService
+  job: IJobCrudService
+  schedule: ICrudService
+  folder: IFolderCrudService
+  queueDefinition: IQueueDefinitionCrudService
+  queueItem: IQueueItemCrudService
+  queueOperation: IQueueCrudService
+  log: ILogCrudService
+  auditLog: IAuditLogCrudService
+  setting: ISettingCrudService
+  asset: IAssetCrudService
+  util: IUtilService
+  tenant: ITenantCrudService
+  hostLicense: IHostLicenseCrudService
+  environment: IEnvironmentCrudService
+  // 以下、汎用的なメソッド
+  getArray: (apiPath: string, queries?: any) => Promise<Array<any>>
+  getData: (apiPath: string) => Promise<any>
+  postData: (apiPath: string, obj: any) => Promise<any>
+  putData: (apiPath: string, obj: any) => Promise<void>
+  deleteData: (apiPath: string) => Promise<any>
+
+  isEnterprise: boolean
+  isCommunity: boolean
+  isRobot: boolean
+  config: any
+  organizationUnitId: number
+  accessToken: string
+}
+
+/**
  * OrchestratorのAPIのWrapperクラス
  * (Mainのクラスです)
  */
@@ -101,20 +194,16 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   constructor(public config: any) {
-    if (config.token) {
-      this.accessToken = config.token.accessToken
-      return
-    }
     // Enterpriseだったら、trueにする
-    if (!this.config.serverinfo.client_id) {
-      // serverinfo.client_idプロパティがなければEnterprise
+    if (!this.config.serverinfo.tenant_logical_name) {
+      // serverinfo.tenant_logical_nameプロパティがなければEnterprise
       this.isEnterprise = true
     } else {
     }
     this.isCommunity = !this.isEnterprise // Enterpriseの逆にする。
 
-    // Enterprise/Community判定は client_id があるなしだけの判定なので、
-    // client_idナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
+    // Enterprise/Community判定は tenant_logical_name があるなしだけの判定なので、
+    // tenant_logical_nameナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
     if (this.config.robotInfo) {
       this.isRobot = true
     } else {
@@ -130,8 +219,9 @@ export class OrchestratorApi implements IOrchestratorApi {
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
-    if (this.config.token) {
+    if (this.config.token && this.config.token.access_token !== '') {
       logger.info('Tokenモードとして処理開始')
+      this.accessToken = this.config.token.access_token
       promise = new Promise((resolve, reject) => {
         resolve()
       })
@@ -283,7 +373,6 @@ export class OrchestratorApi implements IOrchestratorApi {
 
 export default OrchestratorApi
 
-import { IOrchestratorApi } from './IOrchestratorApi'
 import { RobotCrudService } from './services/RobotCrudService'
 import { RoleCrudService } from './services/RoleCrudService'
 import { MachineCrudService } from './services/MachineCrudService'
