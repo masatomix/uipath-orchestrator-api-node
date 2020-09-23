@@ -87,7 +87,6 @@ export interface LicenseFields {
   StudioX: number
 }
 
-
 /**
  * Interfaceのデフォルト実装(全部でOverrideするのはメンドイので)
  */
@@ -172,7 +171,7 @@ export interface IOrchestratorApi {
   isRobot: boolean
   config: any
   organizationUnitId: number
-  accessToken: any
+  accessToken: string
 }
 
 /**
@@ -195,20 +194,16 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   constructor(public config: any) {
-    if (config.token) {
-      this.accessToken = config.token.accessToken
-      return
-    }
     // Enterpriseだったら、trueにする
-    if (!this.config.serverinfo.client_id) {
-      // serverinfo.client_idプロパティがなければEnterprise
+    if (!this.config.serverinfo.tenant_logical_name) {
+      // serverinfo.tenant_logical_nameプロパティがなければEnterprise
       this.isEnterprise = true
     } else {
     }
     this.isCommunity = !this.isEnterprise // Enterpriseの逆にする。
 
-    // Enterprise/Community判定は client_id があるなしだけの判定なので、
-    // client_idナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
+    // Enterprise/Community判定は tenant_logical_name があるなしだけの判定なので、
+    // tenant_logical_nameナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
     if (this.config.robotInfo) {
       this.isRobot = true
     } else {
@@ -224,8 +219,9 @@ export class OrchestratorApi implements IOrchestratorApi {
     // Enterprise版かCommunity版かで認証処理が異なるので、設定ファイルによって振り分ける。
     let promise: Promise<any>
 
-    if (this.config.token) {
+    if (this.config.token && this.config.token.access_token !== '') {
       logger.info('Tokenモードとして処理開始')
+      this.accessToken = this.config.token.access_token
       promise = new Promise((resolve, reject) => {
         resolve()
       })
