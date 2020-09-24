@@ -169,6 +169,7 @@ export interface IOrchestratorApi {
   isEnterprise: boolean
   isCommunity: boolean
   isRobot: boolean
+  isToken: boolean
   config: any
   organizationUnitId: number
   accessToken: string
@@ -182,6 +183,7 @@ export class OrchestratorApi implements IOrchestratorApi {
   isEnterprise: boolean = false
   isCommunity: boolean = false
   isRobot: boolean = false
+  isToken: boolean = false
   accessToken: string = ''
 
   get organizationUnitId() {
@@ -194,19 +196,15 @@ export class OrchestratorApi implements IOrchestratorApi {
   }
 
   constructor(public config: any) {
-    // Enterpriseだったら、trueにする
-    if (!this.config.serverinfo.tenant_logical_name) {
-      // serverinfo.tenant_logical_nameプロパティがなければEnterprise
-      this.isEnterprise = true
-    } else {
-    }
-    this.isCommunity = !this.isEnterprise // Enterpriseの逆にする。
+    const { isEnterprise, isCommunity, isRobot, isToken } = getConfigState(config)
+    this.isEnterprise = isEnterprise
+    this.isCommunity = isCommunity
+    this.isRobot = isRobot
+    this.isToken = isToken
 
-    // Enterprise/Community判定は tenant_logical_name があるなしだけの判定なので、
-    // tenant_logical_nameナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
-    if (this.config.robotInfo) {
-      this.isRobot = true
-    } else {
+    // 全部falseだったら、エラーなので例外で落とす。
+    if (!(this.isEnterprise || this.isCommunity || this.isRobot)) {
+      throw new Error('Invalid Configuration.')
     }
   }
 
@@ -369,6 +367,46 @@ export class OrchestratorApi implements IOrchestratorApi {
   deleteData = (apiPath: string): Promise<any> => {
     return deleteData(this.config, this.accessToken, apiPath)
   }
+}
+
+/**
+ * 与えられたConfigの状態
+ */
+export const getConfigState = (
+  config: any,
+): {
+  isEnterprise: boolean
+  isCommunity: boolean
+  isRobot: boolean
+  isToken: boolean
+} => {
+  let isEnterprise = false
+  let isCommunity = false
+  let isRobot = false
+  let isToken = false
+
+  if (config.token && config.token.access_token !== '') {
+    isToken = true
+  }
+  if (config.serverinfo) {
+    // Enterpriseだったら、trueにする
+    if (!config.serverinfo.tenant_logical_name) {
+      // serverinfo.tenant_logical_nameプロパティがなければEnterprise
+      isEnterprise = true
+    } else {
+      //
+    }
+    isCommunity = !isEnterprise // Enterpriseの逆にする。
+
+    // Enterprise/Community判定は tenant_logical_name があるなしだけの判定なので、
+    // tenant_logical_nameナシかつ robotInfoだけあれば、userinfoなくてもロボットモードで動くようにする
+    if (config.robotInfo) {
+      isRobot = true
+    } else {
+      //
+    }
+  }
+  return { isEnterprise, isCommunity, isRobot, isToken }
 }
 
 export default OrchestratorApi
