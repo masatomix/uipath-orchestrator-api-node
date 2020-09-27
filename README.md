@@ -468,6 +468,7 @@ const api2 = new OrchestratorApi({
 ## Revision history
 
 改訂履歴
+- 0.8.2 tokenモードでauthenticate したときにエラー処理を追加した。
 - 0.8.1 Tokenを直接渡されたときのFlag isToken を追加
 - 0.8.0 Interfaceファイルの場所変更、getRuntimeLicenses、getNamedUserLicenses などのDto名変更など
 - 0.7.9 ライセンスの利用状況を取得するメソッド``license.getRuntimeLicenses``,``license.getNamedUserLicenses``を追加
