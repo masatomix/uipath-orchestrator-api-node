@@ -220,8 +220,12 @@ export class OrchestratorApi implements IOrchestratorApi {
     if (this.config.token && this.config.token.access_token !== '') {
       logger.info('Tokenモードとして処理開始')
       this.accessToken = this.config.token.access_token
+
+      // とりあえず、マシン一覧を取ることで、エラーが出たらトークンがつかえないと見なす。
       promise = new Promise((resolve, reject) => {
-        resolve()
+        getArray(this.config, this.accessToken, '/odata/Machines')
+          .then(() => resolve())
+          .catch((error) => reject(error))
       })
     } else if (this.isRobot) {
       logger.info('Robotモードとして処理開始')

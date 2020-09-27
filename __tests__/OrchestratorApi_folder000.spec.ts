@@ -21,7 +21,7 @@ describe('OrchestratorApi_folder000', () => {
   })
 
   it('Normal Case.', async () => {
-    jest.setTimeout(10000)
+    jest.setTimeout(20000)
     // // サンプル1: Folderの検索
     // await searchSample(api)
 
