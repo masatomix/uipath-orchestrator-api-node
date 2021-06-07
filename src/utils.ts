@@ -147,6 +147,7 @@ const createArrayPromise = (option: any, isOdata: boolean): Promise<Array<any>> 
       if (response.statusCode >= 400) {
         logger.error(body)
         reject(new NetworkAccessError(response.statusCode, body))
+        return 
       }
       logger.debug(body)
       const obj = JSON.parse(body)

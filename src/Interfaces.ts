@@ -168,4 +168,7 @@ export interface ILicenseCrudService extends ICrudService {
   find(): Promise<LicenseDto>
   getRuntimeLicenses(robotType: string): Promise<Array<LicenseRuntimeDto>>
   getNamedUserLicenses(robotType: string): Promise<Array<LicenseNamedUserDto>>
+  getLicensesRuntimeEx(robotType: string): Promise<Array<LicenseRuntimeDto>>
+  getLicensesNamedUserEx(robotType: string): Promise<Array<LicenseNamedUserDto>>
+  
 }
