@@ -1,6 +1,6 @@
 {
   "name": "uipath-orchestrator-api-node",
-  "version": "0.8.3-SNAPSHOT",
+  "version": "0.8.4-SNAPSHOT",
   "description": "UiPath Orchestrator API wrapper for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -69,7 +69,7 @@
   "dependencies": {
     "bunyan": "^1.8.14",
     "config": "^3.3.1",
-    "excel-csv-read-write": "^0.1.4",
+    "excel-csv-read-write": "^0.1.5",
     "request": "^2.88.2"
   }
 }
